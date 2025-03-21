@@ -1,0 +1,850 @@
+# -*- Tcl -*-
+package prefer latest
+package require nx
+package require nx::test
+
+#::nx::configure defaultMethodCallProtection false
+
+nx::test configure -count 10
+nx::test case alias-preliminaries { 
+  
+  # The system methods of nx::VariableSlot are either alias or forwarders
+  ? {lsort [::nx::VariableSlot info methods -type alias]} {value=get value=set}
+  ? {::nx::VariableSlot info method definition value=get} \
+      "::nx::VariableSlot public alias value=get ::nsf::var::get"
+
+  # define an alias and retrieve its definition
+  set cmd "::nx::Object public alias set ::set"
+  eval $cmd
+  ? {nx::Object info method definition set} $cmd
+
+  # define an alias and retrieve its definition
+  set cmd "::nx::Object public alias set -frame method ::set"
+  eval $cmd
+  ? {nx::Object info method definition set} $cmd
+
+  # define an alias and retrieve its definition
+  set cmd "::nx::Object public alias set -frame object ::set"
+  eval $cmd
+  ? {nx::Object info method definition set} $cmd
+  
+  proc ::foo {} {return foo}
+  ? {nx::Object alias foo -frame object ::foo} \
+      "cannot use -frame object|method in alias for scripted command '::foo'"
+  ? {nx::Object alias foo -frame method ::foo} \
+      "cannot use -frame object|method in alias for scripted command '::foo'"
+  ? {nx::Object alias foo -frame default ::foo} "::nsf::classes::nx::Object::foo"
+
+}
+
+nx::test case alias-simple { 
+  # define an alias and retrieve its definition
+  nx::Class create Base {
+    :public method foo {{-x 1}} {return $x}
+  }
+
+  nx::Class create Foo
+  ? {::nsf::method::alias ::Foo foo ::nsf::classes::Base::foo} "::nsf::classes::Foo::foo"
+  
+  ? {Foo info method definition foo} "::Foo public alias foo ::nsf::classes::Base::foo"
+  
+  Foo create f1
+  ? {f1 foo} 1
+  ? {f1 foo -x 2} 2
+  ? {Foo info methods -type alias} "foo"
+  
+  ? {Base info methods -type scripted} {foo}
+  ? {Foo info methods -type scripted} {}
+  ? {Foo info methods -type alias} {foo}
+  Base public method foo {} {}
+  #WITH_IMPORT_REFS
+  #? {Foo info methods -type alias} ""
+  ? {Base info methods -type scripted} {}
+  ? {Foo info methods -type scripted} {}
+  #WITH_IMPORT_REFS
+  #? {Foo info method definition foo} ""
+  ? {Foo info method definition foo} "::Foo public alias foo ::nsf::classes::Base::foo"
+  
+
+  Base public method foo {{-x 1}} {return $x}
+  ::nsf::method::alias ::Foo foo ::nsf::classes::Base::foo
+  
+  ? {Base info methods -type scripted} {foo} "defined again"
+  ? {Foo info methods -type alias} {foo} "aliased again"
+  Foo public method foo {} {}
+  ? {Base info methods -type scripted} {foo} "still defined"
+  ? {Foo info methods -type alias} {} "removed"
+}
+
+nx::test case alias-chaining {
+  #
+  # chaining aliases
+  #
+  
+  nx::Class create T
+  nx::Class create S
+  T create t
+  S create s
+  
+  
+  T public method foo args { return [current class]->[current method] }
+  ::nsf::method::alias T FOO ::nsf::classes::T::foo 
+  
+  ? {t foo} ::T->foo
+  ? {t FOO} ::T->FOO
+  
+  ? {lsort [T info methods]} {FOO foo}
+  T method foo {} {}
+  #WITH_IMPORT_REFS
+  #? {lsort [T info methods]} {} "alias is deleted"
+  ? {lsort [T info methods]} {FOO} "alias is deleted"
+  
+  # puts stderr "double indirection"
+  T public method foo args { return [current class]->[current method] }
+  ::nsf::method::alias T FOO ::nsf::classes::T::foo 
+  ::nsf::method::alias S BAR ::nsf::classes::T::FOO
+  
+  ? {T info methods -type alias} "FOO"
+  ? {T info method definition FOO} "::T public alias FOO ::nsf::classes::T::foo"
+  ? {lsort [T info methods]} {FOO foo}
+  ? {S info methods} {BAR}
+  T method FOO {} {}
+  ? {T info methods} {foo}
+  ? {S info methods} {BAR}
+  ? {s BAR} ::S->BAR
+  ? {t foo} ::T->foo
+  ? {S info method definition BAR} "::S public alias BAR ::nsf::classes::T::FOO"
+  
+  
+  T public method foo {} {}
+  ? {T info methods} {}
+  #WITH_IMPORT_REFS
+  #? {S info methods} {}
+  ? {S info methods} {BAR}
+  
+  T public method foo args { return [current class]->[current method] }
+  ::nsf::method::alias T FOO ::nsf::classes::T::foo 
+  ::nsf::method::alias S BAR ::nsf::classes::T::FOO
+  
+  ? {lsort [T info methods]} {FOO foo}
+  ? {S info methods} {BAR}
+  T public method foo {} {}
+  #WITH_IMPORT_REFS
+  #? {S info methods} {}
+  ? {S info methods} {BAR}
+  #WITH_IMPORT_REFS
+  #? {T info methods} {}
+  ? {T info methods} {FOO}
+  
+  T public method foo args { return [current class]->[current method] }
+  T public object method bar args { return [current class]->[current method] }
+  ::nsf::method::alias T -per-object FOO ::nsf::classes::T::foo 
+  ::nsf::method::alias T -per-object BAR ::T::FOO 
+  ::nsf::method::alias T -per-object ZAP ::T::BAR 
+  #WITH_IMPORT_REFS
+  #? {T info methods} {foo}
+  ? {T info methods} {foo FOO}
+  ? {lsort [T info object methods -type alias]} {BAR FOO ZAP}
+  ? {lsort [T info object methods]} {BAR FOO ZAP bar}
+  ? {t foo} ::T->foo
+  ? {T info object method definition ZAP} {::T public object alias ZAP ::T::BAR}
+  
+  ? {T FOO} ->FOO
+  ? {T BAR} ->BAR
+  ? {T ZAP} ->ZAP
+  ? {T bar} ->bar
+  T object method FOO {} {}
+  #WITH_IMPORT_REFS
+  #? {T info methods} {foo}
+  ? {T info methods} {foo FOO}
+  ? {lsort [T info object methods]} {BAR ZAP bar}
+  ? {T BAR} ->BAR
+  ? {T ZAP} ->ZAP
+  rename ::T::BAR ""
+  #WITH_IMPORT_REFS
+  #? {T info methods} {foo}
+  ? {T info methods} {foo FOO}
+  ? {lsort [T info object methods]} {ZAP bar}
+  ? {T ZAP} ->ZAP; # is ok, still pointing to 'foo'
+  #WITH_IMPORT_REFS
+  #? {T info methods} {foo}
+  ? {T info methods} {foo FOO}
+  ? {lsort [T info object methods]} {ZAP bar}
+  ? {T ZAP} ->ZAP
+  T public method foo {} {}
+  #WITH_IMPORT_REFS
+  #? {T info methods} {}
+  ? {T info methods} {FOO}
+  #WITH_IMPORT_REFS
+  #? {lsort [T info object methods]} {bar}
+  ? {lsort [T info object methods]} {ZAP bar}
+}
+
+nx::test case alias-per-object {
+
+  nx::Class create T {
+    :public object method bar args { return [current class]->[current method] }
+    :create t
+  }
+  proc ::foo args { return [current class]->[current method] }
+
+  #
+  # per-object methods as per-object aliases
+  #
+  T public object method m1 args { return [current class]->[current method] }
+  ::nsf::method::alias T -per-object M1 ::T::m1 
+  ::nsf::method::alias T -per-object M11 ::T::M1 
+  ? {lsort [T info object methods]} {M1 M11 bar m1}
+  ? {T m1} ->m1
+  ? {T M1} ->M1
+  ? {T M11} ->M11
+  T object method M1 {} {}
+  ? {lsort [T info object methods]} {M11 bar m1}
+  ? {T m1} ->m1
+  ? {T M11} ->M11
+  T object method m1 {} {}
+  #WITH_IMPORT_REFS
+  #? {lsort [T info object methods]} {bar}
+  ? {lsort [T info object methods]} {M11 bar}
+  
+  #
+  # a proc as alias
+  #
+  
+  proc foo args { return [current class]->[current method] }
+  ::nsf::method::alias T FOO1 ::foo 
+  ::nsf::method::alias T -per-object FOO2 ::foo
+  #
+  # ! per-object alias referenced as per-class alias !
+  #
+  ::nsf::method::alias T BAR ::T::FOO2
+  #WITH_IMPORT_REFS
+  #? {lsort [T info object methods]} {FOO2 bar}
+  ? {lsort [T info object methods]} {FOO2 M11 bar}
+  ? {lsort [T info methods]} {BAR FOO1}
+  ? {T FOO2} ->FOO2
+  ? {t FOO1} ::T->FOO1
+  ? {t BAR} ::T->BAR
+  #
+  # delete proc
+  #
+  rename ::foo ""
+  #WITH_IMPORT_REFS
+  #? {lsort [T info object methods]} {bar}
+  ? {lsort [T info object methods]} {FOO2 M11 bar}
+  #WITH_IMPORT_REFS
+  #? {lsort [T info methods]} {}
+  ? {lsort [T info methods]} {BAR FOO1}
+}
+
+
+# namespaced procs + namespace deletion
+nx::test case alias-namespaced {
+  nx::Class create T {
+    :public object method bar args { return [current class]->[current method] }
+    :create t
+  }
+  
+  namespace eval ::ns1 {
+    proc foo args { return [current class]->[current method] }
+    proc bar args { return [uplevel 1 {set _}] }
+    proc bar2 args { upvar 1 _ __; return $__}
+  }
+  
+  ::nsf::method::alias T FOO ::ns1::foo
+  ::nsf::method::alias T BAR ::ns1::bar
+  ::nsf::method::alias T BAR2 ::ns1::bar2
+  ? {lsort [T info methods]} {BAR BAR2 FOO}
+  set ::_ GOTYA
+  ? {t FOO} ::T->FOO
+  ? {t BAR} GOTYA
+  ? {t BAR2} GOTYA
+  namespace delete ::ns1
+  ? {info procs ::ns1::*} {}
+  #WITH_IMPORT_REFS
+  #? {lsort [T info methods]} {}
+  ? {lsort [T info methods]} {BAR BAR2 FOO}
+  
+  # per-object namespaces
+  
+  nx::Class create U
+  U create u
+  ? {namespace exists ::U} 0
+  U public object method zap args { return [current class]->[current method] }
+  ::nsf::method::alias ::U -per-object ZAP ::U::zap 
+  U require namespace
+  ? {namespace exists ::U} 1
+  
+  U public object method bar args { return [current class]->[current method] }
+  ::nsf::method::alias U -per-object BAR ::U::bar
+  ? {lsort [U info object methods]} {BAR ZAP bar zap}
+  ? {U BAR} ->BAR
+  ? {U ZAP} ->ZAP
+  namespace delete ::U
+  ? {namespace exists ::U} 0
+  ? {lsort [U info object methods]} {}
+  ? {U info lookup methods BAR} ""
+  ? {U info lookup methods ZAP} ""
+  
+  ::U destroy
+}
+
+# dot-resolver/ dot-dispatcher used in aliased proc
+
+nx::test case alias-dot-resolver {
+
+  nx::Class create V {
+    set :z 1
+    :public method bar {z} { return $z }
+    :public object method bar {z} { return $z }
+    :create v {
+      set :z 2
+    }
+  }
+  ? {lsort [V info vars]} {z}
+
+  ? {lsort [V info vars]} {z}
+  ? {lsort [v info vars]} {z}
+
+  proc ::foo args { return [:bar ${:z}]-[set :z]-[:bar [set :z]] }
+
+  ::nsf::method::alias V FOO1 ::foo 
+  ::nsf::method::alias V -per-object FOO2 ::foo
+
+  ? {lsort [V info object methods]} {FOO2 bar}
+  ? {lsort [V info methods]} {FOO1 bar}
+
+  ? {V FOO2} 1-1-1
+  ? {v FOO1} 2-2-2
+  V public method FOO1 {} {}
+  ? {lsort [V info methods]} {bar}
+  rename ::foo ""
+  #WITH_IMPORT_REFS
+  #? {lsort [V info object methods]} {bar}
+  ? {lsort [V info object methods]} {FOO2 bar}
+}
+
+nx::test case alias-store
+#
+# Tests for the ::nsf::method::alias store, used for introspection for
+# aliases. The alias store (an associative variable) is mostly
+# necessary for the direct aliases (e.g. aliases to C implemented
+# tcl commands), for which we have no stubs at the place where the
+# alias was registered.
+#
+
+#
+# structure of the ::nsf::method::alias store:
+# <object>,<alias_name>,<per_object> -> <aliased_cmd>
+#
+
+nx::Object create o
+nx::Class create C
+
+? {o public object method bar args {;}} ::o::bar
+? {o info object methods bar} bar
+? {info commands ::o::bar} ::o::bar "a command ::o::bar exists"
+
+? {info vars ::nsf::alias} ::nsf::alias
+? {array exists ::nsf::alias} 1 
+
+proc ::foo args {;}
+? {::nsf::method::alias ::o FOO ::foo} ::o::FOO
+? {::nsf::method::alias ::C FOO ::foo} ::nsf::classes::C::FOO
+
+? {info commands ::o::FOO} ::o::FOO
+? {info commands ::nsf::classes::C::FOO} ::nsf::classes::C::FOO
+
+
+? {info exists ::nsf::alias(::o,FOO,1)} 1
+? {info exists ::nsf::alias(::C,FOO,0)} 1
+? {array get ::nsf::alias ::o,FOO,1} "::o,FOO,1 ::foo"
+? {array get ::nsf::alias ::C,FOO,0} "::C,FOO,0 ::foo"
+? {o info object method definition FOO} "::o public object alias FOO ::foo"
+? {C info method definition FOO} "::C public alias FOO ::foo"
+
+? {::nsf::method::alias o FOO ::o::bar} ::o::FOO "redefine alias ::o::FOO"
+? {info exists ::nsf::alias(::o,FOO,1)} 1
+? {array get ::nsf::alias ::o,FOO,1} "::o,FOO,1 ::o::bar"
+? {o info object method definition FOO} "::o public object alias FOO ::o::bar"
+
+# AliasDelete in RemoveObjectMethod
+o public object method FOO {} {}
+? {info exists ::nsf::alias(::o,FOO,1)} 0
+? {array get ::nsf::alias ::o,FOO,1} ""
+? {o info object method definition FOO} ""
+
+# AliasDelete in RemoveClassMethod
+C public method FOO {} {}
+? {info exists ::nsf::alias(::C,FOO,0)} 0
+? {array get ::nsf::alias ::C,FOO,0} ""
+? {C info method definition FOO} ""
+
+? {info commands ::foo}                ::foo     "the target command ::foo exists"
+? {::nsf::method::alias ::o BAR ::foo} ::o::BAR
+? {::nsf::method::alias ::C BAR ::foo} ::nsf::classes::C::BAR
+
+# AliasDelete in AddObjectMethod
+? {info exists ::nsf::alias(::o,BAR,1)} 1 "delete alias via redefinition of an object method (alias exists still)"
+? {info commands ::o::BAR} ::o::BAR
+? {info commands ::BAR} ""
+? {::o public object method BAR {} {;}} ::o::BAR
+? {o info object methods BAR} BAR
+? {info commands ::o::BAR} ::o::BAR          "a command ::o::BAR exists"
+? {info commands ::BAR} ""
+? {info exists ::nsf::alias(::o,BAR,1)} 0 "::o::BAR is not an alias"
+
+# AliasDelete in AddInstanceMethod
+? {info exists ::nsf::alias(::C,BAR,0)} 1 "delete alias via redefinition of a an instance method"
+::C public method BAR {} {;}
+? {info exists ::nsf::alias(::C,BAR,0)} 0
+? {info commands ::o::BAR} ::o::BAR "a command ::o::BAR does not exist"
+
+# AliasDelete in aliasCmdDeleteProc
+::nsf::method::alias o FOO ::foo
+? {info exists ::nsf::alias(::o,FOO,1)} 1 "delete alias via deleting the aliased proc via Tcl"
+rename ::foo ""
+#WITH_IMPORT_REFS
+#? {info exists ::nsf::alias(::o,FOO,1)} 0
+? {info exists ::nsf::alias(::o,FOO,1)} 1
+
+? {info commands ::o::bar} ::o::bar              "::o::bar does not exist"
+? {info commands ::o::FOO} ::o::FOO              "a command ::o::FOO' exists"
+? {info commands ::o::BAR} ::o::BAR              "a command ::o::BAR does not exist"
+? {::nsf::method::alias o FOO ::o::bar} ::o::FOO "redefine an object alias based on existing (?) ::o::bar"
+? {::nsf::method::alias o BAR ::o::FOO} ::o::BAR "define an object alias based on alias based on existing (?) ::o::bar"
+? {info exists ::nsf::alias(::o,FOO,1)} 1
+? {info exists ::nsf::alias(::o,BAR,1)} 1
+o public object method bar {} {}
+#WITH_IMPORT_REFS
+#? {info exists ::nsf::alias(::o,FOO,1)} 0
+? {info exists ::nsf::alias(::o,FOO,1)} 1
+#WITH_IMPORT_REFS
+#? {info exists ::nsf::alias(::o,BAR,1)} 0
+? {info exists ::nsf::alias(::o,BAR,1)} 1
+
+#
+# pulling the rug out from the proc-alias deletion mechanism
+#
+
+proc ::foo args {;}
+::nsf::method::alias C FOO ::foo
+? {info exists ::nsf::alias(::C,FOO,0)} 1
+unset ::nsf::alias(::C,FOO,0)
+? {info exists ::nsf::alias(::C,FOO,0)} 0
+? {C info method definition FOO} ""
+? {C info methods -type alias} FOO
+rename ::foo ""
+#WITH_IMPORT_REFS
+#? {C info methods -type alias} ""
+? {C info methods -type alias} "FOO"
+? {info exists ::nsf::alias(::C,FOO,0)} 0
+? {C info method definition FOO} ""
+
+#
+# test renaming of Tcl proc (actually sensed by the alias, though not
+# reflected by the alias definition store)
+# a) is this acceptable?
+# b) sync ::nsf::method::alias upon "info method definition" calls? is this feasible,
+# e.g. through rename traces?
+#
+
+C create c
+proc ::foo args { return [current]->[current method]}
+? {info exists ::nsf::alias(::C,FOO,0)} 0
+::nsf::method::alias C FOO ::foo
+::nsf::method::alias C FOO2 ::foo
+? {info exists ::nsf::alias(::C,FOO,0)} 1
+? {lsort [C info methods -type alias]} {FOO FOO2}
+# Rename target, such that alias points to an invalid item
+# Note that removing the target works differently (makes cleanup)
+# rename ::foo ""
+rename ::foo ::foo2
+? {info exists ::nsf::alias(::C,FOO,0)} 1
+? {lsort [C info methods -type alias]} {FOO FOO2}
+? {c FOO} {target "::foo" of alias FOO apparently disappeared}
+? {C info method definition FOO} "::C public alias FOO ::foo"
+unset ::nsf::alias(::C,FOO,0)
+? {c FOO} {could not obtain alias definition for ::C FOO.}
+? {c FOO2} {target "::foo" of alias FOO2 apparently disappeared}
+rename ::foo2 ::foo
+? {c FOO} {could not obtain alias definition for ::C FOO.}
+? {c FOO2} {::c->FOO2}
+
+#
+# Check resolving of namespace imported classes
+# and when a class is aliased via "interp alias"
+#
+nx::test case class-resolve {
+  namespace eval ::ns1 {
+    nx::Class create A {:public method foo {} {::nx::current class}}
+    nx::Class create B {:public method foo {} {::nx::current class}}
+    namespace export A
+  }
+  
+  namespace eval ::ns2 {
+    # namespace import Class A from namespace ns1
+    namespace import ::ns1::A
+    ? {A create a1} ::ns2::a1
+    ? {nx::Class create C -superclass A} ::ns2::C
+    ? {C create c1} ::ns2::c1
+    ? {c1 foo} ::ns1::A
+
+    # "import" Class B from namespace ns1 via interp-alias
+    interp alias {} ::ns2::B {} ::ns1::B
+    ? {B create b1} ::ns2::b1
+    ? {b1 foo} ::ns1::B
+    ? {nx::Class create D -superclass B} ::ns2::D
+    ? {D create d1} ::ns2::d1
+    ? {d1 foo} ::ns1::B
+  }
+}
+
+nx::test configure -count 10
+nx::test case proc-alias {
+
+  nx::Class create C {
+    :public method foo {} {upvar x y; info exists y}
+    :public method bar {} {set x 1; :foo}
+
+    :public alias bar_ [:info method registrationhandle bar]
+    :public alias foo_ [:info method registrationhandle foo]
+    :public method bar2 {} {set x 1; :foo_}
+
+    :create c1
+  }
+  
+  nx::Class create D {
+    :public method foo {} {:upvar x y; info exists y}
+    :public method bar {} {set x 1; :foo}
+
+    :public alias foo_ [:info method registrationhandle foo]
+    :public alias bar_ [:info method registrationhandle bar]
+    :public method bar2 {} {set x 1; :foo_}
+
+    :create d1
+  }
+
+  nx::Class create M {
+    :public method foo args next
+    :public method bar args next
+    :public method foo_ args next
+    :public method bar_ args next
+    :public method bar_ args next
+  }
+  
+  ? {c1 bar} 1
+  ? {c1 bar_} 1
+  ? {c1 bar2} 1
+
+  ? {d1 bar} 1
+  ? {d1 bar_} 1
+  ? {d1 bar2} 1
+
+  c1 object mixins add M
+
+  ? {c1 bar} 0   ;# upvar reaches into to mixin method
+  ? {c1 bar_} 0  ;# upvar reaches into to mixin method
+  ? {c1 bar2} 0  ;# upvar reaches into to mixin method
+
+  d1 object mixins add M
+
+  ? {d1 bar} 1
+  ? {d1 bar_} 1
+  ? {d1 bar2} 1
+
+}
+
+proc foo {:a :b} {
+  set :c 1
+  return ${:a}  
+}
+foo 1 2
+
+proc bar {:a :b} {
+  set :b 1
+  set :x 47
+  return [info exists :d]-${:a}-${:x}
+}
+
+proc baz {} {
+  set :z 3
+  return ${:z}  
+}
+
+nx::test configure -count 10
+nx::test case proc-alias-compile {
+
+  nx::Object create o {
+    set :a 100
+    set :d 1001
+    #:method foo {-:a:integer :b :c:optional} {
+    #  puts stderr ${:a},${:b},${:c}
+    #}
+    :public object alias foo ::foo
+    :public object alias bar ::bar
+    :public object alias baz ::baz
+  }
+
+  #
+  # by calling "foo" outside the object/method context, we get a
+  # byte-code without the compiled-local handler, colon-vars are not
+  # recognized, :a refers to the argument
+  ? {foo 1 2} 1
+  ? {lsort [o info vars]} "a d"
+
+  ? {o foo 1 2} 1
+  ? {lsort [o info vars]} "a d"
+
+  #
+  # by calling "bar" the first time as a method, we get a byte-code with
+  # the compiled-local handler, colon-vars are recognized, colon vars
+  # from the argument vector have precedence over instance variables.
+  ? {o bar 2 3} 1-2-47
+  ? {lsort [o info vars]} "a d x"
+
+  ? {o baz} 3
+  ? {lsort [o info vars]} "a d x z"
+  #
+  # by calling "bar" outside the proc context, the compiled-var-fetch
+  # has no object to refer to, the variable is unknown.
+  ? {bar 3 4} 0-3-47
+
+  # the variable in the test scope does not influence result
+  set :d 200
+  ? {bar 3 4} 0-3-47
+}
+
+#
+# test redefinition of a target proc
+#
+nx::test configure -count 1
+nx::test case alias-proc-refetch {
+
+  #
+  # initial definition 
+  #
+  proc target {} {return 1}
+  nx::Object create o {:public object alias foo ::target}
+  ? {o foo} 1
+
+  #
+  # redefinition
+  #
+  proc ::target {} {return 2}
+  ? {o foo} 2
+}
+
+#
+# test registration of a pre-compiled proc
+#
+nx::test configure -count 1
+nx::test case alias-precompiled-proc {
+  nx::Class create C {
+    :public method vars {} {
+      set result [list]
+      foreach v [lsort [:info vars]] {lappend result $v [set :$v]}
+      return $result
+    }
+    :create c1
+  }
+
+  ? {c1 vars} {}
+  proc ::foo {x} {set :a $x}
+  proc ::bar {x} {set :b $x}
+
+  #
+  # force bytecode compilation of ::foo
+  #
+  ? {::foo 1} 1
+  
+  #
+  # Register an already used tcl proc.  Byte compilation happened
+  # without nsf context. If the byte code is not invalidated, the
+  # compiled var resolver would not kick in, we would not be able to
+  # set an instance variable.
+  ::nsf::method::alias ::C foo ::foo
+  ? {c1 foo 2} 2
+  ? {c1 vars} {a 2}
+  
+  #
+  # Register an unused tcl proc.  Byte compilation happens within nsf
+  # context, compiled var resolver works as expected.
+  ::nsf::method::alias ::C bar ::bar
+  ? {c1 bar 2} 2
+  ? {c1 vars} {a 2 b 2}
+  
+  # Call proc from outside nx; does not set the variable, and does not
+  # crash; seems ok, but could warn.
+  ? {::bar 3} 3
+  ? {c1 vars} {a 2 b 2}
+  
+  # call proc from method context; it sets the variable,
+  # maybe questionable, but not horrible
+  c1 public object method baz {} {::bar 4}
+  ? {c1 baz} 4
+  ? {c1 vars} {a 2 b 4}
+}
+
+#
+# Testing aliases to objects and reference counting.
+# Check the effects via MEM_COUNT...
+#
+nx::test case refcount-object-alias-recreate1 {
+  #
+  # alias recreate with the same object
+  #
+  
+  nx::Object create ::x
+  # per-object aliases
+
+  nx::Object create ::o {
+    :object alias X ::x
+    ? {o info object method definition X} "::o protected object alias X ::x"
+    :object alias X ::x
+    ? {o info object method definition X} "::o protected object alias X ::x"
+  }
+
+  # per-class aliases
+  nx::Class create ::C {
+    :alias A1 ::x
+    ? {C info method definition A1} "::C protected alias A1 ::x"
+    :alias A1 ::x
+    ? {C info method definition A1} "::C protected alias A1 ::x"
+
+    :object alias A2 ::x
+    ? {C info object method definition A2} "::C protected object alias A2 ::x"
+    :object alias A2 ::x
+    ? {C info object method definition A2} "::C protected object alias A2 ::x"
+  }
+}
+
+nx::test case refcount-object-alias-recreate2 {
+  #
+  # alias recreate with a proc
+  #
+  nx::Object create ::x
+  ::proc ::y {} {}
+  nx::Object create ::o {
+    :object alias X ::x
+    ? {o info object method definition X} "::o protected object alias X ::x"
+    :object alias X ::y
+    ? {o info object method definition X} "::o protected object alias X ::y"
+  }
+}
+
+nx::test case refount-destroy-delete1 {
+  nx::Object create ::x
+  nx::Object create ::o {:object alias X ::x}
+
+  ? {o info object method definition X} "::o protected object alias X ::x"
+
+  # destroy the object, make sure it does not exist anymore
+  ? {x destroy} ""
+  ? {nsf::object::exists x} 0
+
+  # The alias lookup does still work
+  ? {o info object method definition X} "::o protected object alias X ::x"
+
+  # Create the referenced object new
+  nx::Object create ::x
+  
+  # Recreation of the alias, must free refcount to the old object
+  ? {::o object alias X ::x} "::o::X"
+
+  # Recreate the object. On recreation, the object is not freed,
+  # therefore we test the reference counter is already set, and must
+  # nor be incremented
+  nx::Object create ::x
+  ? {::o object alias X ::x} "::o::X"
+}
+
+nx::test case refount-destroy-delete2 {
+  nx::Object create ::o
+  nx::Object create ::baff
+  nx::Object create ::baff::child
+
+  ::o object alias X ::baff::child
+  ? {nsf::object::exists ::baff::child} 1
+  ? {o info object method definition X} "::o protected object alias X ::baff::child"
+
+  nx::Object create ::baff
+  ? {nsf::object::exists ::baff::child} 0
+
+  # The alias lookup does still work
+  ? {o info object method definition X} "::o protected object alias X ::baff::child"
+
+  # Create the child new
+  nx::Object create ::baff::child
+  ? {nsf::object::exists ::baff::child} 1
+  
+  # Recreation of the alias, must free refcount to the old object
+  ? {::o object alias X ::baff::child} "::o::X"
+}
+
+#
+# Testing cylcic alias
+#
+nx::test case cyclic-alias {
+  nx::Object create o {
+    set handle [:public object method foo {} {return 1}]
+    # we can define currently the recursive definition
+    ? [list [:] public object alias foo $handle] "::o::foo"
+  }
+  # at run time, we get an exception
+  #puts stderr ======
+  ? {o foo} {target "::o::foo" of alias foo apparently disappeared}
+
+  # test indirect case
+  set handle1 [o public object method foo {} {return 1}]
+  set handle2 [o public object alias bar $handle1]
+  set handle3 [o public object alias foo $handle2]
+  ? {o foo} {target "::o::bar" of alias foo apparently disappeared}
+}
+
+#
+# Test namespace of aliased methods coming from different namespaces
+#
+nx::test case proc-alias-target-namespace {
+
+    proc foo {} {
+	set :foo 1
+	namespace current
+    }
+    
+    namespace eval ns1 {
+	proc bar {} {
+	    set :bar 1
+	    namespace current
+	}
+    }
+    namespace eval ns2 {
+	nx::Object create o {
+	    :public object alias foo ::foo
+	    :public object alias bar ::ns1::bar
+	    :public object method baz {} {namespace current}
+	}
+    }
+
+    namespace eval ns3 {
+	nx::Object create o
+	set handle [o public object method FOO {} {namespace current}]
+	::ns2::o public object alias FOO $handle
+    }
+
+    #
+    # The following tests show, that the defining namespace of the
+    # target method prevails always
+    #
+    ? {ns2::o foo} ::    "alias to a global Tcl proc"
+    ? {ns2::o bar} ::ns1 "alias to a namespaced Tcl proc"
+    ? {ns2::o baz} ::ns2 "a method defined locally in ns2::o"
+    ? {ns2::o FOO} ::ns3 "alias to method defined in ::ns3"
+}
+
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:

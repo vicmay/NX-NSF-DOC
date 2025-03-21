@@ -1,0 +1,734 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package require nx::test
+
+nx::Class create M {
+  :method mfoo {} {puts [self proc]}
+}
+nx::Class create M2
+nx::Class create C 
+C create c1
+
+#
+# test mixin method
+#
+nx::test case mixin-method {
+  ? {C info lookup method mixins} "::nsf::classes::nx::Class::mixins"
+  ? {C mixins set M} ::M
+  ? {C info precedence} "::nx::Class ::nx::Object"
+  ? {C mixins get} "::M"
+  ? {C info mixins} "::M"
+  ? {c1 info precedence} "::M ::C ::nx::Object"
+  ? {C mixins add M2} "::M2 ::M"
+  ? {c1 info precedence} "::M2 ::M ::C ::nx::Object"
+  ? {C mixins delete M2} "::M"
+  ? {c1 info precedence} "::M ::C ::nx::Object"
+  ? {C mixins delete M} ""
+  ? {C info mixins} ""
+
+  ? {C mixins set ::M} "::M"
+  ? {C mixins clear} "::M"
+  ? {C info mixins} ""
+
+  ? {C mixins add ::M} "::M"
+  ? {C mixins set {}} ""
+  ? {C info mixins} ""
+}
+
+#
+# test nsf::mixin interface
+#
+nx::test case nsf-mixin {
+  ? {::nsf::mixin C ::M} "::M"
+  ? {C info mixins} "::M"
+  ? {::nsf::mixin C ::M2} "::M2 ::M"
+  ? {C info mixins} "::M2 ::M"
+  ? {::nsf::mixin C ""} ""
+  ? {C info mixins} ""
+}
+
+#
+# per-object mixins
+#
+nx::test case per-object-mixins {
+  ? {c1 info precedence} "::C ::nx::Object"
+  ? {c1 object mixins add M} ::M
+  ? {::nsf::relation::get c1 object-mixin} ::M
+  ? {catch {c1 object mixin UNKNOWN}} 1
+  ? {::nsf::relation::get c1 object-mixin} "::M"
+
+  # add again the same mixin
+  ? {c1 object mixins add M} {::M}
+  ? {c1 info precedence} "::M ::C ::nx::Object"
+  ? {c1 object mixins add M2} "::M2 ::M"
+  ? {c1 info precedence} "::M2 ::M ::C ::nx::Object"
+  ? {c1 object mixins delete M} "::M2"
+  ? {c1 info precedence} "::M2 ::C ::nx::Object"
+  ? {c1 object mixins delete M2} ""
+  ? {c1 info precedence} "::C ::nx::Object"
+
+  ? {c1 object mixins add M} {::M}
+  ? {c1 info object mixins} {::M}
+  ? {c1 object mixins clear} {::M}
+  ? {c1 info object mixins} {}
+}
+
+#
+# adding, removing per-object mixins for classes through relation
+# "object-mixin"
+#
+nx::test case object-mixin-relation {
+  ? {::nsf::relation::set C object-mixin M} ::M
+  ? {C info precedence} "::M ::nx::Class ::nx::Object"
+  ? {C info object mixins} "::M"
+  ? {::nsf::relation::set C object-mixin ""} ""
+  ? {C info precedence} "::nx::Class ::nx::Object"
+}
+
+#
+# adding, removing per-object mixins for classes through slot
+# "object-mixin"
+#
+ # C object-mixin M
+ # ? {C info precedence} "::M ::nx::Class ::nx::Object"
+ # ? {C info object mixins} "::M"
+ # C object-mixin ""
+ # ? {C info precedence} "::nx::Class ::nx::Object"
+
+#
+# add and remove object mixin for classes via modifier "object" and
+# "mixin"
+#
+nx::test case class+mixin {
+  ? {C object mixins set M} ::M
+  ? {C info precedence} "::M ::nx::Class ::nx::Object"
+  ? {C info object mixins} "::M"
+  ? {C object mixins set ""} ""
+  ? {C info precedence} "::nx::Class ::nx::Object"
+}
+
+#
+#  add and remove object mixin for classes via object mixin add
+#
+nx::test case class+mixin-add {
+  ? {C object mixins add M} ::M
+  ? {C info precedence} "::M ::nx::Class ::nx::Object"
+  ? {C info object mixins} "::M"
+  ? {C object mixins set ""} ""
+  ? {C info precedence} "::nx::Class ::nx::Object"
+  
+  ? {C object mixins add M} ::M
+  ? {C info precedence} "::M ::nx::Class ::nx::Object"
+  ? {::nsf::relation::get C object-mixin} ::M
+  ? {catch {C object mixins add UNKNOWN}} 1
+  ? {::nsf::relation::get C object-mixin} "::M"
+  ? {C object mixins set ""} ""
+  ? {C info precedence} "::nx::Class ::nx::Object"
+
+  ? {C object mixins set M} ::M
+  ? {C info precedence} "::M ::nx::Class ::nx::Object"
+
+  # forwarder with get
+  ? {C object mixins get} "::M"
+}
+
+
+
+nx::test case mixin-add {
+
+  nx::Class create M1 {
+    :method mfoo {} {puts [current method]}
+  }
+  nx::Class create M11
+  nx::Class create C1 
+
+  ? {C1 info lookup method mixins} "::nsf::classes::nx::Class::mixins"
+  C1 object mixins set M1
+  ? {C1 info precedence} "::M1 ::nx::Class ::nx::Object"
+  C1 create c11
+  ? {c11 info precedence} "::C1 ::nx::Object"
+  C1 object mixins add M11
+  ? {C1 info precedence} "::M11 ::M1 ::nx::Class ::nx::Object"
+  Object create o -object-mixins M1
+  ? {o info precedence} "::M1 ::nx::Object"
+
+  nx::Class create O 
+  O object mixins set M1
+  ? {O info precedence} "::M1 ::nx::Class ::nx::Object"
+  nx::Class create O -object-mixins M1
+  ? {O info precedence} "::M1 ::nx::Class ::nx::Object"
+}
+
+nx::test case mixin-relation-invalid-value {
+  
+  nx::Class create C
+  nx::Class create M
+  
+  # Double-escaping allows for injecting an invalid string rep of a Tcl
+  # list into MixinregSetFromAny(). Other API facets (::nsf::mixin)
+  # catch this through list ops at the script level.
+  
+  set ::str "\\\{ ::M"
+  ? {lindex [subst $::str] 0} "unmatched open brace in list"
+  ? {C mixins get} ""
+  ? {C object mixins get} ""
+  ? {::nsf::relation::set C class-mixin $::str} "unmatched open brace in list"
+  ? {::nsf::relation::set C object-mixin $::str} "unmatched open brace in list"
+  ? {C mixins get} ""
+  ? {C object mixins get} ""
+
+  # via slot interface
+  ? {C mixins set $::str} "unmatched open brace in list"
+  ? {C object mixins set $::str} "unmatched open brace in list"
+  
+}
+
+
+nx::test case filter-relation {
+  nx::Class create CC {
+    :public method filterA args {next}
+    :public method filterB args {next}
+    :public object method filterC args {next}
+    :create cc {
+      :public object method filterD args {next}
+    }
+  }
+
+  ? {::nsf::relation::get cc object-filter} ""
+  ? {cc info object filters} ""
+  ? {::nsf::relation::set cc object-filter filterA} filterA
+  ? {cc info object filters} "filterA"
+  ? {cc object filters set filterB} "filterB"
+
+  ? {::nsf::relation::get cc object-filter} "filterB"
+  ? {cc info object filters} "filterB"
+
+  ? {cc object filters add filterD} "filterD filterB"
+  ? {::nsf::relation::get cc object-filter} "filterD filterB"
+  ? {cc info object filters} "filterD filterB"
+
+  ? {cc object filters delete filterB} "filterD"
+  ? {::nsf::relation::get cc object-filter} "filterD"
+  ? {cc info object filters} "filterD"
+
+  ? {catch {::nsf::relation::set cc object-filter UNKNOWN}} 1
+  ? {::nsf::relation::get cc object-filter} "filterD"
+  ? {cc info object filters} "filterD"
+
+  ? {::nsf::relation::get CC object-filter} ""
+  ? {CC info object filters} ""
+  ? {::nsf::relation::set CC object-filter filterC} "filterC"
+  ? {::nsf::relation::get CC object-filter} "filterC"
+  ? {CC info object filters} "filterC"
+
+  ? {CC object filters clear} "filterC"
+  ? {::nsf::relation::get CC object-filter} ""
+  ? {CC info object filters} ""
+  
+  ? {::nsf::relation::get CC class-filter} ""
+  ? {CC info filters} ""
+  ? {::nsf::relation::set CC class-filter filterA} "filterA"
+  ? {::nsf::relation::get CC class-filter} "filterA"
+  ? {CC info filters} "filterA"
+
+  ? {CC filters add filterB} "filterB filterA"
+  ? {::nsf::relation::get CC class-filter} "filterB filterA"
+  ? {CC info filters} "filterB filterA"
+
+  ? {CC filters delete filterA} "filterB"
+  ? {::nsf::relation::get CC class-filter} "filterB"
+  ? {CC info filters} "filterB"
+
+  ? {catch {::nsf::relation::set CC class-filter UNKNOWN}} 1
+  ? {::nsf::relation::get CC class-filter} "filterB"
+  ? {CC info filters} "filterB"
+
+  ? {CC filters clear} "filterB"
+  ? {::nsf::relation::get CC class-filter} ""
+  ? {CC info filters} ""
+}
+
+
+nx::test configure -count 3
+nx::test case "filter-and-creation" {
+  nx::Class create Foo {
+    :method myfilter {args} {
+      set i [::incr ::count]
+      set s [self]
+      set m [current calledmethod]
+      #puts stderr "$i: $s.$m"
+      #puts stderr "$i: procsearch before [$s procsearch info]"
+      set r [next]
+      #puts stderr "$i: $s.$m got ($r)"
+      #puts stderr "$i: $s.$m procsearch after [$s info lookup method info]"
+      return $r
+    }
+    # method for testing next to non-existing shadowed method
+    :public method baz {} {next}
+  }
+
+  ? {Foo create ob} ::ob
+
+  # make sure, no unknown handler exists
+  #? {::ob info lookup method unknown} "::nsf::classes::nx::Object::unknown"
+  ? {::ob info lookup method unknown} ""
+
+  ? {ob bar} {::ob: unable to dispatch method 'bar'}
+  ? {ob baz} {}
+
+  # define a global unknown handler
+  ::nx::Object protected method unknown {m args} {
+    error "[::nsf::current object]: unable to dispatch method '$m'"
+  }
+
+  ? {ob bar} {::ob: unable to dispatch method 'bar'}
+  ? {ob baz} {}
+
+  Foo filters set myfilter
+  # create through filter
+  ? {Foo create ob} ::ob
+
+  # unknown through filter
+  ? {ob bar1} {::ob: unable to dispatch method 'bar1'}
+  ? {ob baz} {}
+
+  # deactivate nx unknown handler in case it exists
+  ::nx::Object method unknown {} {}
+
+  # create through filter
+  ? {Foo create ob2} ::ob2
+
+  # unknown through filter
+  ? {ob2 bar2} {::ob2: unable to dispatch method 'bar2'}
+  ? {ob2 baz} {}
+
+  # create with filter
+  ? {Foo create ob3 -object-filters myfilter} ::ob3
+}
+
+
+nx::test configure -count 1
+#
+# Test the next-path with just intrinsic classes in cases where a
+# method handle is used for method dispatch
+#
+
+nx::test case intrinsic+method-handles {
+  nx::Class create A {:public method foo {} {return "A [next]"}}
+  nx::Class create B -superclass A {:public method foo {} {return "B [next]"}}
+  nx::Class create C -superclass B {:public method foo {} {return "C [next]"}}
+  
+  C create c1
+  ? {c1 foo} "C B A "
+  ? {c1 [C info method definitionhandle foo]} "C B A "
+  ? {c1 [B info method definitionhandle foo]} "B A "
+  ? {c1 [A info method definitionhandle foo]} "A "
+
+  # we expect same results via dispatch with fully qualified names
+  ? {nsf::dispatch c1 foo} "C B A "
+  ? {nsf::dispatch c1 [C info method definitionhandle foo]} "C B A "
+  ? {nsf::dispatch c1 [B info method definitionhandle foo]} "B A "
+  ? {nsf::dispatch c1 [A info method definitionhandle foo]} "A "
+
+  # 
+  # check, whether the context of "my -local" is correct
+  #
+  A public method bar {} {nsf::my -local foo}
+  B public method bar {} {nsf::my -local foo}
+  C public method bar {} {nsf::my -local foo}
+
+  ? {c1 bar} "C B A "
+  ? {c1 [C info method definitionhandle bar]} "C B A "
+  ? {c1 [B info method definitionhandle bar]} "B A "
+  ? {c1 [A info method definitionhandle bar]} "A "
+}
+
+#
+# Test the next-path with mixins in cases where a
+# method handle is used for method dispatch
+#
+
+nx::test case mixins+method-handles {
+  #
+  # Just mixins
+  #
+  nx::Class create A {:public method foo {} {return "A [next]"}}
+  nx::Class create B {:public method foo {} {return "B [next]"}}
+  nx::Class create C {:public method foo {} {return "C [next]"}}
+
+  nx::Class create X -mixin {C B A}
+  X create c1
+  ? {c1 foo} "C B A "
+  ? {c1 [C info method definitionhandle foo]} "C B A "
+  ? {c1 [B info method definitionhandle foo]} "B A "
+  ? {c1 [A info method definitionhandle foo]} "A "
+  
+  #
+  # Intrinsic classes and mixins
+  #
+
+  nx::Class create Y {:public method foo {} {return "Y [next]"}}
+  nx::Class create Z -superclass Y {:public method foo {} {return "Z [next]"}}
+
+  Z create c1 -object-mixins {C B A}
+  ? {c1 foo} "C B A Z Y "
+  ? {c1 [C info method definitionhandle foo]} "C B A Z Y "
+  ? {c1 [B info method definitionhandle foo]} "B A Z Y "
+  ? {c1 [A info method definitionhandle foo]} "A Z Y "
+  ? {c1 [Z info method definitionhandle foo]} "Z Y "
+  ? {c1 [Y info method definitionhandle foo]} "Y "
+
+  # 
+  # check, whether the context of "my -local" is correct
+  #
+  A public method bar {} {nsf::my -local foo}
+  B public method bar {} {nsf::my -local foo}
+  C public method bar {} {nsf::my -local foo}
+  Y public method bar {} {nsf::my -local foo}
+  Z public method bar {} {nsf::my -local foo}
+
+  ? {c1 bar} "C B A Z Y "
+  ? {c1 [C info method definitionhandle bar]} "C B A Z Y "
+  ? {c1 [B info method definitionhandle bar]} "B A Z Y "
+  ? {c1 [A info method definitionhandle bar]} "A Z Y "
+  ? {c1 [Z info method definitionhandle bar]} "Z Y "
+  ? {c1 [Y info method definitionhandle bar]} "Y "
+
+}
+
+
+#
+# Test the next-path with mixins in cases where a
+# method handle is used for method dispatch
+#
+
+nx::test case mixins+method-handles+intrinsic {
+  #
+  # Just mixins
+  #
+  nx::Class create A {:public method foo {} {return "A [next]"}}
+  nx::Class create B {:public method foo {} {return "B [next]"}}
+  nx::Class create C {:public method foo {} {return "C [next]"}}
+
+  nx::Class create X -mixin {C B A} {
+    :public method foo {} {return "X [next]"}
+  }
+  X create c1
+  ? {c1 foo} "C B A X "
+  ? {nsf::dispatch c1 -intrinsic foo} "X "
+
+  
+  #
+  # Intrinsic classes and mixins
+  #
+
+  nx::Class create Y {:public method foo {} {return "Y [next]"}}
+  nx::Class create Z -superclass Y {:public method foo {} {return "Z [next]"}}
+
+  Z create c1 -object-mixins {C B A}
+  ? {c1 foo} "C B A Z Y "
+  ? {nsf::dispatch c1 -intrinsic foo} "Z Y "
+
+  # 
+  # check, whether the context of "my -intrinsic" is correct
+  #
+  A public method bar {} {nsf::my -intrinsic foo}
+  B public method bar {} {nsf::my -intrinsic foo}
+  C public method bar {} {nsf::my -intrinsic foo}
+  Y public method bar {} {nsf::my -intrinsic foo}
+  Z public method bar {} {nsf::my -intrinsic foo}
+
+  ? {c1 info precedence} "::C ::B ::A ::Z ::Y ::nx::Object"
+  ? {c1 bar} "Z Y "
+  ? {c1 [C info method definitionhandle bar]} "Z Y "
+  ? {c1 [B info method definitionhandle bar]} "Z Y "
+  ? {c1 [A info method definitionhandle bar]} "Z Y "
+  ? {c1 [Z info method definitionhandle bar]} "Z Y "
+  ? {c1 [Y info method definitionhandle bar]} "Z Y "
+
+  # 
+  # check, whether the context of "nsf::dispatch [self] -intrinsic" is correct
+  #
+  A public method bar {} {nsf::dispatch [self] -intrinsic foo}
+  B public method bar {} {nsf::dispatch [self] -intrinsic foo}
+  C public method bar {} {nsf::dispatch [self] -intrinsic foo}
+  Y public method bar {} {nsf::dispatch [self] -intrinsic foo}
+  Z public method bar {} {nsf::dispatch [self] -intrinsic foo}
+
+  ? {c1 bar} "Z Y "
+  ? {c1 [C info method definitionhandle bar]} "Z Y "
+  ? {c1 [B info method definitionhandle bar]} "Z Y "
+  ? {c1 [A info method definitionhandle bar]} "Z Y "
+  ? {c1 [Z info method definitionhandle bar]} "Z Y "
+  ? {c1 [Y info method definitionhandle bar]} "Z Y "
+}
+
+#
+# Test filter guards (define filter and guard separtely)
+#
+
+nx::test case filter-guard-separately {
+
+  #
+  # Define a room with occupancy and methods for entering and leaving
+  #
+  nx::Class create Room {
+    :property name
+    :variable occupancy:integer 0
+
+    :public method enter {name} {incr ::occupancy}
+    :public method leave {name} {incr ::occupancy -1}
+    
+    #
+    # We are interested, what happens with the room, so we define a
+    # logging filter....
+    #
+    :method loggingFilter args {
+      lappend ::_ [current calledmethod]
+      next
+    }
+    
+    #
+    # ... and we register it.
+    #
+    :filters add loggingFilter
+  }
+
+  set ::_ {}
+
+  ? {Room create r} ::r
+  r enter Uwe
+  r leave Uwe
+  r configure -name "Office"
+  ? {set ::_} "__object_configureparameter init enter leave configure"
+
+  #
+  # Hmm, we not so much interested on all these calls. Just the
+  # "enter" and "leave" operations are fine. We could have certainly
+  # as well mixin for these two methods, but the guards are more
+  # general since the can as well trigger on arbitrary patterns.
+  #
+
+  Room filters guard loggingFilter {
+    [current calledmethod] in {enter leave}
+  }
+
+  r destroy
+  set ::_ {}
+
+  ? {Room create r} ::r
+  r enter Uwe
+  r leave Uwe
+  r configure -name "Office"
+  ? {set ::_} "enter leave"
+
+  r destroy
+  
+  # Now we define a subclass DangerRoom, which refines the filter by
+  # logging into a "dangerRoomLog". We want here entries for all
+  # operations.
+
+  set ::_ {}
+  set ::dangerRoomLog {}
+
+  nx::Class create DangerRoom -superclass Room {
+    :method loggingFilter args {
+      lappend ::dangerRoomLog [current calledmethod]
+      next
+    }
+    :filters add loggingFilter
+  }
+
+  ? {DangerRoom create d} ::d
+  d enter Uwe
+  d leave Uwe
+  d configure -name "Safe Room"
+  ? {set ::_} "enter leave"
+  ? {expr [llength $::dangerRoomLog] > 2} 1
+
+  d destroy
+
+}
+
+#
+# Test filter guards (define filter together with guard)
+#
+
+nx::test case filter-guard-separately {
+
+  #
+  # Define a room with occupancy and methods for entering and leaving
+  #
+  nx::Class create Room {
+    :property name
+    :variable occupancy:integer 0
+
+    :public method enter {name} {incr ::occupancy}
+    :public method leave {name} {incr ::occupancy -1}
+    
+    #
+    # We are interested, what happens with the room, so we define a
+    # logging filter....
+    #
+    :method loggingFilter args {
+      lappend ::_ [current calledmethod]
+      next
+    }
+    
+    #
+    # ... and we register it together with a guard.
+    #
+    :filters add {loggingFilter -guard {
+      [current calledmethod] in {enter leave}
+    }}
+  }
+
+  set ::_ {}
+
+  ? {Room create r} ::r
+  r enter Uwe
+  r leave Uwe
+  r configure -name "Office"
+  ? {set ::_} "enter leave"
+  ? {r info lookup filters} "::nsf::classes::Room::loggingFilter"
+  ? {r info lookup filters -guards} {{loggingFilter -guard {
+      [current calledmethod] in {enter leave}
+    }}}
+  
+  # Now we define a subclass DangerRoom, which refines the filter by
+  # logging into a "dangerRoomLog". We want here entries for all
+  # operations.
+
+  set ::_ {}
+  set ::dangerRoomLog {}
+
+  nx::Class create DangerRoom -superclass Room {
+
+    :method loggingFilter args {
+      lappend ::dangerRoomLog [current calledmethod]
+      next
+    }
+    :filters add loggingFilter
+  }
+
+  ? {DangerRoom create d} ::d
+  d enter Uwe
+  d leave Uwe
+  d configure -name "Safe Room"
+  ? {set ::_} "enter leave"
+  ? {expr [llength $::dangerRoomLog] > 2} 1
+
+  ? {d info lookup filters} "::nsf::classes::DangerRoom::loggingFilter ::nsf::classes::Room::loggingFilter"
+
+  d destroy
+}
+
+
+#
+# Test info lookup mixins (with guards)
+#
+
+nx::test case filter-guard-separately {
+  nx::Class create M1
+  nx::Class create M2
+  nx::Class create M3
+  nx::Class create C
+  nx::Class create D -superclass C
+
+  D create d1 -object-mixins M1
+  ? {d1 info lookup mixins} ::M1
+
+  D mixins add {M2 -guard 1}
+  ? {d1 info lookup mixins} "::M1 ::M2"
+
+  C mixins add M3
+  ? {d1 info lookup mixins} "::M1 ::M2 ::M3"
+  ? {d1 info lookup mixins -guards} "::M1 {::M2 -guard 1} ::M3"
+  ? {d1 info lookup mixins -guards *2*} "{::M2 -guard 1}"
+
+  d1 object mixins clear 
+  ? {d1 info lookup mixins} "::M2 ::M3"
+}
+
+
+#
+# Test potential confusion in case a class has a space in its name
+# when registering methods or mixins.
+#
+
+nx::test case space-in-classname {
+  nx::Class create M1 {
+    :public method foo {} {return "[next] [current class]"}
+  }
+
+  #
+  # Define a class with a space in its name, containing a method. This
+  # class will be used as a mixin class later on.
+  #
+  nx::Class create "M1 b" -superclass M1 {
+    :public method foo {} {return next-[current class]}
+  }
+
+  nx::Class create C {
+    :public method foo {} {return foo}
+    :create c1
+  }
+
+  # Test the base case
+  ? {c1 foo} foo
+
+  # Add spacy class as a mixin. Check, if the introspection returns
+  # sensible values.
+  ? {C mixins add "M1 b"} "{::M1 b}"
+  ? {C info mixins} "{::M1 b}"
+  ? {M1 info mixins} ""
+  ? {M1 info mixinof} ""
+  ? {"M1 b" info mixins} ""
+
+  # check the result of the mixin class
+  ? {c1 foo} "next-::M1 b"
+}
+
+nx::test case filtered-unknowns {
+  package req XOTcl
+
+  ? {info exists ::filtersCalled} 0
+  
+  xotcl::Class create C
+  
+  xotcl::Object instproc f {args} {
+    if {[self] eq "::C" && [lindex $args 0] eq "::c1111"} {
+      lappend ::filtersCalled "[self proc] ([self calledproc])"
+    }
+    next
+  }
+    
+  xotcl::Class instproc f2 {args} {
+    if {[self] eq "::C" && [lindex $args 0] eq "::c1111"} {
+      lappend ::filtersCalled "[self proc] ([self calledproc])"
+    }
+    next
+  }
+
+  ? {info commands ::c1111} ""
+  
+  ? {xotcl::Object instfilter f; xotcl::Class instfilter f2; C ::c1111} ::c1111
+
+  ? {info exists ::filtersCalled} 1
+  ? {set ::filtersCalled} {{f2 (unknown)} {f (unknown)}\
+                                         {f2 (create)} {f (create)}\
+                                         {f2 (alloc)} {f (alloc)}}
+
+  xotcl::Object instfilter ""
+  xotcl::Class instfilter ""
+
+  unset -nocomplain ::filtersCalled
+}
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:

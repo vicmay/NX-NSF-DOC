@@ -1,0 +1,79 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package req nx::test
+
+#
+# [::nsf::current calledclass]
+#
+
+nx::test case current-calledclass {
+  Object create o {
+    :public method foo {} {
+      return [current calledclass]
+    }
+  }
+  ? {o foo} ""
+  Class create C {
+    :public class method bar {} {
+      return [current calledclass]
+    }
+    :public method foo {} {
+      return [current calledclass]
+    }
+  }
+  ? {[C new] foo} ::C
+  ? {C bar} ""
+  
+  C eval {
+    :public method intercept {} {
+      return @[current calledclass]@
+    }
+    :filter add intercept
+  }
+  ? {[C new] foo} @::C@
+
+  C eval {
+    :filter {}
+    :public method baz {} {
+      return [current calledclass]
+    }
+  }
+
+  Class create M {
+    :public method baz {} {
+      return [list [current calledclass] [next]]
+    }
+  }
+  C mixins add M
+
+  ? {[C new] baz} {::C ::C}
+}
+
+#
+# [::nsf::current calledclass]
+#
+nx::test case current-calledmethod {
+  set body {
+    return [list [current nextmethod] {*}[next]]
+  }
+  Object create o
+  set mh [o public method foo {} $body]
+  
+  ? {o foo} {{}}
+
+  Class create M 
+  set mh2 [M public method foo {} $body]
+  M filters add foo
+  o mixin M
+
+  ? {o foo} [list $mh2 $mh {}]
+}
+
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:

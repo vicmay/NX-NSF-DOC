@@ -1,0 +1,433 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package require nx
+package require nx::test
+
+# just 8.6 or newer
+if {[info command yield] eq ""} return
+
+#
+# Test coroutine / yield
+#
+nx::test case number-generator {
+  nx::Object create ::numbers {
+    # set instance variable used in coroutine
+    set :delta 2
+    :public object method ++ {} {
+      yield
+      set i 0
+      while 1 {
+	yield $i
+	incr i ${:delta}
+      }
+    }
+  }
+  # create coroutine
+  coroutine nextNumber ::numbers ++
+  set ::j 0
+  # use coroutine
+  for {set i 0} {$i < 10} {incr i} {
+    incr ::j [nextNumber]
+  }
+
+  # remove coroutine
+  rename nextNumber {}
+
+  ? {set ::j} 90
+}
+
+#
+# Test coroutine / yield 
+#
+nx::test case enumerator1 {
+
+  #
+  # enumerator with yield in a single class
+  #
+  nx::Class create Enumerator {
+    :property members:0..n
+    :public method yielder {} {
+      yield [info coroutine]
+      foreach m ${:members} {
+	yield $m
+      }
+      return -level 2 -code break
+    }
+    :public method next {} {${:coro}}
+    :method init {} {
+      :require namespace
+      set :coro [coroutine [self]::coro [self] yielder]
+    }
+  }
+  
+  #
+  # Some application class using the enumerator (just used for easy
+  # testing)
+  #
+  nx::Class create Foo {
+    :public method sum {} {
+      set sum 0
+      set e [Enumerator new -members {1 2 3}]
+      while 1 {
+	incr sum [$e next]
+      }
+      return $sum
+    }
+    :create f1
+  }
+  
+  ? {f1 sum} 6
+}
+
+
+nx::test case enumerator2 {
+  
+  #
+  # Define separate classes for Yielder and Enumerator
+  #
+  nx::Class create Yielder {
+    :property {block ";"}
+    :variable continuation ""
+
+    #
+    # make apply available as a method
+    #
+    :public alias apply ::apply
+
+    #
+    # The method "yielder" is the working horse for next. We need this
+    # since the interface of Tcl's coroutines is based on a separate
+    # cmd for continuation in the coroutine. The block can be
+    # configured by application classes.
+    #
+    :public method yielder {} {
+      yield [info coroutine]
+      eval ${:block}
+      return -level 2 -code break
+    }
+
+    #
+    # The method "next" simply forwards to the continuation
+    #
+    :public method next {} {${:continuation}}
+
+    #
+    # The method "each" is based on the method "next" and applies the
+    # value returned by next to the lambda expression
+    #
+    :public method each {var body} {
+      while 1 {
+	uplevel [list set $var [:next]]
+	uplevel $body
+      }
+    }
+
+    #
+    # When a yielder is generated, we create automatically a coroutine
+    # for it. The coroutine is placed under the current object, this
+    # ensures simple cleanup (but is most probably not the fastest
+    # variant, since we have to require a namespace).
+    #
+    :method init {} {
+      :require namespace
+      set :continuation [coroutine [self]::coro [self] yielder]
+    }
+  }
+
+  #
+  # The class "Enumerator" provides some application logic for the
+  # class "Yielder". We use here a list of elements as base
+  # representation.
+  #
+  nx::Class create Enumerator -superclass Yielder {
+    :property members:0..n
+    :property {block {
+      foreach m ${:members} { yield $m }
+    }}
+  }
+
+  #
+  # Some application class using the enumerator (just used for easy
+  # testing)
+  #
+  nx::Class create Foo {
+
+    # test Enumerator.next
+    :public method sum {} {
+      set sum 0
+      set e [Enumerator new -members {1 2 3}]
+      while 1 { incr sum [$e next] }
+      return $sum
+    }
+    
+    :public method set {var} {
+      set :$var
+    }
+
+    # test Enumerator.each
+    :public method concat {} {
+      set string "-"
+      set i 0
+      set e [Enumerator new -members {a be bu}]
+      $e each x { append string $x-([incr i])- }
+      return $string
+    }
+    
+    :create f1
+  }
+  
+  ? {f1 sum} 6
+  ? {f1 concat} "-a-(1)-be-(2)-bu-(3)-"
+
+
+  #
+  # Define a class ATeam that uses "Enumerator", refines the method
+  # "each" and adds another method "concat"
+  #
+  nx::Class create ATeam -superclass Enumerator {
+    #
+    # Overload "each" to show overloading. Here, we simply capitalize
+    # the members in the "each" method.
+    #
+    :public method each {var body} {
+      while 1 {
+	set value [string totitle [:next]]
+	uplevel [list set $var $value]
+	uplevel $body
+      }
+    }
+    # Define some arbitrary method using ATeam.each
+    :public method concat {} {
+      set string "-"
+      :each x { append string $x- }
+      return $string
+    }
+  }
+  ATeam create a1 -members {alice bob caesar}
+  ? {a1 concat } "-Alice-Bob-Caesar-"
+}
+
+#
+# apply
+#
+nx::test case apply {
+
+  # Register apply as an alias
+  ::nx::Object public alias apply ::apply
+
+  ::nx::Object create o {
+    # Set an object variable
+    set :delta 100
+
+    # Define a standard map function based on apply
+    :public object method map {lambda values} {
+      set result {}
+      foreach value $values {
+	lappend result [:apply $lambda $value]
+      }
+      return $result
+    }
+
+    :object method foo {x} {return $x-$x}
+  }
+
+  # Two examples from the apply man page
+  ? {o map {x {return [string length $x]:$x}} {a bb ccc dddd}} \
+      "1:a 2:bb 3:ccc 4:dddd"
+  ? {o map {x {expr {$x**2 + 3*$x - 2}}} {-4 -3 -2 -1 0 1 2 3 4}} \
+      "2 -2 -4 -4 -2 2 8 16 26"
+
+  ## Test case accessing object specific variable
+  #? {o map {x {::nsf::__db_show_stack; return [expr {$x * ${:delta}}]}} {-4 -3 -2 -1 0 1 2 3 4}} \
+  #    "-400 -300 -200 -100 0 100 200 300 400"
+
+  # Test case accessing object specific variable
+  ? {o map {x {expr {$x * ${:delta}}}} {-4 -3 -2 -1 0 1 2 3 4}} \
+      "-400 -300 -200 -100 0 100 200 300 400"
+
+  # Test case calling own method via apply
+  ? {o map {x {:foo $x}} {hello world}} \
+      "hello-hello world-world"
+}
+
+
+#
+# The corrected cmd-literal semantics regarding cmd resolvers will
+# only be released starting from and including 8.6.7.
+#
+if {![package vsatisfies [package req Tcl] 8.6.7]} {return}
+
+set tcl87 [package vsatisfies [package req Tcl] 8.7-]
+
+nx::test case bug-3418547 {
+  #
+  # See https://core.tcl-lang.org/tcl/tktview?name=3418547fff
+  # 
+
+  ? {info commands "::@"} ""
+
+  proc getType {x} {dict get [::nsf::__db_get_obj @] type}
+
+  ? {getType @} ""            ;# "@" has no type
+  ? {namespace which @} ""
+  if {!$::tcl87} {
+      ? {getType @} "cmdName"     ;# "@" is of type "cmdName"
+  }
+  
+  ? {@} {invalid command name "@"}
+  ? {getType @} "bytecode"    ;# "@" is of type "bytecode"  
+
+  
+  #
+  # 1) Provide @ for interp resolver in NX root namespace
+  #
+  proc ::nx::@ {} {
+    return ::nx::@
+  }
+
+  nx::Object create ::o {
+    :public object method foo {} {
+      @; # Should resolve against ::nx::@ (by interp resolver)
+    }
+  }
+
+  ? {getType @} "bytecode"        ;# "@" is still of type "bytecode"
+  ::o foo
+  ? {getType @} "bytecode"        ;# "@" is still of type "bytecode"  (byte code compilation should not leak)
+
+  ? {::o foo} ::nx::@             ;# "@" is resolved in the nx context, therefore, we get nx::@
+  
+  #
+  # 2) Provide alternative @
+  #
+  proc ::@ {} {
+    return ::@
+  }
+  
+  ? {info commands ::@} "::@"
+  ? {::@} ::@
+  ? {getType @} "bytecode"        ;# "@" is still of type "bytecode"
+
+  set x [@]                       ;# execute "@" in an nx environment ("eval" of the test case)
+  ? {getType @} "cmdName"         ;# "@" is of type "cmdName"
+
+  ? [list $x] ::nx::@
+  
+  ? @ ::@                         ;# proc "?" interprets "@" as a script and turns "@"
+                                  ;# into type "bytecode". The proc leaves the nx context
+                                  ;# by using a "namespace eval", therefore, we see ::@
+  ? {getType @} "bytecode"        ;# "@" is of type "bytecode"
+  
+  ? {namespace eval :: @} ::@     ;# exercise the same "namespace eval" as described above
+  ? {namespace eval :: ::@} ::@   ;# the same with the global namespace qualifier
+  
+  ? {getType @} "bytecode"        ;# "@" is of type "bytecode"
+  ? {getType ::@} "bytecode"      ;# "::@" is of type "bytecode"
+  
+  ? {namespace origin @} ::@      ;# "namespace origin" converts literal "@" from "bytecode" to "cmdName"
+  ? {getType @} "cmdName"
+
+  ? {namespace origin ::@} ::@
+  ? {getType @}   "cmdName"
+  ? {getType ::@} "cmdName"
+  
+  ? {@} ::@                   ;# the result is still the same as everywhere, since we are in an nx context XXX
+}
+
+#
+# Without nx context
+#
+nx::test case bug-3418547-no-context
+proc getType {x} {dict get [::nsf::__db_get_obj @] type}
+
+# delete the commands
+rename @ ""
+rename ::nx::@ ""
+
+? {info commands "::@"} ""
+
+? {getType @}   ""
+? {namespace which @} ""
+if {!$::tcl87} {
+    ? {getType @}   "cmdName"
+}
+
+? {@} {invalid command name "@"}
+
+#
+# 1) Provide proc @
+#
+proc ::@ {} {
+  return ::@
+}
+
+? {@} ::@
+if {!$::tcl87} {
+    ? {getType @}   "cmdName"
+}
+
+#
+# 2) Provide @ for interp resolver in NX root namespace
+#
+proc ::nx::@ {} {
+  return ::nx::@
+}
+
+set r [@]       ;# "@" is not executed in an nx environment (no testcase eval), therefore, resolved globally
+? {set r} ::@
+if {!$::tcl87} {
+    ? {getType @}   "cmdName"
+}
+
+nx::Object create ::o {
+  :public object method foo {} {
+    @          ; # resolve against ::nx::@ (via interp resolver)
+  }
+}
+
+set r [::o foo]
+? {set r} ::nx::@
+if {!$::tcl87} {
+    ? {getType @}   "cmdName"
+}
+
+? {::o foo} ::nx::@
+
+set r [@]       ;# "@" is not executed in an nx environment (no testcase eval), therefore, resolves globally
+? {set r} ::@
+? {@} ::@       ;# "@" is executed in an "namespace eval ::", therefore, no nx context
+
+# cleanup
+rename ::nx::@ ""
+rename @ ""
+
+
+#
+# Try to reconstruct test case of Tcl's resolver.test 1.6
+#
+nx::test case resolver-1.6
+
+proc ::@@ {} {return ::@@}
+proc ::nx::@ {} {
+  return ::nx::@
+}
+
+nx::Object create ::o {
+  :public object method foo {} {
+    @          ; # resolve against ::nx::@ (via interp resolver)
+  }
+}
+
+set r [::o foo]
+? {set r} ::nx::@
+
+interp alias {} ::nx::@ {} ::@@
+
+# call the new aliased definition
+? {::nx::@} ::@@
+
+# see consistent results from method foo
+set r [::o foo]
+? {set r} ::@@

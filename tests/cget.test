@@ -1,0 +1,423 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package req nx
+package require nx::test
+
+#
+# The first test set checks just the basic behavior:
+#
+nx::test case cget-simple {
+
+  nx::Class create Person {
+    :property famnam:required
+    :property {age:integer,required 0}
+    :property {friends:0..n ""}
+    :property sex
+    
+    # Create an instance of the class
+    :create p1 -famnam hugo -age 25 
+  }
+
+  #
+  # first, check basic provided values and defaults
+  #
+  ? {p1 cget -age} 25
+  ? {p1 cget -famnam} hugo
+  ? {p1 cget -friends} ""
+
+  #
+  # a method property
+  ? {p1 cget -class} ::Person
+
+  #
+  # error handling:
+  # - wrong # args
+  # - wrong parameter 
+  # - parameter without a value
+  #
+  ? {p1 cget} {wrong # of arguments: should be "cget /name/"}
+  ? {p1 cget -foo} "cget: unknown configure parameter -foo"
+  ? {p1 cget foo} "cget: parameter must start with a '-': foo"
+  ? {p1 cget -sex} {can't read "sex": no such variable}
+
+  # 
+  # Reconfigure the object
+  #
+  ? {p1 configure -famnam joe -age 27} ""
+
+  #
+  # check the new values
+  #
+  ? {p1 cget -age} 27
+  ? {p1 cget -famnam} joe  
+
+  #
+  # configure without arguments
+  #
+  ? {p1 configure} ""
+
+  ? {p1 info lookup syntax configure} {?-sex /value/? -famnam /value/ ?-age /integer/? ?-friends /value .../? ?-object-mixins /mixinreg .../? ?-object-filters /filterreg .../? ?-class /class/? ?/__initblock/?}
+}
+
+#
+# The second test set checks redirection of configure / cget to slot
+# methods "set" and "get".
+#
+
+nx::test configure -count 1
+nx::test case cget-via-slot {
+
+  nx::Class create C {
+    
+    # Define a property with a "get" method
+    :property bar1 {
+      :public object method value=get { object property} {
+	incr ::count(cget)
+	nsf::var::set $object $property
+      }
+    }
+    
+    # Define a property with a "get" and "set" method
+    :property bar2 {
+      :public object method value=get { object property} {
+	incr ::count(cget)
+	nsf::var::set $object $property
+      }
+      :public object method value=set { object property value } {
+	incr ::count(assign)
+	nsf::var::set $object $property $value
+      }
+    }
+
+    # Create an instance of the class
+    :create p1 
+  }
+
+  #
+  # configure without arguments
+  #
+  ? {p1 configure} ""
+
+  ? {p1 info lookup syntax configure} {?-bar1 /value/? ?-bar2 /value/? ?-object-mixins /mixinreg .../? ?-object-filters /filterreg .../? ?-class /class/? ?/__initblock/?}
+
+
+  #
+  # test gettin/setting via slots
+  #
+  # just a getter:
+  #
+  array unset ::count
+  ? {p1 configure -bar1 100} ""
+  ? {array get ::count} ""
+
+  ? {p1 cget -bar1} 100
+  ? {array get ::count} "cget 1"
+
+  # a getter and a setter:
+  #  
+  array unset ::count
+  ? {p1 configure -bar2 100} ""
+  ? {array get ::count} "assign 1"
+
+  ? {p1 cget -bar2} 100
+  ? {array get ::count} "assign 1 cget 1"
+  
+}
+
+#
+# The third test set checks method binding to parameter:
+# All cmds are supposed to return reasonable values.
+#
+nx::test case cget-parameter-methods {
+  nx::Class create C {
+    :property {foo:alias,method=m0 {1 2 3}}
+    :property {{bar:forward,method=%self m1 a b c %method} bar1}
+    :public method m0 {args} {set :m0 $args; return $args}
+    :public method m1 {args} {set :m1 $args; return $args}
+    :create c1
+  }
+
+  package req nx::volatile
+
+  #
+  # class-level lookup
+  #
+  ? {C info lookup syntax configure} \
+      "?-mixins /mixinreg .../? ?-superclasses /class .../? ?-filters /filterreg .../? ?-volatile? ?-object-mixins /mixinreg .../? ?-object-filters /filterreg .../? ?-class /class/? ?/__initblock/?"
+  ? {C cget -superclasses} "::nx::Object"
+  ? {C cget -superclass} "::nx::Object"
+  ? {C cget -object-mixin} ""
+  ? {C cget -mixin} ""
+  ? {C cget -filter} ""
+  ? {C cget -volatile} 0
+  #? {C cget -noinit} ""
+  ? {C cget -class} "::nx::Class"
+
+  #
+  # object-level lookup
+  #
+  ? {c1 info lookup syntax configure} \
+      "?-foo /value/? ?-bar /value/? ?-volatile? ?-object-mixins /mixinreg .../? ?-object-filters /filterreg .../? ?-class /class/? ?/__initblock/?"
+
+  #
+  # query all properties from base classes
+  #
+  ? {c1 cget -volatile} 0
+  #? {c1 cget -noinit} ""
+  #? {c1 cget -mixin} ""
+  ? {c1 cget -object-mixin} ""
+  ? {c1 cget -class} ::C
+  #? {c1 cget -filter} ""
+  ? {c1 cget -object-filter} ""
+
+  #
+  # query alias and forward
+  #
+  ? {c1 eval {set :m0}} "{1 2 3}"
+  ? {c1 eval {set :m1}} {a b c bar bar1}
+
+  ? {c1 cget -foo} ""
+  ? {c1 cget -bar} "a b c bar"
+}
+
+
+#
+# The fourth test set checks performance of "cget" and "configure".
+#
+nx::test configure -count 10000
+nx::test case cget-performance {
+
+  nx::Class create Person {
+    :property famnam:required
+    :property -accessor public {age:integer,required 0}
+    :property {friends:0..n ""}
+    :property sex
+    
+    # Define a property with a "get" and "set" method
+    :property bar {
+      :public object method value=get { object property } {
+	nsf::var::set $object $property
+      }
+      :public object method value=set { object property value } {
+	nsf::var::set $object $property $value
+      }
+    }
+
+    # Create an instance of the class
+    :create p1 -famnam hugo -age 25 -bar 101
+  }
+
+  #
+  # read properties
+  # - built-in accessor
+  # - cget
+  # - dispatch of cget method with full path
+  # - cget via slot method
+  ? {p1 age get} 25
+  ? {p1 cget -age} 25
+  ? {p1 ::nsf::methods::object::cget -age} 25
+  ? {p1 cget -bar} 101
+
+  #
+  # write properties:
+  # - built-in accessor
+  # - configure
+  # - configure via slot method
+  ? {p1 age set 27} 27
+  ? {p1 configure -age 27} ""
+  ? {p1 configure -bar 102} ""
+
+}
+
+nx::test configure -count 1
+nx::test case configure-trace-class {
+
+  #
+  # class case with no default
+  #
+  nx::Class create C
+  C property -trace set p {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }
+  
+  C create c1
+
+  ? {c1 eval {info exists :p}} 0  
+  ? {c1 cget -p} {can't read "p": no such variable}
+  ? {c1 configure -p 1} ""
+  ? {c1 eval {info exists :p}} 1
+  ? {c1 cget -p} "2"
+
+  #
+  # class case with default
+  #
+  C property -trace set {q 100} {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }
+  C create c2
+  
+  ? {c2 eval {info exists :q}} 1
+  ? {c2 cget -q} 100
+  ? {c2 configure -q 101} ""
+  ? {c2 cget -q} "102"
+}
+
+nx::test case configure-trace-object {
+  #
+  # object case with no default
+  #
+  
+  nx::Object create o
+  ? {o eval {info exists :A}} 0
+  o object property -trace set A {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }
+  # puts [o info object variables A]
+  # puts [o info variable parameter [o info object variables A]]
+  # puts [[o info object slots A] getParameterSpec]
+  
+  ? {o eval {info exists :A}} 0
+  ? {o cget -A} {can't read "A": no such variable}
+  ? {o configure -A 1} ""
+  ? {o cget -A} "2"
+  
+  #
+  # object case with default
+  #
+  
+  ? {o eval {info exists :B}} 0
+  o object property -trace set {B 1000} {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }
+  
+  ? {o eval {info exists :B}} 1
+  ? {o cget -B} 1000
+  ? {o configure -B 1001} ""  
+  ? {o cget -B} 1002
+}
+
+
+
+nx::test case configure-trace-class-type {
+
+  #
+  # class case with type and no default
+  #
+  nx::Class create C
+  C property -trace set p:integer {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }
+  
+  C create c1
+
+  ? {c1 eval {info exists :p}} 0  
+  ? {c1 cget -p} {can't read "p": no such variable}
+  ? {c1 configure -p a} {expected integer but got "a" for parameter "-p"}
+  ? {c1 eval {info exists :p}} 0  
+  ? {c1 configure -p 1} ""
+  ? {c1 eval {info exists :p}} 1
+  ? {c1 cget -p} "2"
+  
+  #
+  # class case with type and default
+  #
+
+  ? {C property -trace set {q:integer aaa} {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }} {expected integer but got "aaa" for parameter "q"}
+
+  # slot should no exist
+  ? {C info slots q} ""
+
+  ? {C property -trace set {q:integer 99} {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }} ""
+
+  # slot should exist
+  ? {C info slots q} "::C::slot::q"
+
+  ? {C create c2 -q 111} ::c2
+  ? {c2 eval {info exists :q}} 1
+
+  ? {c2 cget -q} 112
+  ? {c2 configure -q 101} ""
+  ? {c2 cget -q} "102"
+}
+
+
+nx::test case configure-trace-object-type {
+  #
+  # object case with no default
+  #
+  
+  nx::Object create o
+  ? {o eval {info exists :A}} 0
+  o object property -trace set A:integer {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }
+  # puts [o info object variables A]
+  # puts [o info variable parameter [o info object variables A]]
+  # puts [[o info object slots A] getParameterSpec]
+  
+  ? {o eval {info exists :A}} 0
+  ? {o cget -A} {can't read "A": no such variable}
+  ? {o configure -A 1} ""
+  ? {o cget -A} "2"
+  ? {o configure -A x} {expected integer but got "x" for parameter "-A"}
+  ? {o cget -A} "2"
+  
+  #
+  # object case with default
+  #
+  
+  ? {o eval {info exists :B}} 0
+  ? {o object property -trace set {B:integer x} {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }} {expected integer but got "x" for parameter "B"}
+  ? {o eval {info exists :B}} 0
+
+  ? {o info object slots B} ""
+
+  ? {o object property -trace set {B:integer 1000} {
+    :public object method value=set {obj var value} {
+      ::nsf::var::set -notrace $obj $var [expr {$value + 1}]
+    }
+  }} {}
+
+  ? {o info object slots B} {::o::per-object-slot::B}
+  ? {o eval {info exists :B}} 1
+
+  ? {o cget -B} 1000
+  ? {o configure -B 1001} ""  
+  ? {o cget -B} 1002
+
+  ? {o configure -B x} {expected integer but got "x" for parameter "-B"}
+  ? {o cget -B} 1002
+}
+
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:

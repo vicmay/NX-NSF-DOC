@@ -1,0 +1,599 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package require nx
+package require nx::test
+
+set ::tcl86 [package vsatisfies [package req Tcl] 8.6-]
+
+###########################################
+# trivial object delegation
+###########################################
+nx::test case delegation {
+  nx::Object create dog
+  nx::Object create tail {
+    :public object method wag args { return $args }
+    :public object method nxwag args { return $args }
+  }
+  dog public object forward wag tail %proc
+  dog public object forward nxwag tail %method
+
+  ? {dog wag 100} 100
+  ? {dog nxwag 100} 100
+}
+
+
+###########################################
+# evaluating in scope
+###########################################
+nx::test case inscope {
+  nx::Class create X {
+    :property {x 1}
+    :public forward Incr -frame object incr
+  }
+
+  X create x1 -x 100
+  x1 Incr x
+  x1 Incr x
+  x1 Incr x
+  ? {x1 cget -x} 103
+}
+
+###########################################
+# adding
+###########################################
+nx::test case adding {
+  nx::Object create obj {
+    :public object forward addOne expr 1 +
+  }
+
+  ? {obj addOne 5} 6
+}
+
+###########################################
+# more arguments
+###########################################
+nx::test case multiple-args {
+  nx::Object create target {
+    :public object method foo args {return $args}
+  }
+  nx::Object create obj {
+    :public object forward foo target %proc %self a1 a2
+  }
+
+  ? {obj foo x1 x2} [list ::obj a1 a2 x1 x2]
+
+  obj public object forward foo target %proc %self %%self %%p
+  ? {obj foo x1 x2} [list ::obj %self %p x1 x2]
+}
+
+###########################################
+# mixin example
+###########################################
+nx::test case mixin-via-forward {
+  nx::Object create mixins {
+    :object method unknown {m args} {return [concat [current] $m $args]}
+  }
+
+  nx::Object create obj {
+    :public object forward Mixin mixins %1 %self
+  }
+
+  ? {obj Mixin add M1} [list ::mixins add ::obj M1]
+  ? {catch {obj Mixin}} 1
+
+  obj public object forward Mixin mixins "%1 {Getter Setter}" %self
+  ? {obj Mixin add M1} [list ::mixins add ::obj M1]
+  ? {obj Mixin M1} [list ::mixins Setter ::obj M1]
+  ? {obj Mixin} [list ::mixins Getter ::obj]
+}
+
+
+###########################################
+# sketching extensibe info
+###########################################
+nx::test case info-via-forward {
+  nx::Object create Info {
+    :public object method @mixin {o} {
+      $o info mixin
+    }
+    :public object method @class {o} { ;# without prefix, doing here a [Info class] wod be wrong
+      $o info class
+    }
+    :public object method @help {o} { ;# define a new subcommand for info
+      foreach c [:info object methods] {lappend result [string range $c 1 end]}
+      return $result
+    }
+  }
+  nx::Object public forward Info -prefix @ Info %1 %self
+
+  nx::Class create X {
+    :create x1
+  }
+  ? {x1 Info class} ::X
+  ? {x1 Info help} [list help mixin class]
+}
+
+###########################################
+# variations of placement of options
+###########################################
+nx::test case incr {
+  nx::Object create obj {
+    set :x 1
+    :public object forward i1 -frame object incr x
+  }
+
+  ? {obj i1} 2
+}
+
+###########################################
+# introspeciton options
+###########################################
+nx::test case introspection {
+  nx::Class create C {
+    :public forward Info -prefix @ Info %1 %self
+  }
+
+  ? {C info methods -type forwarder} Info
+  C public forward XXXo x
+  ? {lsort [C info methods -type forwarder]} [list Info XXXo]
+
+  ? {C info methods -type forwarder X*} [list XXXo]
+  ? {lsort [C info methods -type forwarder *o]} [list Info XXXo]
+
+  # delete the forwarder
+  C method XXXo {} {}
+  ? {C info methods -type forwarder} [list Info]
+
+  # get the definition of a instforwarder
+  ? {C info method definition Info} [list ::C public forward Info -prefix @ Info %1 %self]
+
+  # check introspection for objects
+  nx::Object create obj {
+    :public object forward i1 -frame object incr x
+    :public object forward Mixin mixin %1 %self
+    :public object forward foo target %proc %self %%self %%p
+    :public object forward addOne expr 1 +
+  }
+
+  ? {lsort [obj info object methods -type forwarder]} "Mixin addOne foo i1"
+  ? {obj info object method definition Mixin} "::obj public object forward Mixin mixin %1 %self"
+  ? {obj info object method definition addOne} "::obj public object forward addOne expr 1 +"
+  ? {obj info object method definition foo} "::obj public object forward foo target %proc %self %%self %%p"
+  ? {obj info object method definition i1} "::obj public object forward i1 -frame object ::incr x"
+}
+
+###########################################
+# test serializer
+###########################################
+package require nx::serializer
+nx::test case serializer {
+  nx::Object create obj {
+    :object method test {} {puts "i am [current method]"}
+  }
+  set ::a [Serializer deepSerialize obj]
+  #puts <<$::a>>
+  eval $::a
+  ? {set ::a} [Serializer deepSerialize obj]
+}
+
+###########################################
+# test optional target cmd
+###########################################
+nx::test case optional-target {
+  nx::Object create obj {
+    set :x 2
+    :public object forward append -frame object
+  }
+  ? {obj append x y z} 2yz
+
+  nx::Object create n; nx::Object create n::x {:public object method current {} {current}}
+  nx::Object create o
+  o public object forward ::n::x
+  ? {o x current} ::n::x
+}
+
+###########################################
+# arg including instvar
+###########################################
+nx::test case percent-cmd {
+  nx::Object create obj {
+    set :x 10
+    :public object forward x* expr {%:eval {set :x}} *
+  }
+  ? {obj x* 10} "100"
+}
+
+###########################################
+# positional arguments
+###########################################
+nx::test case positioning-args {
+  nx::Object create obj
+  obj public object forward @end-13 list {%@end 13}
+  ? {obj @end-13 1 2 3 } [list 1 2 3 13]
+
+  obj public object forward @-1-13 list {%@-1 13}
+  ? {obj @-1-13 1 2 3 } [list 1 2 13 3]
+
+  obj public object forward @1-13 list {%@1 13}
+  ? {obj @1-13 1 2 3 } [list 13 1 2 3]
+  ? {obj @1-13} [list 13]
+
+  obj public object forward @2-13 list {%@2 13}
+  ? {obj @2-13 1 2 3 } [list 1 13 2 3]
+
+  obj public object forward @list 10 {%@0 list} {%@end 99}
+  ? {obj @list} [list 10 99]
+  ? {obj @list a b c} [list 10 a b c 99]
+
+  obj public object forward @list {%@end 99} {%@0 list} 10
+  ? {obj @list} [list 10 99]
+  ? {obj @list a b c} [list 10 a b c 99]
+
+  obj public object forward @list {%@2 2} {%@1 1} {%@0 list}
+  ? {obj @list} [list 1 2]
+  ? {obj @list a b c} [list 1 2 a b c]
+
+  obj public object forward @list x y z {%@0 list} {%@1 1} {%@2 2}
+  ? {obj @list} [list 1 2 x y z]
+  ? {obj @list a b c} [list 1 2 x y z a b c]
+
+  obj public object forward @list x y z {%@2 2} {%@1 1} {%@0 list}
+  ? {obj @list} [list x 1 y 2 z]
+  ? {obj @list a b c} [list x 1 y 2 z a b c]
+
+  # adding some test cases which cover the interactions
+  # between %@POS and %1 substitutions
+  #
+
+  obj public object forward @end-13 list {%@end 13} %1 %self
+  ? {obj @end-13 1 2 3 } [list 1 ::obj 2 3 13]
+
+  obj public object forward @end-13 list %1 {%@end 13} %self
+  ? {obj @end-13 1 2 3 } [list 1 ::obj 2 3 13]
+
+  obj public object forward @end-13 list {%@end 13} %1 %1 %1 %self
+  ? {obj @end-13 1 2 3 } [list 1 1 1 ::obj 2 3 13]
+
+  obj public object forward @end-13 list {%@-1 13} %1 %self
+  ? {obj @end-13 1 2 3 } [list 1 ::obj 2 13 3]
+
+  obj public object forward @end-13 list {%@1 13} %1 %self
+  ? {obj @end-13 1 2 3 } [list 13 1 ::obj 2 3]
+}
+
+nx::test case forwarder-basics {
+
+  nx::Object create obj
+
+
+  ##
+  ## Particular role of first forwarder arg: (fully-qualified) target
+  ## & methodName in one (provides shortcut notation)
+  ##
+
+  ? {obj info object methods foo} ""
+  obj public object forward ::ns1::foo
+  ? {obj info object methods foo} "foo"
+  if {$::tcl86} {
+    ? {obj foo X} {TCL LOOKUP COMMAND ::ns1::foo} "invalid target command"
+  } else {
+    ? {obj foo X} {invalid command name "::ns1::foo"} "invalid target command"
+  }
+  namespace eval ::ns1 {proc foo {p} {return $p}}
+  ? {obj foo X} "X"
+  obj public object forward ::ns1::foo %method %method
+  ? {namespace eval ::ns1 { ::obj foo }} "foo"
+
+  # make sure, old-style arguments don't get moved into argument
+  # delegatee cmd (called target)
+  ? {obj public object forward x1 -methodprefix @ -verbose %self X} \
+      "target '-methodprefix' must not start with a dash"
+  ? {obj public object forward x2 -prefix @ -verbose %self X} \
+      "::obj::x2"
+  ? {obj x2 a b c} "::obj: unable to dispatch method '@X'"
+
+  ##
+  ## argclindex
+  ##
+
+  obj public object forward foo list {%argclindex {A B C}}
+  ? {obj foo} A
+  ? {obj foo _} "B _"
+  ? {obj foo _ _} "C _ _"
+  ? {obj foo _ _ _ _} "forward: not enough elements in specified list of ARGC argument argclindex {A B C}"
+
+  ##
+  ## %1 + defaults
+  ##
+
+  ::nsf::configure debug 2
+
+  obj public object method FOO args {return [current method]-$args}
+  obj public object method OOF args {return [current method]-$args}
+  obj public object forward foo -verbose %self %1
+  ? {obj foo} {%1 requires argument; should be "foo arg ..."}
+  obj public object forward foo -verbose %self {%1 FOO}
+  ? {obj foo} "FOO-"
+  ? {obj foo X} {::obj: unable to dispatch method 'X'}
+  obj public object forward foo -verbose %self {%1 FOO OOF}
+  ? {obj foo X} {::obj: unable to dispatch method 'X'}
+  obj public object forward foo -verbose %self {%1 {FOO OOF}}
+  ? {obj foo X} "OOF-X"
+  ? {obj foo X Y} {::obj: unable to dispatch method 'X'}
+  obj public object forward foo -verbose %self {%1 {FOO OOF}} {%1 {A B}}
+  ? {obj foo} "FOO-A"
+  obj public object forward foo -verbose %self {%1 {FOO OOF}} {%1 {A B}}
+  ? {obj foo X} "OOF-B X"
+
+  obj public object forward foo -verbose %self "%1\n{FOO\nOOF}" "%1\r{A\tB}"
+  ? {obj foo X} "OOF-B X"
+
+
+  ##
+  ## -prefix; requires a 2nd arg!
+  ##
+  ##
+
+  obj public object method _FOO args {return [current method]-$args}
+  ## 1) 2nd arg is missing! Prefix is silently neglected ...
+  obj public object forward FOO -prefix _ %self
+  ? {obj FOO} {::obj}
+  # 2) There is a 2nd arg, a method argument
+  ? {obj FOO FOO X} "_FOO-X" "prefix, 2nd arg is method argument"
+  # 3) There is a 2nd arg, a forwarder argument
+  obj public object forward FOO -prefix _ %self %1
+  ? {obj FOO FOO X} "_FOO-X" "prefix, 2nd arg is forwarder argument"
+  # 4) There is a 2nd arg, a forwarder argument provided through %1
+  obj public object forward FOO -prefix _ %self {%1 {FOO FOO}}
+  ? {obj FOO X} "_FOO-X" "prefix, 2nd arg is forwarder argument provided through %1"
+
+}
+
+nx::test case positioning-arg-extended {
+
+  nx::Object create obj
+  obj public object forward foo list {%@end %self}
+  ? {obj foo 1 2 3} [list 1 2 3 ::obj]
+  obj public object forward foo list {%@end %method}
+  ? {obj foo 1 2 3} [list 1 2 3 foo]
+
+  obj public object forward foo list {%@end %%}
+  ? {obj foo 1 2 3} [list 1 2 3 %]
+
+  obj public object forward foo list {%obj foo}
+  if {$::tcl86} {
+    # Avoid crashes when system stack size is limited (with forwards
+    # being more stack-hungry than, e.g., ordinary scripted methods).
+    set limit [interp recursionlimit {}]
+    interp recursionlimit {} 100
+    ? {obj foo 1 2 3} "TCL LIMIT STACK" "stack overflow"
+    interp recursionlimit {} $limit
+  } else {
+    # see CheckCStack in Tcl 8.5:
+    # https://core.tcl-lang.org/tcl/artifact?name=97fd3164833e9ef3&ln=3576
+    if {$::tcl_platform(platform) ne "windows" } {
+      ? {obj foo 1 2 3} {too many nested evaluations (infinite loop?)} "stack overflow"
+    } else {
+      ? {obj foo 1 2 3} {out of stack space (infinite loop?)} "stack overflow"
+    }
+  }
+
+  obj public object forward foo list {%apply {{x} {return $x}} A}
+  ? {obj foo 1 2 3} [list A 1 2 3]
+
+  ## positioning of "simple" cmd substitution works fine
+  obj public object forward foo list {%@end %obj}
+  ? {obj foo 1 2 3} [list 1 2 3 ::obj] "simple cmd substitution by position"
+
+  ## lindex allows for omitting the index arg or passing {} as index value ... forward catches both cases nicely:
+  obj public object forward foo list {%@{} %obj}
+  ? {obj foo 1 2 3} "forward: invalid index specified in argument %@{} %obj"
+
+  obj public object forward foo list {%@ %obj}
+  ? {obj foo 1 2 3} "forward: invalid index specified in argument %@ %obj"
+
+  ##
+  ## resolving name conflicts between Tcl commands & predefined
+  ## placeholder names -> use fully qualified names
+  ##
+
+  obj public object forward foo list {%@end %::proc}
+  if {$::tcl86} {
+    ? {obj foo 1 2 3} {TCL WRONGARGS} "provided wrong arguments for target command"
+  } else {
+    ? {obj foo 1 2 3} {wrong # args: should be "::proc name args body"} "provided wrong arguments for target command"
+  }
+
+  # the next test does not work unless called from nxsh, which imports ::nx::self
+  # obj public object forward foo list {%@end %::self}
+  #? {obj foo 1 2 3} [list 1 2 3 ::obj]
+
+  obj public object forward foo list {%@end %::nx::self}
+  ? {obj foo 1 2 3} [list 1 2 3 ::obj] "fully qualified self"
+
+  obj public object forward foo list {%@end %::1}
+  if {$::tcl86} {
+    ? {obj foo 1 2 3} {TCL LOOKUP COMMAND ::1} "forward to non-existing object"
+  } else {
+    ? {obj foo 1 2 3} {invalid command name "::1"} "forward to non-existing object"
+  }
+
+  ##
+  ## position prefixes are interpreted in a context-dependent manner:
+  ##
+
+  obj public object forward foo list {%@1 %@1}
+  if {$::tcl86} {
+    ? {obj foo 1 2 3} {TCL LOOKUP COMMAND @1}  "forward to non-existing cmd"
+  } else {
+    ? {obj foo 1 2 3} {invalid command name "@1"}  "forward to non-existing cmd"
+  }
+
+  if {![string length "ISSUES"]} {
+
+    ## list protection makes this fail
+    obj public object forward foo list {%@end {%argclindex {A B C D}}}
+    ? {obj foo 1 2 3} [list 1 2 3 D]
+
+    ## positioned "complex" cmd substitution (cmd + args) not working because of list protection
+    obj public object forward foo list {%@end {%list 1}}
+    ? {obj foo 1 2 3} [list 1 2 3 A]
+
+    ## Why not %1 not working with positioning working?
+    obj public object forward foo list {%@end %1}
+    ? {obj foo 1 2 3} [list 1 2 3 1]
+
+    ##
+    ## Should this be caught somehow? How would this be treated when list protection would not interfere?
+    ##
+    obj public object forward foo list {%@1 {%@1 "x"}}
+    ? {obj foo 1 2 3} "forward: invalid index specified in argument %@{} %obj"
+  }
+}
+
+
+###############################################
+# substitution depending on number of arguments
+###############################################
+nx::test case num-args {
+  nx::Object create obj {
+    :public object forward f %self [list %argclindex [list a b c]]
+    :object method a args {return [list [current method] $args]}
+    :object method b args {return [list [current method] $args]}
+    :object method c args {return [list [current method] $args]}
+  }
+  ? {obj f} [list a {}]
+  ? {obj f 1 } [list b 1]
+  ? {obj f 1 2} [list c {1 2}]
+  ? {catch {obj f 1 2 3}} 1
+}
+
+###############################################
+# option earlybinding
+###############################################
+nx::test case earlybinding {
+  nx::Object create obj {
+    #:public object forward s -earlybinding ::set ::X
+    :public object forward s ::set ::X
+  }
+  ? {obj s 100} 100
+  ? {obj s} 100
+
+  nx::Object public method f args { next }
+
+  nx::Class create NS
+  nx::Class create NS::Main {
+    :public object method m1 {} { :m2 }
+    :public object method m2 {} {
+      ? {namespace eval :: {nx::Object create toplevelObj1}} ::toplevelObj1
+
+      ? [list set _ [namespace current]] ::NS
+      ? [list set _ [NS create m1]] ::NS::m1
+      NS filters set f
+      ? [list set _ [NS create m2]] ::NS::m2
+      NS filters set ""
+
+      namespace eval ::test {
+        ? [list set _ [NS create m3]] ::test::m3
+        NS filters set f
+        ? [list set _ [NS create m4]] ::test::m4
+        NS filters set ""
+      }
+
+      namespace eval test {
+        ? [list set _ [NS create m5]] ::NS::test::m5
+        NS filters set f
+        ? [list set _ [NS create m6]] ::NS::test::m6
+        NS filters set ""
+      }
+    }
+
+    :public method i1 {} { :i2 }
+    :public method i2 {} {
+      ? {namespace eval :: {nx::Object create toplevelObj2}} ::toplevelObj2
+
+      ? [list set _ [namespace current]] ::NS
+      ? [list set _ [NS create i1]] ::NS::i1
+      NS filters set f
+      ? [list set _ [NS create i2]] ::NS::i2
+      NS filters set ""
+
+      namespace eval ::test {
+        ? [list set _ [NS create i3]] ::test::i3
+        NS filters set f
+        ? [list set _ [NS create i4]] ::test::i4
+        NS filters set ""
+      }
+
+      namespace eval test {
+        ? [list set _ [NS create i5]] ::NS::test::i5
+        NS filters set f
+        ? [list set _ [NS create i6]] ::NS::test::i6
+        NS filters set ""
+      }
+
+    }
+  }
+
+  #puts ====
+  NS::Main m1
+  NS::Main create m
+  m i1
+
+  #puts ====
+  ? [list set _ [NS create n1]] ::n1
+  NS filters set f
+  ? [list set _ [NS create n2]] ::n2
+  NS filters set ""
+
+  #puts ====
+  namespace eval test {
+    ? [list set _ [NS create n1]] ::test::n1
+    ? [list set _ [NS create n3]] ::test::n3
+    NS filters set f
+    ? [list set _ [NS create n4]] ::test::n4
+    NS filters set ""
+  }
+}
+
+###########################################
+# forward to expr + callstack
+###########################################
+nx::test case callstack {
+  nx::Object public forward expr -frame object
+
+  nx::Class create C {
+    :method xx {} {current}
+    :public object method t {o expr} {
+      return [$o expr $expr]
+    }
+  }
+  C create c1
+
+  ? {c1 expr {[current]}}               ::c1
+  ? {c1 expr {[current] eq "::c1"}}     1
+  ? {c1 expr {[:xx]}}           ::c1
+  ? {c1 expr {[:info class]}}   ::C
+  ? {c1 expr {[:info has type C]}}      1
+  ? {c1 expr {[:info has type ::C]}}    1
+
+  ? {C t ::c1 {[current]}}              ::c1
+  ? {C t ::c1 {[current] eq "::c1"}}  1
+  ? {C t ::c1 {[:xx]}}          ::c1
+  ? {C t ::c1 {[:info class]}} ::C
+  ? {C t ::c1 {[:info has type C]}}     1
+  ? {C t ::c1 {[:info has type ::C]}}	1
+
+  nx::Object method expr {} {}
+
+}
+
+
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:

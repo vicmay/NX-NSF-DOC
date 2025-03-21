@@ -1,0 +1,415 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package require nx
+package require nx::test
+
+#
+# simple method parameter tests
+#
+nx::test case method-params-0 {
+  nsf::proc p0 {} {return 1}
+  nsf::proc p1 {-x} {return [list [info exists x]]}
+
+  ? {p0} 1
+  # the following error msg comes from Tcl
+  ? {p0 -x} {wrong # args: should be "p0"}
+
+  ? {p1} 0
+  ? {p1 -x} {value for parameter '-x' expected}
+  ? {p1 -x 1} 1
+  ? {p1 -x 1 2} {invalid argument '2', maybe too many arguments; should be "p1 ?-x /value/?"}
+  ? {p1 -x 1 -y} {invalid non-positional argument '-y', valid are: -x;
+ should be "p1 ?-x /value/?"}
+  ? {p1 a} {invalid argument 'a', maybe too many arguments; should be "p1 ?-x /value/?"}
+  ? {p1 a -x} {invalid argument 'a', maybe too many arguments; should be "p1 ?-x /value/?"}
+
+  ? {p1 --} 0
+  ? {p1 -y} {invalid non-positional argument '-y', valid are: -x;
+ should be "p1 ?-x /value/?"}
+  ? {p1 -y --} {invalid non-positional argument '-y', valid are: -x;
+ should be "p1 ?-x /value/?"}
+
+  #
+  # should we really allow numeric nonpos arg names?
+  #
+  ? {nsf::proc p2 {1 -2 -3} {return [list ${1} [info exists 2] [info exists 3]]}} ""
+  ? {p2 -4 -2 -3 -3 -2} "-4 1 1" ;# var 2 has value "-3", var 3 has value "-2"
+  ? {p2 -4 -3 + -2 -1} "-4 1 1" ;# var 2 has value "-2", var 3 has value "+"
+
+  ? {nsf::proc p3 {1 -2 -3 4} {return [list ${1} [info exists 2] [info exists 3] ${4}]}} ""
+  ? {p3 -4 -3 -2 -1} "-4 0 1 -1" ;# var 1 has value "-4", var 4 has value "-1"
+}
+
+
+#
+# test behavior of parameter option nodashalnum
+#
+
+nx::test case nodashalnum {
+
+  nsf::proc p2a {-x args} {return [list [info exists x] $args]}
+  nsf::proc p2b {-x args:nodashalnum} {return [list [info exists x] $args]}
+
+  ? {p2a -x -y} {1 {}} ;# "-y" is the value of "x"
+  ? {p2b -x -y} {1 {}} ;# "-y" is the value of "x"
+
+  ? {p2a -x 1 -y} {1 -y}
+  ? {p2a -x 1 -100} {1 -100}
+
+  ? {p2b -x 1 -y} {invalid non-positional argument '-y', valid are: -x;
+ should be "p2b ?-x /value/? ?/arg .../?"}
+  ? {p2b -x 1 -100} {1 -100}
+
+  nsf::proc p3a {a -x -y b:nodashalnum -z} {return [list $a [info exists x] [info exists y] $b]}
+
+  ? {p3a 100 -x 1 -y 1 200} {100 1 1 200}
+  ? {p3a 100 -xx 1 -y 1 200} {invalid non-positional argument '-xx', valid are: -x, -y;
+ should be "p3a /a/ ?-x /value/? ?-y /value/? /b/ ?-z /value/?"}
+}
+
+#
+# Testing the unknown handler
+#
+
+nx::test case unknown-handler {
+
+  Class create C {
+    :public method p1 {-x} {return [list [info exists x]]}
+    :create c1
+  }
+  ? {c1 p1 -x 1 -y} {invalid non-positional argument '-y', valid are: -x;
+ should be "::c1 p1 ?-x /value/?"}
+
+  proc ::nsf::argument::unknown {method arg args} {
+    puts stderr "??? unknown nonpos-arg $arg in $method obj <$args>\n[info frame -1]\n"
+    return ""
+  }
+
+  ? {c1 p1 -x 1 -y} {invalid non-positional argument '-y', valid are: -x;
+ should be "::c1 p1 ?-x /value/?"}
+
+  if {0} {
+    proc ::nsf::argument::unknown {method arg args} {
+      # nasty handler redefines method
+      puts stderr "??? REDEFINE ::nsf::argument::unknown <$args> [info frame -1]"
+      C public method p1 {-y} {return [list [info exists y]]}
+      return ""
+    }
+
+    ? {c1 p1 -x 1 -y} {invalid non-positional argument '-y', valid are: -x;
+ should be "::c1 p1 ?-x /value/?"}
+  }
+}
+
+#
+# testing error message when flags are used within an ensemble
+#
+
+nx::test case flag-in-ensemble {
+  nx::Class create C
+
+  if {[::nsf::pkgconfig get development]} {
+    set info {info baseclass, info children, info class, info filters, info has mixin, info has namespace, info has type, info heritage, info info, info instances, info lookup filter, info lookup filters, info lookup method, info lookup methods, info lookup mixins, info lookup parameters, info lookup slots, info lookup syntax, info lookup variables, info method args, info method body, info method callprotection, info method debug, info method definition, info method definitionhandle, info method deprecated, info method disassemble, info method exists, info method handle, info method origin, info method parameters, info method registrationhandle, info method returns, info method submethods, info method syntax, info method type, info methods, info mixinof, info mixins, info name, info object filters, info object method args, info object method body, info object method callprotection, info object method debug, info object method definition, info object method definitionhandle, info object method deprecated, info object method disassemble, info object method exists, info object method handle, info object method origin, info object method parameters, info object method registrationhandle, info object method returns, info object method submethods, info object method syntax, info object method type, info object methods, info object mixins, info object slots, info object variables, info parent, info precedence, info slots, info subclasses, info superclasses, info variable definition, info variable name, info variable parameter, info variables, info vars}
+  } else {
+    set info {info baseclass, info children, info class, info filters, info has mixin, info has namespace, info has type, info heritage, info info, info instances, info lookup filter, info lookup filters, info lookup method, info lookup methods, info lookup mixins, info lookup parameters, info lookup slots, info lookup syntax, info lookup variables, info method args, info method body, info method callprotection, info method debug, info method definition, info method definitionhandle, info method deprecated, info method exists, info method handle, info method origin, info method parameters, info method registrationhandle, info method returns, info method submethods, info method syntax, info method type, info methods, info mixinof, info mixins, info name, info object filters, info object method args, info object method body, info object method callprotection, info object method debug, info object method definition, info object method definitionhandle, info object method deprecated, info object method exists, info object method handle, info object method origin, info object method parameters, info object method registrationhandle, info object method returns, info object method submethods, info object method syntax, info object method type, info object methods, info object mixins, info object slots, info object variables, info parent, info precedence, info slots, info subclasses, info superclasses, info variable definition, info variable name, info variable parameter, info variables, info vars}
+  }
+
+  
+  ? {C info superclasses} "::nx::Object"
+  ? {C info -a superclass} "unable to dispatch sub-method \"-a\" of ::C info; valid are: $info"
+  ? {C info -- superclass} "unable to dispatch sub-method \"--\" of ::C info; valid are: $info"
+  ? {C info -- -a superclass} "unable to dispatch sub-method \"--\" of ::C info; valid are: $info"
+  ? {C info -a -- superclass} "unable to dispatch sub-method \"-a\" of ::C info; valid are: $info"
+}
+
+
+#
+# Testing error messages in info subclasses, when too many arguments are
+# specified, or when wrong non-positional arguments are given. The
+# argument "pattern" in "info subclasses" has parameter option
+# "nodashalnum" set.
+#
+
+nx::test case info-subclass-error-messages {
+  nx::Class create C
+  nx::Class create D -superclass C
+  nx::Class create E -superclass C
+
+  #
+  # no argument
+  #
+  ? {C info subclasses} "::E ::D"
+  ? {C info subclasses --} "::E ::D"
+
+  #
+  # one argument
+  #
+  ? {C info subclasses a} ""
+
+  #
+  # The argument definition of "pattern" for subclass has
+  # "nodashalnum" option, therefore, we can deduce that "-a" must be
+  # a flag. OTOH, if "-a" is a proper value (e.g. value of a
+  # variable), then the following command would be perfectly fine.
+  #
+  ? {C info subclasses -a} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -a --} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -- -a} ""
+  ? {C info subclasses -1} ""
+  ? {C info subclasses -- -1} ""
+  ? {C info subclasses -1 --} \
+      {invalid argument '--', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  #
+  # two arguments
+  #
+  ? {C info subclasses a b} \
+      {invalid argument 'b', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -- a b} \
+      {invalid argument 'b', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses a -- b} \
+      {invalid argument '--', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses a b --} \
+      {invalid argument 'b', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  # first flag
+
+  ? {C info subclasses -a b} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -- -a b} \
+      {invalid argument 'b', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -a -- b} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -a b --} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  # second flag
+
+  ? {C info subclasses a -b} \
+      {invalid argument '-b', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -- a -b} \
+      {invalid argument '-b', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses a -- -b} \
+      {invalid argument '--', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses a -b --} \
+      {invalid argument '-b', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  # both flag
+
+  ? {C info subclasses -a -b} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -- -a -b} \
+      {invalid argument '-b', maybe too many arguments; should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -a -- -b} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -a -b --} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+}
+
+
+#
+# Testing error messages in info superclasses, when too many arguments
+# are specified, or when wrong non-positional arguments are
+# given. The argument "pattern" in "info superclasses" has parameter option
+# "nodashalnum" NOT set.
+#
+
+nx::test case info-superclass-error-messages {
+  nx::Class create C
+  nx::Class create D -superclass C
+
+  #
+  # no argument
+  #
+  ? {D info superclasses} "::C"
+  ? {D info superclasses --} "::C"
+
+  #
+  # one argument
+  #
+  ? {D info superclasses a} ""
+
+  #
+  # The argument definition of "pattern" for superclass has no
+  # "nodashalnum" option, "-a" is treated like a pattern.
+  #
+  ? {D info superclasses -a} ""
+  ? {D info superclasses -a --} \
+      {invalid argument '--', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+  ? {D info superclasses -- -a} ""
+  ? {D info superclasses -1} ""
+
+  #
+  # two arguments
+  #
+  ? {D info superclasses a b} \
+      {invalid argument 'b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses -- a b} \
+      {invalid argument 'b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses a -- b} \
+      {invalid argument '--', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses a b --} \
+      {invalid argument 'b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  # first flag
+
+  ? {D info superclasses -a b} \
+      {invalid argument 'b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses -- -a b} \
+      {invalid argument 'b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses -a -- b} \
+      {invalid argument '--', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses -a b --} \
+      {invalid argument 'b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  # second flag
+
+  ? {D info superclasses a -b} \
+      {invalid argument '-b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses -- a -b} \
+      {invalid argument '-b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses a -- -b} \
+      {invalid argument '--', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses a -b --} \
+      {invalid argument '-b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  # both flag
+
+  ? {D info superclasses -a -b} \
+      {invalid argument '-b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses -- -a -b} \
+      {invalid argument '-b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses -a -- -b} \
+      {invalid argument '--', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+  ? {D info superclasses -a -b --} \
+      {invalid argument '-b', maybe too many arguments; should be "::D info superclasses ?-closure? ?/pattern/?"}
+
+}
+
+#
+# Test interactions of parameter option nodashalnum in "pattern"
+# with values starting with a dash.
+#
+
+nx::test case info-with-dash-class-names {
+  nx::Class create C
+  nx::Class create -a -superclass C
+  nx::Class create -b -superclass -a
+
+  #
+  # no argument
+  #
+  ? {C info subclasses} "::-a"
+  ? {C info subclasses --} "::-a"
+
+  ? {-b info superclasses} "::-a"
+  ? {-b info superclasses --} "::-a"
+
+  #
+  # one argument
+  #
+  ? {C info subclasses -a} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -a --} \
+      {invalid non-positional argument '-a', valid are: -closure, -dependent;
+ should be "::C info subclasses ?-closure? ?-dependent? ?/pattern/?"}
+
+  ? {C info subclasses -- -a} "::-a"
+
+  ? {-b info superclasses -a} "::-a"
+  ? {-b info superclasses -a --} \
+      {invalid argument '--', maybe too many arguments; should be "::-b info superclasses ?-closure? ?/pattern/?"}
+  ? {-b info superclasses -- -a} "::-a"
+}
+
+#
+# Test abbreviations
+#
+
+nx::test case abbrevs1 {
+
+  nsf::proc x {-super -super11 -superclass -super12} {
+    return [info exists super]-[info exists super11]-[info exists superclass]-[info exists super12]
+  }
+  ? {x -super 1} "1-0-0-0"
+  ? {x -super1 1} "the provided argument -super1 is an abbreviation for -super11 and -super12"
+  ? {x -superc 1} "0-0-1-0"
+  ? {x -super12 1} "0-0-0-1"
+
+  nsf::proc y {-aaa1 -aa1 -a1 -a} { return [info exists aaa1]-[info exists aa1]-[info exists a1]-[info exists a] }
+
+  ? {y -a 1} "0-0-0-1"
+  ? {y -aa 1} {invalid non-positional argument '-aa', valid are: -aaa1, -aa1, -a1, -a;
+ should be "y ?-aaa1 /value/? ?-aa1 /value/? ?-a1 /value/? ?-a /value/?"}
+  ? {y -aaa 1} "1-0-0-0"
+  ? {y -aa1 1} "0-1-0-0"
+}
+
+#
+# leading dash and numbers
+#
+
+nx::test case abbrevs2 {
+
+  nsf::proc x {-x y:integer} {
+    return [info exists x]-$y
+  }
+  ? {x 1} "0-1"
+  ? {x -1} "0--1"
+  ? {x -- -1} "0--1"
+
+  nsf::proc y {-1 y:integer} {
+    return [info exists 1]-$y
+  }
+  ? {y 1} "0-1"
+  ? {y -1} "value for parameter '-1' expected"
+  ? {y -- -1} "0--1"
+}
+
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:

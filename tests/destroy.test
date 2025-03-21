@@ -1,0 +1,1120 @@
+# -*- Tcl -*-
+package require nx
+package require nx::test
+
+set ::tcl86 [package vsatisfies [package req Tcl] 8.6-]
+
+nx::test configure -count 10
+
+::nx::configure defaultMethodCallProtection false
+
+::nsf::method::alias ::nx::Object set -frame object ::set
+
+nx::Class create O -superclass nx::Object {
+  :method init {} {
+    set ::ObjectDestroy 0
+    set ::firstDestroy 0
+  }
+  :method destroy {} {
+    incr ::ObjectDestroy
+    #[:info class] dealloc [current]
+    next
+  }
+}
+
+#
+# classical simple case
+#
+set case "simple destroy (1)"
+nx::test case simple-destroy-1
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  :destroy
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  puts stderr XXXX2
+  ? "[current] set x" 1 "$::case can still access [current]"
+  puts stderr XXXX3
+  ? {::nsf::object::exists c1} 1 "$::case object still exists in proc"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  ? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+}
+C create c1
+c1 foo
+
+? {::nsf::object::exists c1} 0 "$::case object deleted"
+? "set ::firstDestroy" 1 "firstDestroy called"
+
+
+#
+# simple case, destroy does not propagate, c1 survives
+#
+set case "simple destroy (2), destroy blocks"
+nx::test case simple-destroy-2
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy block"}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  :destroy
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  ? "[current] set x" 1 "$::case can still access [current]"
+  ? {::nsf::object::exists c1} 1 "$::case object still exists in proc"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  ? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+}
+C create c1
+c1 foo
+
+? {::nsf::object::exists c1} 1 "$::case object deleted"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+
+#
+# simple object recreate
+#
+set case "recreate"
+nx::test case recreate
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  [:info class] create [current]
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  ? "[current] set x" 1 "$::case can still access [current]"
+  ? {::nsf::object::exists c1} 1 "$::case object still exists in proc"
+  ? "set ::firstDestroy" 0 "firstDestroy called"
+  ? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+}
+C create c1
+c1 foo
+
+? {::nsf::object::exists c1} 1 "$::case object deleted"
+? "set ::firstDestroy" 0 "firstDestroy called"
+
+#
+# cmd rename to empty, xotcl provides its own rename and calls destroy
+# .. like simple case above
+#
+set case "cmd rename empty (1)"
+nx::test case rename-empty-1
+nx::Object create o
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  rename [current] ""
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  ? "[current] set x" 1 "$::case can still access [current]"
+  ? {::nsf::object::exists c1} 1 "$::case object still exists in proc"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  ? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+}
+C create c1
+c1 foo
+
+? {::nsf::object::exists c1} 0 "$::case object still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+
+#
+# cmd rename to empty, xotcl provides its own rename and calls
+# destroy, but destroy does not propagate, c1 survives rename, since
+# this is the situation like above, as long xotcl's rename is used.
+#
+set case "cmd rename empty (2)"
+nx::test case rename-empty-2
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy block"}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  rename [current] ""
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  ? "[current] set x" 1 "$::case can still access [current]"
+  ? {::nsf::object::exists c1} 1 "$::case object still exists in proc"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  ? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+}
+C create c1
+c1 foo
+
+#puts stderr ======[c1 set x]
+? {::nsf::object::exists c1} 1 "$::case object still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+
+#
+# cmd rename other xotcl object to current, 
+# xotcl's rename invokes a move 
+#
+set case "cmd rename object to current"
+nx::test case rename-to-current
+nx::Object create o
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  rename o [current]
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  #? "[current] set x" 1 "$::case can still access [current]"
+
+  if {$::tcl86} {
+    ? "[current] set x" {TCL LOOKUP VARNAME x} "$::case cannot access [current]"
+  } else {
+    ? "[current] set x" {can't read "x": no such variable} "$::case cannot access [current]"
+  }
+  ? {::nsf::object::exists c1} 1 "$::case object still exists in proc"
+  #? "set ::firstDestroy" 0 "firstDestroy called"
+  #? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  ? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+}
+C create c1
+c1 foo
+
+? {::nsf::object::exists c1} 1 "$::case object still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+
+#
+# cmd rename other proc to current object, 
+# xotcl's rename invokes a move 
+#
+set case "cmd rename proc to current"
+nx::test case rename-proc-to-current
+proc o args {}
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  set x [catch {rename o [current]}]
+  ? "set _ $x" 1 "$::case tcl refuses to rename into an existing command"
+}
+C create c1
+c1 foo
+? {::nsf::object::exists c1} 1 "$::case object still exists after proc"
+? "set ::firstDestroy" 0 "firstDestroy called"
+? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+
+rename o ""
+
+#
+# namespace delete: tcl delays delete until the namespace is not
+# active anymore. destroy is called after BBBB. Hypothesis: destroy is
+# called only when we are lucky, since C might be destroyed before c1
+# by the namespace delete
+#
+
+set case "delete parent namespace (1)"
+nx::test case delete-parent-namespace
+namespace eval ::test {
+  nx::Class create C -superclass O
+  C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+  C method foo {} {
+    puts stderr "==== $::case [current]"
+    namespace delete ::test
+    
+    puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+    :set x 1
+    #
+    # If the following line is commented in, the namespace is deleted
+    # here. Is there a bug with nsPtr->activationCount
+    #
+    #? "[current] set x" 1 "$::case can still access [current]"
+    puts stderr "BBB"
+    puts stderr "???? [current] exists [::nsf::object::exists [current]]"
+    ? "::nsf::object::exists [current]" 0 ;# WHY?
+    puts stderr "???? [current] exists [::nsf::object::exists [current]]"
+    ? "set ::firstDestroy" 0 "firstDestroy called"
+    ? "set ::ObjectDestroy" 0 "$::case destroy not yet called"
+  }
+}
+test::C create test::c1
+test::c1 foo
+
+? {::nsf::object::exists test::c1} 0  "object still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 1 "destroy was called when popping stack frame"
+? {::nsf::object::exists ::test::C} 0  "class still exists after proc"
+? {namespace exists ::test::C} 0  "namespace ::test::C still exists after proc"
+? {namespace exists ::test} 1  "parent ::test namespace still exists after proc"
+? {namespace exists ::xotcl::classes::test::C} 0  "namespace ::xotcl::classes::test::C still exists after proc"
+
+#
+# namespace delete: tcl delays delete until the namespace is not
+# active anymore. destroy is called after BBBB, but does not
+# propagate.  
+#
+set case "delete parent namespace (2)"
+nx::test case delete-parent-namespace-2
+namespace eval ::test {
+  ? {namespace exists test::C} 0 "exists test::C"
+  nx::Class create C -superclass O
+  C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy block"}
+  C method foo {} {
+    puts stderr "==== $::case [current]"
+    namespace delete ::test
+    puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+    :set x 1
+    #
+    # If the following line is commented in, the namespace is deleted
+    # here. Is there a bug with nsPtr->activationCount
+    #
+    #? "[current] set x" 1 "$::case can still access [current]"
+    puts stderr "BBBB"
+    puts stderr "???? [current] exists [::nsf::object::exists [current]]"
+    ? "::nsf::object::exists [current]" 0 "$::case object still exists in proc";# WHY?
+    puts stderr "???? [current] exists [::nsf::object::exists [current]]"
+    ? "set ::firstDestroy" 0 "firstDestroy called"
+    ? "set ::ObjectDestroy" 0  "ObjectDestroy called"; # NOT YET CALLED
+  }
+}
+test::C create test::c1
+test::c1 foo
+
+? {::nsf::object::exists test::c1} 0  "$::case object still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 0 "ObjectDestroy called"  ;# toplevel destroy was blocked
+
+#
+# controlled namespace delete: xotcl has its own namespace cleanup,
+# topological order should be always ok. however, the object o::c1 is
+# already deleted, while a method of it is executed
+#
+set case "delete parent object (1)"
+nx::test case delete-parent-object
+nx::Object create o
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  o destroy
+  puts stderr "AAAA"
+  # the following object::exists call has a problem in Tcl_GetCommandFromObj(), 
+  # which tries to access invalid memory
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  #? "[current] set x" 1 "$::case can still access [current]"
+  puts stderr "BBBB"
+  ? {::nsf::object::exists ::o::c1} 0 "$::case object still exists in proc"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  ? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+}
+C create o::c1
+o::c1 foo
+
+? {::nsf::object::exists ::o::c1} 0 "$::case object o::c1 still exists after proc"
+? {::nsf::object::exists o} 0 "$::case object o still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+
+#
+# controlled namespace delete: xotcl has its own namespace cleanup.
+# destroy does not delegate, but still o::c1 does not survive, since o
+# is deleted.
+#
+set case "delete parent object (2)"
+nx::test case delete-parent-object-2
+nx::Object create o
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy block"}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  o destroy
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  #? "[current] set x" 1 "$::case can still access [current]"
+  puts stderr "BBB"
+  ? {::nsf::object::exists ::o::c1} 0 "$::case object still exists in proc"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  ? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+}
+C create o::c1
+o::c1 foo
+
+? {::nsf::object::exists ::o::c1} 0 "$::case object still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+
+
+#
+# create another cmd with the current object's name.
+# XOTcl 1.6 crashed on this test.
+#
+set case "redefine current object as proc"
+nx::test case redefine-current-object-as-proc
+nx::Object create o
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  proc [current] {args} {puts HELLO}
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  #? "[current] set x" 1 "$::case can still access [current]"
+  puts stderr "BBB"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  ? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+  ? {::nsf::object::exists c1} 0 "$::case object still exists in proc"
+}
+C create c1
+c1 foo
+
+? {::nsf::object::exists c1} 0 "$::case object still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+
+rename c1 ""
+
+#
+# delete the active class
+#
+set case "delete active class"
+nx::test case delete-active-class
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  C destroy
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  #? "[current] set x" 1 "$::case can still access [current]"
+  puts stderr "BBB"
+  #? [:info class] ::xotcl::Object "object reclassed"
+  ? [:info class] ::C "object reclassed?"
+  ? "set ::firstDestroy" 0 "firstDestroy called"
+  ? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+  ? {::nsf::object::exists c1} 1 "object still exists in proc"
+  #? {::nsf::is class ::C} 0 "class still exists in proc"
+  ? {::nsf::is class ::C} 1 "class still exists in proc"
+}
+C create c1
+c1 foo
+
+? {::nsf::object::exists c1} 1 "object still exists after proc"
+? [c1 info class] ::nx::Object "after proc: object reclassed?"
+? "set ::firstDestroy" 0 "firstDestroy called"
+? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+
+#
+# delete active object nested in class
+#
+set case "delete active object nested in class"
+nx::test case delete-active-object-nested-in-class
+nx::Class create C -superclass O
+C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+C method foo {} {
+  puts stderr "==== $::case [current]"
+  C destroy
+  puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+  :set x 1
+  #? "[current] set x" 1 "$::case can still access [current]"
+  puts stderr "BBB"
+  #? "set ::firstDestroy" 0 "firstDestroy called"
+  ? "set ::firstDestroy" 1 "firstDestroy called"
+  #? "set ::ObjectDestroy" 0 "ObjectDestroy called"
+  ? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+  ? [:info class] ::C "object reclassed"
+  #? [:info class] ::xotcl::Object "object reclassed"
+  ? {::nsf::object::exists ::C::c1} 1 "object still exists in proc"
+  ? {::nsf::is class ::C} 1 "class still exists in proc"
+}
+C create ::C::c1
+C::c1 foo
+#puts stderr ======[::nsf::object::exists ::C::c1]
+? {::nsf::object::exists ::C::c1} 0 "object still exists after proc"
+? {::nsf::is class ::C} 0 "class still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 1 "ObjectDestroy called"
+
+#
+nx::test case nesting-destroy {
+  nx::Object create x
+  nx::Object create x::y
+  x destroy
+  ? {::nsf::object::exists x} 0 "parent object gone"
+  ? {::nsf::object::exists x::y} 0 "child object gone"
+}
+
+nx::test case deleting-aliased-object1 {
+  nx::Object create o
+  nx::Object create o2
+  # behave like an ensemble: aliased object has self of the caller
+  ::nsf::object::property o2 perobjectdispatch 1
+  ::nsf::method::alias o a o2
+  ? {o a} ::o2 "call object via alias"
+  ? {o info object method type a} alias
+  ## the ensemble-object needs per-object methods
+  o2 object method info args {:info {*}$args}
+  o2 object method set args {:set {*}$args}
+  ::nsf::object::property o2 keepcallerself 1
+  ? {o a info vars} "" "call info on aliased object"
+  ? {o set x 10} 10   "set variable on object"
+  ? {o info vars} x   "query vars"
+  ? {o a info vars} x  "query vars via alias"
+  ? {o a set x} 10     "set var via alias"
+  o2 destroy
+  #? {o a info vars} "Trying to dispatch deleted object via method 'a'" "1st call on deleted object"
+  #? {o a info vars} "::o: unable to dispatch method 'a'" "2nd call on deleted object"
+  ? {o a info vars} {target "o2" of alias a apparently disappeared} "1st call on deleted object"
+  ? {o a info vars} {target "o2" of alias a apparently disappeared} "2nd call on deleted object"
+}
+
+nx::test case deleting-aliased-object2 {
+  nx::Object create o
+  nx::Object create o2
+  # The methods of the aliased object have their own self
+  ::nsf::method::alias o a o2
+
+  ? {o a} ::o2 "call object via alias"
+
+  ? {o info object method type a} alias
+  # In order to avoid recursive calls, we have to provide the
+  # selector for the method definitions in nx::Object
+  o2 object method info args {: ::nsf::classes::nx::Object::info {*}$args}
+  o2 object method set args {: ::nsf::classes::nx::Object::set {*}$args}
+
+  ? {o a info vars} ""   "call info on aliased object"
+  ? {o set x 10} 10     "set variable on object o"
+  ? {o info vars} x     "query vars of o"
+  ? {o a info vars} ""  "query vars via alias (from o2)"
+  ? {o a set y 1} 1     "set var via alias (on o2)"
+  ? {o a info vars} y   "query vars via alias (from o2)"
+  o2 destroy
+  #? {o a info vars} "Trying to dispatch deleted object via method 'a'" "1st call on deleted object"
+  #? {o a info vars} "::o: unable to dispatch method 'a'" "2nd call on deleted object"
+  ? {o a info vars} {target "o2" of alias a apparently disappeared} "1st call on deleted object"
+  ? {o a info vars} {target "o2" of alias a apparently disappeared} "2nd call on deleted object"
+}
+
+set case "deleting object with alias to object"
+nx::test case deleting-object-with-alias-to-object
+nx::Object create o
+nx::Object create o3
+::nsf::method::alias o x o3
+o destroy
+? {::nsf::object::exists o} 0 "parent object gone"
+? {::nsf::object::exists o3} 1 "aliased object still here"
+o3 destroy
+? {::nsf::object::exists o3} 0 "aliased object destroyed"
+
+set case "create an alias, and delete cmd via aggregation"
+nx::test case create-alias-delete-via-aggregation
+nx::Object create o
+nx::Object create o3
+::nsf::method::alias o x o3
+#o::x destroy
+o3 destroy
+? {o x foo} {target "o3" of alias x apparently disappeared}
+#? {o x foo} {Trying to dispatch deleted object via method 'x'}
+? {::nsf::object::exists o3} 0 "aliased object destroyed"
+o destroy
+
+#
+# create an alias, and recreate obj
+#
+nx::test case create-alias-and-recreate-obj {
+  nx::Object create o
+  nx::Object create o3
+  o object alias x o3
+  nx::Object create o3
+  o3 object method set args {: ::nsf::classes::nx::Object::set {*}$args}
+  o x set a 13
+  ? {o x set a} 13 "aliased object works after recreate"
+}
+
+#
+# create an alias on the class level, double aliasing, delete aliased
+# object
+#
+nx::test case create-alias-on-class-delete-aliased-obj {
+  nx::Class create C
+  nx::Object create o
+  nx::Object create o3
+
+  ::nsf::object::property o keepcallerself 1
+  ::nsf::object::property o3 keepcallerself 1
+  ::nsf::object::property o perobjectdispatch 1
+  ::nsf::object::property o3 perobjectdispatch 1
+  o object alias a o3
+  C alias b o
+
+  o3 object method set args {: ::nsf::classes::nx::Object::set {*}$args}
+  o object method set args {: ::nsf::classes::nx::Object::set {*}$args}
+
+  C create c1
+  ? {c1 b set B 2} 2 "call 1st level"
+  ? {c1 b a set A 3} 3 "call 2nd level"
+  
+  ? {c1 set B} 2 "call 1st level ok"
+  ? {c1 set A} 3 "call 2nd level ok"
+  o destroy
+  #? {c1 b} "Trying to dispatch deleted object via method 'b'" "call via alias to deleted object"
+  ? {c1 b} {target "o" of alias b apparently disappeared} "call via alias to deleted object"
+}
+
+#
+# create an alias on the class level, double aliasing, destroy class
+#
+nx::test case create-alias-on-class-destroy-class {
+  nx::Class create C
+  nx::Object create o
+  nx::Object create o3
+  o object alias a o3
+  C alias b o
+  C create c1
+  C destroy
+  ? {::nsf::object::exists o} 1 "object o still here"
+  ? {::nsf::object::exists o3} 1 "object o3 still here"
+}
+
+#
+# test cases where preexisting namespaces are re-used
+#
+
+nx::test case module {
+  # create a namespace with an object/class in it
+  namespace eval ::module { nx::Object create foo }
+  
+  # reuse the namespace for a class/object
+  nx::Class create ::module
+
+  ? {::nsf::is class ::module} 1
+
+  # delete the object/class ... and namespace
+  ::module destroy
+
+  ? {::nsf::is class ::module} 0
+}
+
+nx::test case namespace-import {
+
+  namespace eval ::module {
+    nx::Class create Foo {
+      :create foo
+    }
+    namespace export Foo foo
+  }
+  nx::Class create ::module {
+    :create mod1
+  }
+  ? {::nsf::is class ::module::Foo} 1
+  ? {::nsf::is class ::module::foo} 0
+  ? {::nsf::object::exists ::module::foo} 1
+  ? {::nsf::is class ::module} 1
+
+  nx::Object create ::o { :require namespace }
+  namespace eval ::o {namespace import ::module::*}
+
+  ? {::nsf::is class ::o::Foo} 1
+  ? {::nsf::object::exists ::o::foo} 1
+
+  # do not destroy namespace imported objects/classes
+  ::o destroy
+
+  ? {::nsf::is class ::o::Foo} 0
+  ? {::nsf::object::exists ::o::foo} 0
+
+  ? {::nsf::is class ::module::Foo} 1
+  ? {::nsf::object::exists ::module::foo} 1
+
+  ::module destroy
+}
+
+
+# to avoid CallDirectly, we could activate this line
+::nx::Class create M {:method dealloc args {next}}
+
+nx::test case delete-parent-namespace-dealloc
+namespace eval ::test {
+  nx::Class create C -superclass O
+  C method destroy {} {incr ::firstDestroy; puts stderr "  *** [current] destroy"; next}
+  C method foo {} {
+    puts stderr "==== $::case [current]"
+    namespace delete ::test
+    puts stderr "AAAA [current] exists [::nsf::object::exists [current]]"
+    :set x 1
+    #
+    # If the following line is commented in, the namespace is deleted
+    # here. Is there a bug with nsPtr->activationCount
+    #
+    #? "[current] set x" 1 "$::case can still access [current]"
+    puts stderr "???? [current] exists [::nsf::object::exists [current]]"
+    ? "::nsf::object::exists [current]" 0 ;# WHY?
+    puts stderr "???? [current] exists [::nsf::object::exists [current]]"
+    ? "set ::firstDestroy" 0 "firstDestroy called"
+    ? "set ::ObjectDestroy" 0 "$::case destroy not yet called"
+  }
+}
+
+test::C create test::c1
+test::c1 foo
+? {::nsf::object::exists test::c1} 0  "object still exists after proc"
+? "set ::firstDestroy" 1 "firstDestroy called"
+? "set ::ObjectDestroy" 1 "destroy was called when popping stack frame"
+? {::nsf::object::exists ::test::C} 0  "class still exists after proc"
+? {namespace exists ::test::C} 0  "namespace ::test::C still exists after proc"
+? {namespace exists ::test} 1  "parent ::test namespace still exists after proc"
+? {namespace exists ::xotcl::classes::test::C} 0  "namespace ::xotcl::classes::test::C still exists after proc"
+
+nx::test case destroy-during-init {
+  # create class
+  nx::Class create Foo {
+    :public method bar {} {return 1}
+    :public method baz {} {return 2}
+  }
+  
+  # create object
+  Foo create f1 { :bar; :baz; :destroy } 
+
+  ? {info command f1} "" "explicit destroy of object"
+
+  set c [nx::Class new {
+    :public method bar {} {return 1}
+    :public method baz {} {return 2}
+    :new { :bar; :baz; :destroy }
+    :destroy
+  }]
+
+  ? [list info command $c] "" "explicit destroy of class"
+
+  package require nx::volatile
+  ::nsf::method::require ::nx::Object volatile
+
+  # create new class and object and cleanup everything
+  set x [nx::Class new {
+    :volatile
+    :public method bar {} {return 1}
+    :public method baz {} {return 2}
+    :new { :volatile; :bar; :baz }
+  }]
+  
+  ? [list info command $x] "" "destroy via volatile"
+  
+  set x [nx::Class new -volatile {
+    :public method bar {} {return 1}
+    :public method baz {} {return 2}
+    :new { :volatile; :bar; :baz }
+  }]
+  
+  ? [list info command $x] $x "destroy via volatile method"
+
+  # create new class and object and cleanup everything + 2 filters
+
+  ::nx::Object public method f1 args {next}
+  ::nx::Object public method f2 args {next}
+  ::nx::Object filters set {f1 f2}
+
+  set x [nx::Class new {
+    :volatile
+    :public method bar {} {return 1}
+    :public method baz {} {return 2}
+    :new { :volatile; :bar; :baz }
+  }]
+  
+  ? [list info command $x] "" "destroy via volatile + 2 filters"
+  
+  set x [nx::Class new -volatile {
+    :public method bar {} {return 1}
+    :public method baz {} {return 2}
+    :new { :volatile; :bar; :baz }
+  }]
+  
+  ? [list info command $x] $x "destroy via volatile method + 2 filters"
+
+  ::nx::Object filters set ""
+}
+
+nx::test case nested-ordered-composite {
+  # The following test case an explicit deletion/redefinition of an
+  # toplevel object (o1) will cause the implicit deletion of a nested
+  # object o1::o2. The object o2 has as well several included objects,
+  # containing an "ordered composite". The deletion of the ordered
+  # compostite causes the (explicit) deletion of its siblings (all
+  # children of o1::o2). This is actually a stress test for the deletion
+  # of o2's namespace, since the loop over its children will be
+  # confronted with the deletion of indirectly deleted items (deleted by
+  # the deletion of the ordered composite).
+
+  nx::Class create C {
+    :property os
+    :public method destroy {} {
+      #puts stderr "[self] destroy ${:os}"
+      foreach o ${:os} {
+	if {[::nsf::object::exists $o]} {
+	  #puts stderr "--D $o destroy"
+	  $o destroy
+	}
+	next
+      }
+    }
+  }
+  #
+  # 10 siblings of oc1:
+  # deletion order in bucket: 8 4 10 9 5 1 6 2 oc1 7 3
+  # oc1 deletes 7 and 3, fine
+  # ... loop might run into an epoched cmd -> might crash
+  #
+
+  set c 0
+  for {set i 0} {$i < 10} {incr i} {
+    set os [list]
+    for {set j 0} {$j < 10} {incr j} {lappend os ::o1::o2::[incr c]}
+    nx::Object create ::o1
+    nx::Object create ::o1::o2
+    foreach o $os {nx::Object create $o}
+    C create ::o1::o2::oc1 -os $os
+    ? {llength [o1 info children]} 1
+    ? {llength [o1::o2 info children]} 11
+  }
+
+  ### 20 siblings of oc1 (has to be >12):
+  # deletion order in bucket: 17 18 1 20 19 2 3 4 5 6 7 8 9 19 11 oc1 12 13 14 15 16
+  # oc1 deletes 12 13 14 15 16
+  # after destroy of oc1 
+  #  a) NextHashEntry(hSearch) returns valid looking hPtr
+  #  b) Tcl_GetHashValue(hPtr) returns garbage (uninitialized memory?) instead of cmd
+  # --> might crash
+  # 
+  set c 0
+  for {set i 0} {$i < 10} {incr i} {
+    set os [list]
+    for {set j 0} {$j < 20} {incr j} {lappend os ::o1::o2::[incr c]}
+    nx::Object create ::o1
+    nx::Object create ::o1::o2
+    foreach o $os {nx::Object create $o}
+    C create ::o1::o2::oc1 -os $os
+    ? {llength [o1 info children]} 1
+    ? {llength [o1::o2 info children]} 21
+  }
+
+  # similar to above, but this time partial deletes occur
+  set c 0
+  for {set i 0} {$i < 10} {incr i} {
+    set os [list]
+    for {set j 0} {$j < 20} {incr j} {lappend os ::o1::o2::[incr c]}
+    nx::Object create ::o1
+    nx::Object create ::o1::o2
+    foreach o $os {nx::Object create $o}
+    C create ::o1::o2::ocX -os {}
+    C create ::o1::o2::ocY -os $os
+    ? {llength [o1 info children]} 1
+    ? {llength [o1::o2 info children]} 22
+  }
+}
+
+
+#
+# The following tests the deletion order triggering implicit
+# deletions. This caused a crash in nsf 2.0b2.
+#
+package req nx::serializer
+
+nx::test case class-object-property {
+
+  nx::Class create C {
+    :object property -accessor public x
+    :property a:int
+  }
+
+  ? {::nsf::object::exists ::C} 1
+  ? {::nsf::object::exists ::C::slot} 1
+  
+  set s(C) [C serialize]
+  C destroy
+
+  ? {::nsf::object::exists ::C} 0
+  ? {::nsf::object::exists ::C::slot} 0
+
+  eval $s(C)
+
+  ? {::nsf::object::exists ::C} 1
+  ? {::nsf::object::exists ::C::slot} 1
+
+  C::slot destroy
+  ? {::nsf::object::exists ::C} 1
+  ? {::nsf::object::exists ::C::slot} 0
+
+  C destroy
+  ? {::nsf::object::exists ::C} 0
+}
+
+nx::test case unset-traces-during-cleanup {
+  global i
+  set i [interp create]
+  $i eval {
+    package req nx
+    nx::Object create o {
+      set :x 100
+      # The following line is tricky: the trailing ";#" 
+      # is used to trim the undesirable extra arguments 
+      # from the trace command.
+      ::trace add variable :x unset "[list set ::X ${:x}];#"
+    }
+  }
+
+  ? {$i eval {info exists ::X}} 0
+  $i eval {::nsf::finalize -keepvars}
+  ? {$i eval {info exists ::X}} 1
+  ? {$i eval {set ::X}} 100
+
+  interp delete $i
+  unset i
+}
+
+nx::test case unset-traces-during-cleanup-with-destroy {
+  #
+  # Make sure that a very-late destroy (in the unset trace) does not
+  # fire ... and does not cause any side effects.
+  #
+  global i
+  set i [interp create]
+  $i eval {
+    package req nx
+    nx::Object create o {
+      :public object method destroy args {
+	incr ::X
+	next
+      } 
+      set :x 100
+      # The following line is tricky: the trailing ";#" 
+      # is used to trim the undesirable extra arguments 
+      # from the trace command.
+      ::trace add variable :x unset "[list ::incr ::X]; [list [self] destroy];#"
+    }
+  }
+
+  ? {$i eval {info exists ::X}} 0
+  $i eval {::nsf::finalize -keepvars}
+  ? {$i eval {info exists ::X}} 1
+  ? {$i eval {set ::X}} 2
+
+  interp delete $i
+  unset i
+}
+
+nx::test case unset-traces-during-cleanup-with-destroy-2 {
+  #
+  # We are safe when trying to delete the base class/metaclass ...
+  #
+  global i
+  set i [interp create]
+  $i eval {
+    package req nx
+    nx::Object create o {
+      set :x _
+      # The following line is tricky: the trailing ";#" 
+      # is used to trim the undesirable extra arguments 
+      # from the trace command.
+      ::trace add variable :x unset "[list catch [list ::nx::Object destroy] msg1]; [list catch [list ::nx::Class destroy] msg2]; set ::MSG \[list \$msg1 \$msg2\];#"
+    }
+  }
+  
+  ? {$i eval {info exists ::MSG}} 0
+  $i eval {::nsf::finalize -keepvars}
+  ? {$i eval {info exists ::MSG}} 1
+  ? {$i eval {set ::MSG}} [list "cannot destroy base class ::nx::Object" "cannot destroy base class ::nx::Class"]
+
+  interp delete $i
+  unset i
+}
+
+nx::test case unset-traces-during-cleanup-with-reset {
+  #
+  # Check for leaks ...
+  #
+  global i
+  set i [interp create]
+  $i eval {
+    package req nx
+    nx::Object create o {
+      set :x 100
+      # The following line is tricky: the trailing ";#" 
+      # is used to trim the undesirable extra arguments 
+      # from the trace command.
+      ::trace add variable :x unset "[list ::nsf::var::set [self] x ${:x}];#"
+    }
+  }
+
+  ? {$i eval {::nsf::object::exists ::o}} 1
+  ? {$i eval {info commands ::o}} ::o
+  $i eval {::nsf::finalize -keepvars}
+  ? {$i eval {info commands ::o}} ""
+
+  interp delete $i
+  unset i
+}
+
+#
+# Test on UnsetTracedVars() under revived vars & unset traces
+# for per-object variable tables (no namespace involved).
+#
+nx::test case unset-traces-during-cleanup-with-reset-2 {
+  global i
+  set i [interp create]
+  $i eval {
+    package req nx
+    set ::called(reset) 0
+    proc ::reset {obj var value} {
+      #
+      # ... revive object variable 'x' and add yet another unset trace
+      #
+      ::nsf::var::set $obj $var $value
+      $obj eval [list ::trace add variable :$var unset \
+                     "incr ::called(reset); ::reset $obj $var $value; #"]
+    }
+    nx::Object create ::o 
+    ::reset ::o x 100
+  }
+  ? {$i eval {::nsf::object::exists ::o}} 1
+  ? {$i eval {info commands ::o}} ::o
+  ? {$i eval {namespace exists ::o}} 0
+  ? {$i eval {set ::called(reset)}} 0
+  $i eval {::nsf::finalize -keepvars}
+  ? {$i eval {info commands ::o}} ""
+  ? {$i eval {namespace exists ::o}} 0
+ # ? {$i eval {set ::called(reset)}} 1; # unset trace, also re-registered, is only called once!
+
+  interp delete $i
+  unset i
+}
+
+#
+# Test on UnsetTracedVars() under revived vars & unset traces
+# for namespaced variable tables.
+#
+nx::test case unset-traces-during-cleanup-with-reset-3 {
+  global i
+  set i [interp create]
+  $i eval {
+    package req nx
+    set ::called(reset) 0
+    proc ::reset {obj var value} {
+      #
+      # ... revive object variable 'x' and add yet another unset trace
+      #
+      ::set ${obj}::$var $value
+      $obj eval [list ::trace add variable ${obj}::$var unset \
+                     "incr ::called(reset); ::reset $obj $var $value; #"]
+    }
+    nx::Object create ::o {
+      :require namespace
+    }
+    ::reset ::o x 100
+  }
+  ? {$i eval {::nsf::object::exists ::o}} 1
+  ? {$i eval {info commands ::o}} ::o
+  ? {$i eval {namespace exists ::o}} 1
+  ? {$i eval {set ::called(reset)}} 0
+  $i eval {::nsf::finalize -keepvars}
+  ? {$i eval {info commands ::o}} ""
+  ? {$i eval {namespace exists ::o}} 0
+  ? {$i eval {set ::called(reset)}} 1; # unset trace, also re-registered, is only called once!
+
+  interp delete $i
+  unset i
+}
+
+
+
+#
+# Exercise renaming of cmds which are used as methods
+#
+nx::test case rename-cached-method {
+  # Create a class with a namespace
+  nx::Class create A {:public object method foo args {}}
+  #
+  # Add a proc named "new" to the namespace of the class.
+  # This is not recommended, but we can't avoid it.
+  #
+  proc ::A::new {} { return "something from A" }
+  #
+  # Call the proc via the method interface. After the call the cmd is
+  # cached in the Tcl_Obj "new".
+  #
+  ? {A new} "something from A"
+  #
+  # Delete the proc. The rename command has to take care, that the
+  # cached cmd has to be invalidated.
+  #
+  rename ::A::new ""
+  
+  #
+  # We expect that the original method works again.
+  #
+  ? {string match ::nsf::__#* [A new]} 1
+
+  # 
+  # Now try the same with the internal namespace from nsf.  Messing
+  # around there is even less wanted, but still, we can't avoid this.
+  # We make first a backup of the method.
+  #
+  rename ::nsf::classes::nx::Class::new ::nsf::classes::nx::Class::new.orig
+  proc ::nsf::classes::nx::Class::new {} { return "something" }
+  
+  ? {A new} "something"
+  #
+  # Delete the proc and call "new" again
+  #
+  rename ::nsf::classes::nx::Class::new ""
+  ? {A new} "method 'new' unknown for ::A; in order to create an instance of class ::A, consider using '::A create new ?...?'"
+  
+  #
+  # Restore the original state
+  #
+  rename ::nsf::classes::nx::Class::new.orig ::nsf::classes::nx::Class::new
+  #
+  # We expect that the original method works again.
+  #
+  ? {string match ::nsf::__#* [A new]} 1
+}
+
+#
+# Create a cyclical class dependency and delete it manually
+#
+nx::test case cyclical-dependency {
+  nx::Object create o1
+  ? {nx::Class create o1::C} ::o1::C
+  ? {nsf::relation::set o1 class o1::C} ::o1::C
+  o1 destroy
+}
+
+#
+# Create a cyclical class dependency and let it be deleted on
+# object-system-cleanup
+#
+nx::Object create o1
+nx::Class create o1::C
+nsf::relation::set o1 class o1::C
+
+#
+# Create a cyclical superclass dependency and delete it manually
+#
+nx::test case cyclical-dependency {
+  nx::Class create C 
+  nx::Class create C::*
+  ? {nsf::relation::set C superclass {C::* nx::Object}} ""
+  C destroy
+}
+
+#
+# Create a cyclical superclass dependency and let it be deleted on
+# object-system-cleanup
+#
+nx::Class create C 
+nx::Class create C::*
+nsf::relation::set C superclass {C::* nx::Object}
+
+puts "==== EXIT [info script]"
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:

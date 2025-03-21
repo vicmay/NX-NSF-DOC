@@ -1,0 +1,119 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package require nx::test
+
+nx::test case plain-methods-0 {
+  nx::Class create M1
+  nx::Object create o {
+    ? {o public method foo {} {return foo}} "::o: unable to dispatch method 'method'"
+    :public object method f args {next}
+  }
+  ? {o mixins set M1} "::o: unable to dispatch method 'mixins'"
+  ? {o filters set f} "::o: unable to dispatch method 'filters'"
+
+  ? {lsort [o info object methods]} "f"
+  ? {lsort [o info]} "valid submethods of ::o info: baseclass children class has info lookup name object parent precedence variable vars"
+}
+
+#
+# require the convenience layer
+# and make it verbose
+#
+package require nx::plain-object-method
+nx::configure plain-object-method-warning on
+
+
+nx::test case plain-methods-1 {
+  nx::Class create M1
+  nx::Object create o {
+    :public method foo {} {return [:pm1]}
+    :public method f args {next}
+    :protected method pm1 args {return pm1}
+    :public alias a ::o::pm1
+    :public forward fwd %self pm1
+    :private method priv args {return priv}
+    :method pm2 args {return pm2}
+    :property -accessor public p
+    :variable v1 1
+    :variable -incremental v2:integer 1
+  }
+  ? {o info methods} "v2 p foo fwd a f"
+  ? {lsort [o info methods -callprotection protected]} "pm1 pm2"
+  ? {lsort [o info methods -callprotection private]} "priv"
+
+  ? {o info variables} "::o::per-object-slot::v2 ::o::per-object-slot::p"
+  ? {o info object variables} "::o::per-object-slot::v2 ::o::per-object-slot::p"
+  ? {o info slots} "::o::per-object-slot::v2 ::o::per-object-slot::p"
+  
+  ? {o pm1} "::o: unable to dispatch method 'pm1'"
+  ? {o foo} "pm1"
+  ? {o a} "pm1"
+  ? {o fwd} "pm1"
+
+  ? {o mixins set M1} ::M1
+  ? {o info mixins} ::M1
+  ? {o mixins set ""} ""
+  ? {o info mixins} ""
+
+  ? {o filters set f} f
+  ? {o info filters} f
+  ? {o filters set ""} ""
+  ? {o info filters} ""
+
+  ? {lsort [o info object methods]} "a f foo fwd p v2"
+  ? {lsort [o info]} "valid submethods of ::o info: baseclass children class filters has info lookup method methods mixins name object parent precedence slots variable variables vars"
+}
+
+#
+# delete class method, class property, class variable
+# 
+nx::test case plain-methods-2 {
+  nx::Object create ::o {
+    :public method foo {} {return foo}
+    :property -accessor public p
+    :variable -incremental v1:integer 1
+  }
+
+  ? {o info methods} "p foo v1"
+  ? {o info variables} "::o::per-object-slot::p ::o::per-object-slot::v1"
+
+  ? {o delete method foo} ""
+  ? {o info methods} "p v1"
+  ? {o info variables} "::o::per-object-slot::p ::o::per-object-slot::v1"
+
+  ? {o delete property p} ""
+  ? {o info methods} "v1"
+  ? {o info variables} "::o::per-object-slot::v1"
+
+  ? {o delete variable v1} ""
+  ? {o info methods} ""
+  ? {o info variables} ""
+
+}
+
+#
+# require method
+# 
+
+nx::test case plain-methods-3 {
+
+  nsf::method::provide set {::nsf::method::alias  set -frame object ::set}
+
+  nx::Object create ::o {
+    :require method set
+  }
+
+  ? {::o info methods} "set"
+  ? {::o info object methods} "set"
+
+}
+
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:
+

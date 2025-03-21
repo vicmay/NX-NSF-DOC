@@ -1,0 +1,345 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package req nx::test
+package req nx::serializer
+
+nx::test case serialize-target {
+  #
+  # Create object structure with a forwarder and a slot
+  #
+  Object create ::xxx {
+    :object property -accessor public ref
+    Object create [self]::b {
+      [:info parent] ref set [Object create [self]::c]
+    }
+  }
+  #
+  # check forwarder target and domain+manager of slot.
+  #
+  ? {nsf::method::forward::property :::xxx -per-object ref target} "::xxx::per-object-slot::ref"
+  ? {nsf::var::get ::xxx::per-object-slot::ref manager} "::xxx::per-object-slot::ref"
+  ? {nsf::var::get ::xxx::per-object-slot::ref domain} "::xxx"
+
+  #puts [xxx serialize -target XXX]
+  #
+  # Create a serialized object, which has the target mapped to
+  # XXX. The target name has intentionally no leading colons, such
+  # that the object can be instantiated in a different namespace. This
+  # is for example useful when importing objects in OpenACS from a
+  # different system, where one has to assure that the imported
+  # objects do not clash with the already existing objects, but it has
+  # as well certain dangers.
+  #
+  set code [xxx serialize -target XXX]
+
+  #
+  # Create the object with the new target
+  #
+  set result [eval $code]
+
+  ? [list set _ $result] ::XXX::per-object-slot::ref
+
+  #
+  # The target object of the forwarder + the slot manager and domain are mapped as well.
+  # Otherwise, we would trigger warnings during destroy
+  #
+
+  ? {nsf::method::forward::property ::XXX -per-object ref target} "XXX::per-object-slot::ref"
+  ? {nsf::var::get ::XXX::per-object-slot::ref manager} "XXX::per-object-slot::ref"
+  ? {nsf::var::get ::XXX::per-object-slot::ref domain} "XXX"
+
+}
+
+
+
+
+nx::test case deepSerialize-map-filter {
+
+  Object create ::a {
+    :object property -accessor public ref:object,type=[:info class]
+    Object create [self]::b {
+      [:info parent] ref set [Object create [self]::c]
+    }
+  }
+
+  ? {::nsf::object::exists ::a} 1
+  ? {::nsf::object::exists ::a::b} 1
+  ? {::nsf::object::exists ::a::b::c} 1
+  ? {::a ref get} [[::a::b] info children]
+
+  set script [::Serializer deepSerialize -map {::a::b ::x::y ::a ::x} ::a]
+  # fix collateral damage (TODO: fixme, preprecate me, ...)
+  set script [string map {::nsf::object::xlloc ::nsf::object::alloc} $script]
+
+  ::a destroy
+
+  ? {::nsf::object::exists ::a} 0
+  ? {::nsf::object::exists ::a::b} 0
+  ? {::nsf::object::exists ::a::b::c} 0
+
+  eval $script
+
+  ? {::nsf::object::exists ::a} 0
+  ? {::nsf::object::exists ::a::b} 0
+  ? {::nsf::object::exists ::a::b::c} 0
+
+  ? {::nsf::object::exists ::x} 1
+  ? {::nsf::object::exists ::x::y} 1
+  ? {::nsf::object::exists ::x::y::c} 1
+  ? {::x ref get} [::x::y info children]
+
+  Object create ::a
+  ::x::y::c eval {
+    :object variable parentRef [[:info parent] info parent]
+  }
+  set script [::a eval {
+    ::Serializer deepSerialize -map [list ::x::y [self] ::x [self]] ::x::y::c
+  }]
+
+  ? {::x::y::c eval {set :parentRef}} ::x
+  ? {::nsf::object::exists ::a::c} 0
+  eval $script
+  ? {::nsf::object::exists ::a::c} 1
+  ? {::a::c eval {set :parentRef}} ::a
+}
+
+nx::test case deepSerialize-ignoreVarsRE-filter {
+  nx::Class create C {
+    :object property -accessor public x
+    :object property -accessor public y
+    :property -accessor public a:int
+    :property -accessor public b:int
+    :create c1
+  }
+
+  ? {C x set 1} 1
+  ? {C x get} 1
+  ? {C y set 1} 1
+  ? {C y get} 1
+
+  ? {lsort [C info methods]} "a b"
+  ? {lsort [C info object methods]} "x y"
+  ? {c1 a set b} {expected integer but got "b" for parameter "value"}
+  ? {c1 a set 1} 1
+  ? {c1 b set 1} 1
+
+  set c1(IgnoreNone1) [list [::Serializer deepSerialize c1] "a b"]
+  set c1(IgnoreNone2) [list [::Serializer deepSerialize -ignoreVarsRE "" c1] "a b"]
+  set c1(One)         [list [::Serializer deepSerialize -ignoreVarsRE "a" c1] "b"]
+  set c1(One2)        [list [::Serializer deepSerialize -ignoreVarsRE {::a$} c1] "b"]
+  set c1(IgnoreAll)   [list [::Serializer deepSerialize -ignoreVarsRE "." c1] ""]
+  set names {}; foreach s [C info slots] {lappend names [$s cget -name]}
+  set c1(None2)       [list [::Serializer deepSerialize -ignoreVarsRE [join $names |] c1] ""]
+
+  c1 destroy
+  foreach t [array names c1] {
+    ? {nsf::object::exists c1} 0
+    lassign $c1($t) script res
+    eval $script
+    ? {nsf::object::exists c1} 1
+    ? {lsort [c1 info vars]} $res "Object c1 $t"
+    c1 destroy
+  }
+
+
+  set C(IgnoreNone1) [list [::Serializer deepSerialize C] "x y"]
+  set C(IgnoreNone2) [list [::Serializer deepSerialize -ignoreVarsRE "" C] "x y"]
+  #set C(One) [list [::Serializer deepSerialize -ignoreVarsRE "x" C] "y"]
+  set C(One2) [list [::Serializer deepSerialize -ignoreVarsRE {::x$} C] "y"]
+  #set C(IgnoreAll) [list [::Serializer deepSerialize -ignoreVarsRE "." C] ""]
+  set names {}; foreach s [C info object slots] {lappend names [$s cget -name]}
+  #set C(None2) [list [::Serializer deepSerialize -ignoreVarsRE [join $names |] C] ""]
+
+  C destroy
+
+  foreach t [array names C] {
+    ? {nsf::object::exists C} 0
+    lassign $C($t) script res
+
+    #puts stderr "=====C($t)\n$script\n===="
+
+    eval $script
+    ? {nsf::object::exists C} 1
+    ? {lsort [C info vars]} $res "Class C $t"
+    C destroy
+  }
+}
+
+nx::test case deepSerialize-ignore-filter {
+  Object create ::a {
+    Object create [self]::b
+    Object create [self]::c
+  }
+
+  ? {::nsf::object::exists ::a} 1
+  ? {::nsf::object::exists ::a::b} 1
+  ? {::nsf::object::exists ::a::c} 1
+
+  set script [::Serializer deepSerialize -ignore ::a::b ::a]
+  ::a destroy
+
+  ? {::nsf::object::exists ::a::c} 0
+  ? {::nsf::object::exists ::a::b} 0
+  ? {::nsf::object::exists ::a} 0
+
+  eval $script
+  ? {::nsf::object::exists ::a} 1
+  ? {::nsf::object::exists ::a::b} 0
+  ? {::nsf::object::exists ::a::c} 1
+
+  set script [::Serializer deepSerialize -ignore ::a ::a]
+  ::a destroy
+
+  ? {::nsf::object::exists ::a} 0
+  eval $script
+  ? {::nsf::object::exists ::a} 0
+}
+
+nx::test case serialize-slotContainer {
+
+  nx::Class create C {
+    :object property x
+    :property a
+  }
+
+  ? {::nsf::object::exists ::C::slot} 1
+  ? {::nsf::object::exists ::C::per-object-slot} 1
+  ? {::nx::isSlotContainer ::C::slot} 1
+  ? {::nx::isSlotContainer ::C::per-object-slot} 1
+  ? {::nsf::object::exists ::C::slot::a} 1
+  ? {::nsf::object::exists ::C::per-object-slot::x} 1
+  ? {::nsf::object::property ::C hasperobjectslots} 1
+
+  set script [C serialize]
+  C destroy
+  ? {::nsf::object::exists ::C} 0
+
+  eval $script
+  ? {::nsf::object::exists ::C::slot} 1
+  ? {::nsf::object::exists ::C::per-object-slot} 1
+  ? {::nx::isSlotContainer ::C::slot} 1
+  ? {::nx::isSlotContainer ::C::per-object-slot} 1
+  ? {::nsf::object::exists ::C::slot::a} 1
+  ? {::nsf::object::exists ::C::per-object-slot::x} 1
+  ? {::nsf::object::property ::C hasperobjectslots} 1
+}
+
+#
+# check whether ::nsf::object::properties keepcallerself and
+# perobjectdispatch for nx::Objects are handled correctly via serialize
+#
+nx::test case serialize-object-properties {
+
+  #
+  # Check on object o
+  #
+  nx::Object create o
+  ::nsf::object::property ::o keepcallerself 1
+  ::nsf::object::property ::o perobjectdispatch 1
+
+  set script [o serialize]
+  o destroy
+  ? {::nsf::object::exists ::o} 0
+
+  eval $script
+  ? {::nsf::object::property ::o keepcallerself} 1
+  ? {::nsf::object::property ::o perobjectdispatch} 1
+
+  #
+  # Now the same for a class
+  #
+  nx::Class create C
+  ::nsf::object::property ::C keepcallerself 1
+  ::nsf::object::property ::C perobjectdispatch 1
+
+  set script [C serialize]
+  C destroy
+  ? {::nsf::object::exists ::C} 0
+
+  eval $script
+  ? {::nsf::object::property ::C keepcallerself} 1
+  ? {::nsf::object::property ::C perobjectdispatch} 1
+
+}
+
+#
+# Check handling of method properties "debug" and "deprecated"
+# in serializer
+#
+nx::test case nx-serialize-debug-deprecated {
+
+  #
+  # Check on object o
+  #
+  nx::Object create o {
+    :public object method -deprecated ofoo {} {return 1}
+    :public object method -debug      obar {} {return 1}
+    :public object alias -deprecated -debug obaz ::nsf::is
+  }
+  ? {::nsf::method::property o ofoo deprecated} 1
+  ? {::nsf::method::property o ofoo debug} 0
+  ? {::nsf::method::property o obar deprecated} 0
+  ? {::nsf::method::property o obar debug} 1
+  ? {::nsf::method::property o obaz deprecated} 1
+  ? {::nsf::method::property o obaz debug} 1
+
+
+  set script [o serialize]
+  o destroy
+  ? {::nsf::object::exists ::o} 0
+
+  eval $script
+
+  ? {::nsf::method::property o ofoo deprecated} 1
+  ? {::nsf::method::property o ofoo debug} 0
+  ? {::nsf::method::property o obar deprecated} 0
+  ? {::nsf::method::property o obar debug} 1
+  ? {::nsf::method::property o obaz deprecated} 1
+  ? {::nsf::method::property o obaz debug} 1
+  #
+  # Now the same for a class
+  #
+  nx::Class create C {
+    :public method -deprecated foo {} {return 1}
+    :public method -debug      bar {} {return 1}
+    :public alias -deprecated -debug baz ::nsf::is
+  }
+
+  ? {::nsf::method::property C foo deprecated} 1
+  ? {::nsf::method::property C foo debug} 0
+  ? {::nsf::method::property C bar deprecated} 0
+  ? {::nsf::method::property C bar debug} 1
+  ? {::nsf::method::property C baz deprecated} 1
+  ? {::nsf::method::property C baz debug} 1
+
+  set script [C serialize]
+  C destroy
+  ? {::nsf::object::exists ::C} 0
+
+  eval $script
+  ? {::nsf::method::property C foo deprecated} 1
+  ? {::nsf::method::property C foo debug} 0
+  ? {::nsf::method::property C bar deprecated} 0
+  ? {::nsf::method::property C bar debug} 1
+  ? {::nsf::method::property C baz deprecated} 1
+  ? {::nsf::method::property C baz debug} 1
+}
+
+
+#
+# Check serializing of info internals
+#
+package require XOTcl
+package require xotcl::serializer
+nx::test case xotcl-info-internals {
+  ? {catch {::Serializer methodSerialize ::xotcl::classInfo default ""}} 0
+}
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:
+

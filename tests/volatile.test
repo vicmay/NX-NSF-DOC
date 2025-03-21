@@ -1,0 +1,131 @@
+# -*- Tcl -*-
+
+package prefer latest
+
+package req nx::test
+
+package prefer latest
+package req XOTcl 2.0
+
+package req nx::volatile
+::nsf::method::require ::nx::Object volatile
+
+#
+# Wrapper to call a command in a proc/method
+#
+proc bar {args} {
+  set c [{*}$args]
+  set empty [expr {[info command $c] eq ""}]
+  ? [list set _ $empty] 0 "bar: $c destroyed too early"
+  return $c
+}
+
+#
+# Create NX objects with volatile through the wrapper
+#
+proc foon {} {
+  #puts stderr ====2
+  set c [bar C create c1 -volatile {:object method destroy {} {#puts "[self] destroy";next}}]
+  ? [list info command $c] "" "foon: $c destroyed too late"
+
+  #puts stderr ====3
+  set c [bar C new -volatile {:object method destroy {} {#puts "[self] destroy";next}}]
+  ? [list info command $c] "" "foon: $c destroyed too late"
+}
+
+#
+# Create XOTcl objects with volatile through the wrapper
+#
+proc foox {} {
+  #puts stderr ====1
+  set c [bar XC c1 -volatile -proc destroy {} {#puts "[self] destroy";next}]
+  ? [list info command $c] "" "foox: $c destroyed too late"
+
+  #puts stderr ====2
+  set c [bar XC create c1 -volatile -proc destroy {} {#puts "[self] destroy";next}]
+  ? [list info command $c] "" "foox: $c destroyed too late"
+
+  #puts stderr ====3
+  set c [bar XC new -volatile -proc destroy {} {#puts "[self] destroy";next}]
+  ? [list info command $c] "" "foox: $c destroyed too late"
+}
+
+#
+# Producer classes in NX and XOTcl 
+#
+::nx::Class create C
+::xotcl::Class create XC
+
+# 
+# Create a NX class using foox, foon, and bar as methods
+#
+nx::Class create D {
+  #
+  # call volatile in nsf method bar
+  #
+  :method bar {args} [info body ::bar]
+  :public method foox {} [string map [list bar :bar] [info body ::foox]]
+  :public method foon {} [string map [list bar :bar] [info body ::foon]]
+  #
+  # call volatile in tcl proc bar
+  #
+  :public method foox2 {} [info body ::foox]
+  :public method foon2 {} [info body ::foon]
+}
+
+D create d1
+nx::test case methods-methods {
+  d1 foox
+  d1 foon
+}
+
+nx::test case methods-procs {
+  d1 foox2
+  d1 foon2
+}
+
+#
+# Call just in tcl procs
+#
+nx::test case procs-procs {
+  ::foox
+  ::foon
+}
+
+nx::test case self-context-volatile {
+
+  xotcl::Class create C 
+  xotcl::Class create M
+  M instproc configure args {
+    next
+  }
+  
+  
+  C instproc destroy-after-run {} {
+    my volatile
+
+    set o2 [xotcl::Object new -volatile]
+    xotcl::Object instmixin ::M
+    set o3 [xotcl::Object new -volatile]
+    xotcl::Object instmixin {}
+    ? [info commands [self]] [self]
+    ? [info commands $o2] $o2
+    ? [info commands $o3] $o3
+    return [list [self] $o2 $o3]
+  }
+
+  set c [C new]
+  lassign [$c destroy-after-run] obj1 obj2 obj3
+  ? [list info commands $obj1] ""
+  ? [list info commands $obj2] ""
+  ? [list info commands $obj3] ""
+}
+
+
+
+#
+# Local variables:
+#    mode: tcl
+#    tcl-indent-level: 2
+#    indent-tabs-mode: nil
+# End:
