@@ -122,8 +122,8 @@ nsf::dispatch obj methodName
 nsf::dispatch obj -intrinsic methodName  # Skip mixins
 
 # Context-aware dispatch
-nsf::my -local methodName    # Dispatch in current context
-nsf::my -intrinsic methodName  # Skip mixins in current context
+nsf:: :-local methodName    # Dispatch in current context
+nsf:: :-intrinsic methodName  # Skip mixins in current context
 ```
 
 ## Method Implementation Patterns

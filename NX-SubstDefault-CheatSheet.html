@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NX-SubstDefault-CheatSheet</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="temp_style.css" />
+</head>
+<body>
+<h1 id="nx-framework-substdefault-cheatsheet">NX Framework: substdefault
+Cheatsheet</h1>
+<h2 id="overview">Overview</h2>
+<p>The <code>substdefault</code> modifier in the NX/TCL framework allows
+for variable substitution in default values. This cheatsheet documents
+its behavior, options, and usage patterns.</p>
+<h2 id="basic-syntax">Basic Syntax</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span><span class="ot">name</span>:substdefault <span class="st">&quot;value&quot;</span><span class="kw">}</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span><span class="ot">name</span>:substdefault=OPTION <span class="st">&quot;value&quot;</span><span class="kw">}</span></span></code></pre></div>
+<p>Where OPTION is a binary flag that controls the substitution
+behavior.</p>
+<h2 id="substitution-options">Substitution Options</h2>
+<table>
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 24%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Flag Notation</th>
+<th>Decimal</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0b111</td>
+<td>7</td>
+<td>Substitute all (variables, commands, backslashes)</td>
+</tr>
+<tr class="even">
+<td>0b100</td>
+<td>4</td>
+<td>Only substitute backslashes (-novars -nocommands)</td>
+</tr>
+<tr class="odd">
+<td>0b010</td>
+<td>2</td>
+<td>Only substitute variables (-nocommands -nobackslashes)</td>
+</tr>
+<tr class="even">
+<td>0b001</td>
+<td>1</td>
+<td>Only substitute commands (-novars -nobackslashes)</td>
+</tr>
+<tr class="odd">
+<td>0b000</td>
+<td>0</td>
+<td>Substitute nothing (-nocommands -novars -nobackslashes)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="examples-with-results">Examples with Results</h2>
+<p>Given input: <code>{a $::X [set x 4] \t}</code></p>
+<table>
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 41%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Option</th>
+<th>Result</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>No substdefault</td>
+<td><code>a $::X [set x 4] \t</code></td>
+<td>No substitution</td>
+</tr>
+<tr class="even">
+<td>:substdefault</td>
+<td><code>a 123 4</code></td>
+<td>Default substitution (all)</td>
+</tr>
+<tr class="odd">
+<td>:substdefault=0b111</td>
+<td><code>a 123 4</code></td>
+<td>Substitute all</td>
+</tr>
+<tr class="even">
+<td>:substdefault=0b100</td>
+<td><code>a $::X [set x 4]</code></td>
+<td>Only substitute backslashes</td>
+</tr>
+<tr class="odd">
+<td>:substdefault=0b010</td>
+<td><code>a 123 [set x 4] \t</code></td>
+<td>Only substitute variables</td>
+</tr>
+<tr class="even">
+<td>:substdefault=0b001</td>
+<td><code>a $::X 4 \t</code></td>
+<td>Only substitute commands</td>
+</tr>
+<tr class="odd">
+<td>:substdefault=0b000</td>
+<td><code>a $::X [set x 4] \t</code></td>
+<td>No substitution</td>
+</tr>
+</tbody>
+</table>
+<h2 id="context-and-scoping">Context and Scoping</h2>
+<h3 id="general-considerations">General Considerations</h3>
+<ul>
+<li><code>[self]</code> is always set correctly in substdefault
+expressions</li>
+</ul>
+<h3 id="object-parameters">Object Parameters</h3>
+<ol type="1">
+<li><strong>Class-defined properties:</strong>
+<ul>
+<li>Use caution when referring to instance variables, as users have no
+control over variable creation order</li>
+<li>Referring to global or namespaced variables avoids creation order
+issues</li>
+<li><code>[current class]</code> called directly may not return expected
+results</li>
+<li>Recommendation: Define methods to get default values instead of
+direct references</li>
+</ul></li>
+</ol>
+<h3 id="method-parameters">Method Parameters</h3>
+<ul>
+<li>Instance variables can be referenced directly in the default scope
+without namespace prefixes</li>
+<li>Method frame contains instance variables, allowing direct
+access</li>
+</ul>
+<h2 id="usage-patterns">Usage Patterns</h2>
+<h3 id="referring-to-current-object">1. Referring to Current Object</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>b:substdefault <span class="st">&quot;[current]&quot;</span><span class="kw">}</span>  # Evaluates to object <span class="ot">name</span>, e.g., <span class="st">&quot;::d1&quot;</span></span></code></pre></div>
+<h3 id="accessing-property-values">2. Accessing Property Values</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>:property<span class="ot"> -accessor</span> public <span class="kw">{</span>c <span class="dv">1</span><span class="kw">}</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>param:substdefault <span class="st">&quot;[:c get]&quot;</span><span class="kw">}</span>  # Access another property&#39;s value</span></code></pre></div>
+<h3 id="accessing-instance-variables">3. Accessing Instance
+Variables</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>d <span class="dv">2</span><span class="kw">}</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>param:substdefault <span class="st">&quot;</span><span class="dt">$</span><span class="st">d&quot;</span><span class="kw">}</span>  # Direct reference to instance <span class="kw">variable</span></span></code></pre></div>
+<h3 id="accessing-object-variables">4. Accessing Object Variables</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>:object <span class="kw">variable</span> Y <span class="dv">1002</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>param:substdefault <span class="st">&quot;[:object getvar Y]&quot;</span><span class="kw">}</span>  # Access object <span class="kw">variable</span></span></code></pre></div>
+<h3 id="accessing-class-information">5. Accessing Class Information</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>param:substdefault <span class="st">&quot;[:current class]&quot;</span><span class="kw">}</span>  # Get <span class="ot">current</span> <span class="ot">class</span></span></code></pre></div>
+<h3 id="accessing-namespaced-variables">6. Accessing Namespaced
+Variables</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> <span class="kw">eval</span> ::my-module <span class="kw">{</span> <span class="kw">set</span> X <span class="dv">1001</span> <span class="kw">}</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>:method <span class="kw">file</span>-scoped <span class="kw">{</span><span class="ot">x</span><span class="kw">}</span> <span class="kw">{</span> <span class="kw">namespace</span> <span class="kw">eval</span> ::my-module <span class="kw">[list</span> <span class="kw">set</span> <span class="dt">$x</span> <span class="kw">]</span> <span class="kw">}</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>param:substdefault <span class="st">&quot;[:file-scoped X]&quot;</span><span class="kw">}</span>  # Access namespaced <span class="kw">variable</span></span></code></pre></div>
+<h2 id="special-cases-and-caveats">Special Cases and Caveats</h2>
+<ol type="1">
+<li>The value of <code>[current class]</code> directly in substdefault
+may not be as expected
+<ul>
+<li>Use a method that returns <code>[current class]</code> instead</li>
+</ul></li>
+<li>When using substdefault in a namespace:
+<ul>
+<li>The scope of <code>[current]</code> is preserved (e.g.,
+<code>::my-module::d1</code>)</li>
+<li>Definition namespace can be accessed via
+<code>[nsf::definitionnamespace]</code></li>
+</ul></li>
+<li>Dynamic resolution:
+<ul>
+<li>Variable values are resolved dynamically at the time of
+evaluation</li>
+<li>Changes to instance variables are reflected in subsequent
+evaluations</li>
+</ul></li>
+</ol>
+<h2 id="best-practices">Best Practices</h2>
+<ol type="1">
+<li>Use methods to get default values instead of direct expressions</li>
+<li>Leverage namespaces for better organization of variables</li>
+<li>Be aware of the evaluation context when using substdefault</li>
+<li>Use appropriate substitution flags based on security and performance
+needs</li>
+<li>For complex cases, define helper methods that return the appropriate
+values</li>
+</ol>
+</body>
+</html>

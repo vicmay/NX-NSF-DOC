@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NX-Submethods-CheatSheet</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="temp_style.css" />
+</head>
+<body>
+<h1 id="nx-submethods-cheatsheet">NX Submethods Cheatsheet</h1>
+<h2 id="overview">Overview</h2>
+<p>Submethods in NX (Next Scripting Framework) are hierarchical method
+structures that allow creating command ensembles with multiple levels of
+dispatch. This document covers the key concepts, syntax, and behaviors
+of submethods based on the test cases.</p>
+<h2 id="basic-syntax">Basic Syntax</h2>
+<h3 id="defining-submethods">Defining Submethods</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a submethod with space-separated path components</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;string length&quot;</span> <span class="ot">x</span> <span class="kw">{return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]}</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;foo a x&quot;</span> <span class="kw">{}</span> <span class="kw">{return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]}</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># For class methods</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;bar m1&quot;</span> <span class="kw">{</span>a:integer<span class="ot"> -flag</span><span class="kw">}</span> <span class="kw">{</span>;<span class="kw">}</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;baz a m1&quot;</span> <span class="kw">{</span><span class="ot">x</span>:integer<span class="ot"> -y</span>:boolean<span class="kw">}</span> <span class="kw">{return</span> m1<span class="kw">}</span></span></code></pre></div>
+<h3 id="calling-submethods">Calling Submethods</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard submethod call</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>obj foo a <span class="ot">x</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Using colon notation for object-local calls</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>obj <span class="kw">eval</span> <span class="kw">{</span> :foo a <span class="ot">x</span> <span class="kw">}</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Calling with colon prefix (alternative syntax)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>obj <span class="kw">eval</span> <span class="kw">{</span> : foo a <span class="ot">x</span> <span class="kw">}</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Local call with -local flag (for private methods)</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>obj <span class="kw">eval</span> <span class="kw">{</span> :<span class="ot"> -local</span> foo a <span class="ot">x</span> <span class="kw">}</span></span></code></pre></div>
+<h2 id="error-handling-and-discovery">Error Handling and Discovery</h2>
+<h3 id="error-messages">Error Messages</h3>
+<p>When a submethod cannot be found, NX provides helpful error
+messages:</p>
+<pre><code>unable to dispatch sub-method &quot;z&quot; of ::obj foo a; valid are: foo a defaultmethod, foo a subcmdName, foo a unknown, foo a x, foo a y</code></pre>
+<h3 id="listing-available-submethods">Listing Available Submethods</h3>
+<p>Calling a partial path returns a list of valid submethods:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns: &quot;valid submethods of ::obj string: info length tolower&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>obj <span class="kw">string</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Use lsort to get an alphabetical list of available submethods</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">lsort</span> <span class="kw">[</span>obj <span class="kw">info</span> has<span class="kw">]</span></span></code></pre></div>
+<h2 id="introspection-in-submethods">Introspection in Submethods</h2>
+<h3 id="current-context">Current Context</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the current method name</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> method<span class="kw">]</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the current class</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> <span class="ot">class</span><span class="kw">]</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the full method path</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> methodpath<span class="kw">]</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Get current method arguments</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> <span class="ot">args</span><span class="kw">]</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the current object</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span>self<span class="kw">]</span></span></code></pre></div>
+<h3 id="calling-context">Calling Context</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the calling class</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> callingclass<span class="kw">]</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the calling object</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> callingobject<span class="kw">]</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the calling method</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> callingmethod<span class="kw">]</span></span></code></pre></div>
+<h3 id="next-methods">Next Methods</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the next method in the chain</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> nextmethod<span class="kw">]</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if current call is from next</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> isnextcall<span class="kw">]</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the method that was called</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> calledmethod<span class="kw">]</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the class of the called method</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span><span class="ot">current</span> calledclass<span class="kw">]</span></span></code></pre></div>
+<h2 id="using-next-with-submethods">Using <code>next</code> with
+Submethods</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic next usage in a submethod</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;foo a&quot;</span> <span class="kw">{</span><span class="ot">x</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Do something</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  nx::next</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Passing arguments to next</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;foo a&quot;</span> <span class="kw">{}</span> <span class="kw">{</span>next <span class="dv">42</span><span class="kw">}</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Collecting results from next</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="kw">set</span> result <span class="kw">[</span>next<span class="kw">]</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Appending next results to your own</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="kw">return</span> <span class="kw">[list</span> <span class="st">&quot;My result&quot;</span> <span class="kw">{</span>*<span class="kw">}[</span>next<span class="kw">]]</span></span></code></pre></div>
+<h3 id="leaf-next">Leaf Next</h3>
+<p>A “leaf next” is a next call at the end of the method resolution
+chain:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>:public object method <span class="st">&quot;FOO bar&quot;</span> <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">incr</span> :<span class="ot">x</span>; next;  <span class="co"># a &quot;leaf next&quot; - won&#39;t trigger unknown handling</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="next-with-ensemble-methods">Next with Ensemble Methods</h3>
+<p>When using next with ensemble methods, the next call is passed to the
+appropriate level in the hierarchy:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In a mixin class</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;foo a&quot;</span> <span class="kw">{</span><span class="ot">x</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  nx::next  # Calls the <span class="st">&quot;foo a&quot;</span> method in the next <span class="ot">class</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># With different ensemble depths</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;l1 l2&quot;</span> <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  nx::next  # Can connect to methods with different ensemble depths</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="method-protection-and-visibility">Method Protection and
+Visibility</h2>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Public submethod</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>:public method <span class="st">&quot;foo a&quot;</span> <span class="kw">{}</span> <span class="kw">{return</span> something<span class="kw">}</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Private submethod</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>:private method <span class="st">&quot;bar x&quot;</span> <span class="kw">{}</span> <span class="kw">{return</span> something<span class="kw">}</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Protected submethod</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>:protected method <span class="st">&quot;baz y&quot;</span> <span class="kw">{}</span> <span class="kw">{return</span> something<span class="kw">}</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Local calls to private methods</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>:public method some_method <span class="kw">{}</span> <span class="kw">{</span>:<span class="ot"> -local</span> private_method<span class="kw">}</span></span></code></pre></div>
+<h3 id="private-helper-methods">Private Helper Methods</h3>
+<p>Private submethods can be used as helper methods that are only
+accessible from within the object:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>:public object method foo <span class="kw">{}</span> <span class="kw">{</span>:<span class="ot"> -local</span> bar <span class="dv">1</span><span class="kw">}</span>  # Calls private bar method</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>:private object method <span class="st">&quot;bar 1&quot;</span> <span class="kw">{}</span> <span class="kw">{</span>:<span class="ot"> -local</span> baz <span class="dv">1</span><span class="kw">}</span>  # Calls private baz method</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>:private object method <span class="st">&quot;baz 1&quot;</span> <span class="kw">{}</span> <span class="kw">{return</span> <span class="st">&quot;result&quot;</span><span class="kw">}</span></span></code></pre></div>
+<h2 id="variable-access-in-ensemble-methods">Variable Access in Ensemble
+Methods</h2>
+<h3 id="using-upvar">Using upvar</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Regular upvar - doesn&#39;t work across ensemble boundaries</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;bar0 x&quot;</span> <span class="kw">{</span>varname<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">upvar</span> <span class="dt">$varname</span> v</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">return</span> <span class="kw">[info</span> <span class="ot">exists</span> v<span class="kw">]</span>  # Returns <span class="dv">0</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># NX-specific upvar - works across ensemble boundaries</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;bar1 x&quot;</span> <span class="kw">{</span>varname<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  :<span class="kw">upvar</span> <span class="dt">$varname</span> v  # Note the colon prefix</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">return</span> <span class="kw">[info</span> <span class="ot">exists</span> v<span class="kw">]</span>  # Returns <span class="dv">1</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="method-forwarding-with-submethods">Method Forwarding with
+Submethods</h2>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Forward to a command with submethods</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>:public object forward link1 <span class="kw">{</span>%<span class="kw">[</span>self<span class="kw">]</span>::child<span class="kw">}</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Forward to a child object</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>:public object forward link2 :child</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Method-based forwarding</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>:public object method link3 <span class="ot">args</span> <span class="kw">{[</span>self<span class="kw">]</span>::child <span class="kw">{</span>*<span class="kw">}</span><span class="dt">$args</span><span class="kw">}</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Alias forwarding</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>:public object alias link4 <span class="kw">[</span>self<span class="kw">]</span>::child</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Direct object forwarding</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>:public object forward link5 <span class="kw">[</span>self<span class="kw">]</span>::child</span></code></pre></div>
+<h2 id="object-properties-affecting-submethod-behavior">Object
+Properties Affecting Submethod Behavior</h2>
+<h3 id="keepcallerself">keepcallerself</h3>
+<p>Controls whether <code>[self]</code> refers to the caller or the
+called object in forwarded calls.</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set keepcallerself</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::some_obj keepcallerself true</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># When true: the self in called methods is the caller</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># When false: the self in called methods is the invoked object</span></span></code></pre></div>
+<h3 id="perobjectdispatch">perobjectdispatch</h3>
+<p>Controls whether instance methods are accessible via object-specific
+forwarding.</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set perobjectdispatch</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::some_obj perobjectdispatch true</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># When true: instance methods are not accessible via object forwarding</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># When false: instance methods are accessible via object forwarding</span></span></code></pre></div>
+<h3
+id="combined-effects-of-keepcallerself-and-perobjectdispatch">Combined
+Effects of keepcallerself and perobjectdispatch</h3>
+<p>Different combinations of these properties create different
+behaviors:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># keepcallerself off, perobjectdispatch off</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># - self in called method is the invoked object</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># - instance methods are callable</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::obj keepcallerself off</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::obj perobjectdispatch off</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># keepcallerself off, perobjectdispatch on</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># - self in called method is the invoked object</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># - instance methods are not callable</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::obj keepcallerself off</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::obj perobjectdispatch on</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co"># keepcallerself on, perobjectdispatch on</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># - self in called method is the caller</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co"># - instance methods are not callable</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::obj keepcallerself on</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::obj perobjectdispatch on</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co"># keepcallerself on, perobjectdispatch off</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co"># - self in called method is the caller</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co"># - instance methods are callable</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::obj keepcallerself on</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>::nsf::object::property ::obj perobjectdispatch off</span></code></pre></div>
+<h2 id="ensemble-vs-simple-methods">Ensemble vs Simple Methods</h2>
+<p>NX prevents overwriting methods with submethods or vice versa:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This works</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>C public method foo <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{return</span> foo/<span class="dv">1</span><span class="kw">}</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># This fails with &quot;refuse to overwrite method foo&quot;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>C public method <span class="st">&quot;foo x&quot;</span> <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{return</span> foo/<span class="dv">2</span><span class="kw">}</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># This works (different root method name)</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>C public method <span class="st">&quot;bar x&quot;</span> <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{return</span> bar/<span class="dv">2</span><span class="kw">}</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># This fails (tries to overwrite existing submethod)</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>C public method <span class="st">&quot;bar x y&quot;</span> <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{return</span> foo/<span class="dv">3</span><span class="kw">}</span></span></code></pre></div>
+<h2 id="mixins-with-submethods">Mixins with Submethods</h2>
+<p>Mixins can provide or override submethods at any level:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Base class with submethods</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>nx::Class <span class="ot">create</span> BaseClass <span class="kw">{</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  :method <span class="st">&quot;foo a&quot;</span> <span class="kw">{}</span> <span class="kw">{return</span> <span class="st">&quot;base&quot;</span><span class="kw">}</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Mixin class with submethods</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>nx::Class <span class="ot">create</span> MixinClass <span class="kw">{</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  :method <span class="st">&quot;foo a&quot;</span> <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="st">&quot;mixin [next]&quot;</span>  # Calls next method in chain</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">}</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the mixin</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>BaseClass mixins <span class="kw">set</span> MixinClass</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Result: &quot;mixin base&quot;</span></span></code></pre></div>
+<h2 id="default-methods-and-unknown-handling">Default Methods and
+Unknown Handling</h2>
+<p>When a method isn’t found, NX provides mechanisms to handle it:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default method handler</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;foo a defaultmethod&quot;</span> <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Handle unknown subcommands</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Unknown handler</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;foo a unknown&quot;</span> <span class="ot">args</span> <span class="kw">{</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Handle unknown subcommands with arguments</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="symbol-naming-considerations">Symbol Naming Considerations</h2>
+<p>There are special considerations when using certain names that might
+conflict with internal command names:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Potential conflict with Tcl commands</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;string length&quot;</span> <span class="ot">x</span> <span class="kw">{return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]}</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;string info&quot;</span> <span class="ot">x</span> <span class="kw">{return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]}</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Potential conflict with ensemble internals</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;foo a subcmdName&quot;</span> <span class="kw">{}</span> <span class="kw">{return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]}</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;foo a defaultmethod&quot;</span> <span class="kw">{}</span> <span class="kw">{return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]}</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>:object method <span class="st">&quot;foo a unknown&quot;</span> <span class="ot">args</span> <span class="kw">{return</span> <span class="kw">[</span><span class="ot">current</span> method<span class="kw">]}</span></span></code></pre></div>
+<h2 id="best-practices">Best Practices</h2>
+<ol type="1">
+<li>Use submethods to create logical hierarchies of commands</li>
+<li>Use the <code>:</code> prefix with <code>-local</code> for calling
+private submethods: <code>: -local private_method</code></li>
+<li>Be aware of <code>keepcallerself</code> and
+<code>perobjectdispatch</code> settings when forwarding methods</li>
+<li>Use <code>[current methodpath]</code> to get the full path of the
+current method</li>
+<li>Leverage error messages to provide information about available
+submethods</li>
+<li>Use <code>:upvar</code> instead of <code>upvar</code> when accessing
+variables across ensemble boundaries</li>
+<li>Consider using private submethods as internal helpers to maintain
+clean interfaces</li>
+<li>Be careful with method names that might conflict with Tcl commands
+or ensemble internals</li>
+<li>Standardize your ensemble hierarchies for consistency across your
+codebase</li>
+</ol>
+<h2 id="common-pitfalls">Common Pitfalls</h2>
+<ol type="1">
+<li>Cannot overwrite a simple method with a submethod (or vice
+versa)</li>
+<li>Submethods are sensitive to protection modifiers (public, private,
+protected)</li>
+<li>When using <code>next</code> in submethods, be aware of the method
+resolution path</li>
+<li>Ensure proper handling of arguments when forwarding to
+submethods</li>
+<li>Regular <code>upvar</code> doesn’t work across ensemble boundaries -
+use <code>:upvar</code> instead</li>
+<li>Method path reporting in error messages may be confusing at
+first</li>
+<li><code>keepcallerself</code> without <code>perobjectdispatch</code>
+can lead to unexpected behavior</li>
+<li>Namespace conflicts between child objects and methods with the same
+name</li>
+</ol>
+<h2 id="debugging-submethods">Debugging Submethods</h2>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List all available methods</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">lsort</span> <span class="kw">[</span>obj <span class="kw">info</span> object methods<span class="kw">]</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check method type</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>obj <span class="kw">info</span> object method <span class="ot">type</span> methodname</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a method&#39;s registration handle</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">set</span> mh <span class="kw">[</span>Class <span class="kw">info</span> method registrationhandle methodname<span class="kw">]</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Test for method existence</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="kw">{[</span>obj <span class="kw">info</span> lookup methods pattern<span class="kw">]</span> ne <span class="st">&quot;&quot;</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Method exists</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="advanced-techniques">Advanced Techniques</h2>
+<h3 id="method-path-navigation">Method Path Navigation</h3>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Access parent in the method path</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;parent child&quot;</span> <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Access the parent level</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">[namespace</span> <span class="ot">parent</span> <span class="kw">[namespace</span> <span class="ot">current</span><span class="kw">]]</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Dynamic method resolution</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>:method <span class="st">&quot;foo&quot;</span> <span class="ot">args</span> <span class="kw">{</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Dynamically determine and call a submethod</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">set</span> submethod <span class="kw">[lindex</span> <span class="dt">$args</span> <span class="dv">0</span><span class="kw">]</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">return</span> <span class="kw">[</span>:foo <span class="dt">$submethod</span> <span class="kw">{</span>*<span class="kw">}[lrange</span> <span class="dt">$args</span> <span class="dv">1</span> end<span class="kw">]]</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="callstack-manipulation">Callstack Manipulation</h3>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Examine the call stack structure</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>:method <span class="ot">debug</span> <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">set</span> callstack <span class="kw">[info</span> <span class="ot">level</span><span class="kw">]</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">puts</span> <span class="st">&quot;Call depth: </span><span class="dt">$</span><span class="st">callstack&quot;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">for</span> <span class="kw">{set</span> i <span class="dv">1</span><span class="kw">}</span> <span class="kw">{</span><span class="dt">$i</span> &lt;= <span class="dt">$callstack</span><span class="kw">}</span> <span class="kw">{incr</span> i<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">puts</span> <span class="st">&quot;Level </span><span class="dt">$</span><span class="st">i: [info level </span><span class="dt">$</span><span class="st">i]&quot;</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">}</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+</body>
+</html>

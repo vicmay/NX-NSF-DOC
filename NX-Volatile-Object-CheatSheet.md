@@ -45,11 +45,11 @@ XC new -volatile -proc destroy {} {puts "[self] destroy"; next}
 
 ```tcl
 # Make current object volatile within a method
-my volatile
+:volatile
 
 # Example usage in a method
 C instproc destroy-after-run {} {
-  my volatile
+  :volatile
   # ...code...
   # Object will be destroyed after method completes
 }
@@ -76,7 +76,7 @@ set obj [xotcl::Object new -volatile]
 Objects created in a procedure with the `-volatile` flag are automatically destroyed when the procedure completes.
 
 ### Volatile Objects in Methods
-Objects marked as volatile within methods using `my volatile` are automatically destroyed when the method returns.
+Objects marked as volatile within methods using `:volatile` are automatically destroyed when the method returns.
 
 ### Testing for Proper Destruction
 Use the pattern below to verify objects are destroyed as expected:
@@ -89,7 +89,7 @@ Use the pattern below to verify objects are destroyed as expected:
 
 1. The volatile flag ensures objects are automatically destroyed when they go out of scope
 2. Works with both NX and XOTcl object systems
-3. Can be applied at creation time with `-volatile` flag or later with `my volatile`
+3. Can be applied at creation time with `-volatile` flag or later with `:volatile`
 4. Compatible with custom destroy methods through either:
    - `:object method destroy {}` (NX)
    - `-proc destroy {}` (XOTcl)
@@ -102,7 +102,7 @@ Both frameworks support volatile objects, but with slightly different syntax:
 |---------|-------|-------|
 | Creation flag | `-volatile` | `-volatile` |
 | Custom destroy | `:object method destroy {}` | `-proc destroy {}` |
-| Making existing object volatile | `my volatile` | `my volatile` |
+| Making existing object volatile | `:volatile` | `my volatile` |
 
 ## Best Practices
 

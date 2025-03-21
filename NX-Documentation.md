@@ -798,7 +798,7 @@ obj1 info filters         # List applied filters
 2. **self**
    - Reference to current object
 
-3. **my**
+3. **:**
    - Call method on self 
 
 ### Variable and Property Commands

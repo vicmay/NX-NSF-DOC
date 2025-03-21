@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NX/NSF: The Definitive Guide</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --text-color: #333;
+            --bg-color: #fff;
+            --sidebar-bg: #f8f9fa;
+            --code-bg: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: var(--sidebar-bg);
+            padding: 2rem;
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 2rem;
+            max-width: 900px;
+        }
+
+        .toc {
+            margin-bottom: 2rem;
+        }
+
+        .toc h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 0.5rem 0;
+        }
+
+        .toc a {
+            color: var(--text-color);
+            text-decoration: none;
+            display: block;
+            padding: 0.3rem 0;
+        }
+
+        .toc a:hover {
+            color: var(--secondary-color);
+        }
+
+        .toc .submenu {
+            margin-left: 1.5rem;
+            display: none;
+        }
+
+        .toc .active > .submenu {
+            display: block;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin: 2rem 0 1rem;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            font-size: 0.9em;
+            background: var(--code-bg);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--sidebar-bg);
+            font-weight: 600;
+        }
+
+        .nav-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="nav-toggle" onclick="toggleNav()">☰</button>
+    <nav class="sidebar">
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#introduction">Introduction</a>
+                    <ul class="submenu">
+                        <li><a href="#historical-context">Historical Context</a></li>
+                        <li><a href="#key-differentiators">Key Differentiators</a></li>
+                    </ul>
+                </li>
+                <li><a href="#core-packages">Core Packages and Base Classes</a>
+                    <ul class="submenu">
+                        <li><a href="#tcl-interpreter">Tcl Interpreter Integration</a></li>
+                        <li><a href="#basic-interpreter">Basic Interpreter Operations</a></li>
+                        <li><a href="#command-hiding">Command Hiding and Exposure</a></li>
+                    </ul>
+                </li>
+                <li><a href="#mixins">Mixins</a>
+                    <ul class="submenu">
+                        <li><a href="#basic-concepts">Basic Concepts</a></li>
+                        <li><a href="#setting-mixins">Setting Mixins</a></li>
+                        <li><a href="#querying-mixins">Querying Mixins</a></li>
+                    </ul>
+                </li>
+                <li><a href="#methods">Methods and Properties</a>
+                    <ul class="submenu">
+                        <li><a href="#method-provision">Method Provision and Requirements</a></li>
+                        <li><a href="#property-declaration">Property Declaration Syntax</a></li>
+                        <li><a href="#accessor-visibility">Accessor Visibility</a></li>
+                    </ul>
+                </li>
+                <li><a href="#protection">Protection Mechanisms</a>
+                    <ul class="submenu">
+                        <li><a href="#access-modifiers">Access Modifiers</a></li>
+                        <li><a href="#method-protection">Method Protection and Visibility</a></li>
+                        <li><a href="#return-value">Return Value Checking</a></li>
+                    </ul>
+                </li>
+                <li><a href="#object-copying">Object Copying</a>
+                    <ul class="submenu">
+                        <li><a href="#copy-features">Copying Features</a></li>
+                        <li><a href="#copy-patterns">Common Patterns</a></li>
+                        <li><a href="#copy-best-practices">Best Practices</a></li>
+                    </ul>
+                </li>
+                <li><a href="#serialization">Serialization</a>
+                    <ul class="submenu">
+                        <li><a href="#basic-serialization">Basic Serialization</a></li>
+                        <li><a href="#target-mapping">Target Mapping</a></li>
+                        <li><a href="#deep-serialization">Deep Serialization</a></li>
+                        <li><a href="#name-mapping">Name Mapping</a></li>
+                        <li><a href="#variable-filtering">Variable Filtering</a></li>
+                        <li><a href="#object-exclusion">Object Exclusion</a></li>
+                    </ul>
+                </li>
+                <li><a href="#advanced-features">Advanced Features</a>
+                    <ul class="submenu">
+                        <li><a href="#meta-programming">Meta-Programming</a></li>
+                        <li><a href="#event-handling">Event Handling</a></li>
+                        <li><a href="#design-patterns">Design Patterns</a></li>
+                    </ul>
+                </li>
+                <li><a href="#best-practices">Best Practices</a>
+                    <ul class="submenu">
+                        <li><a href="#object-system">Object System Design</a></li>
+                        <li><a href="#meta-programming-practices">Meta-Programming</a></li>
+                        <li><a href="#error-handling">Error Handling</a></li>
+                    </ul>
+                </li>
+                <li><a href="#traits">Traits</a>
+                    <ul class="submenu">
+                        <li><a href="#traits-basic">Basic Concepts</a></li>
+                        <li><a href="#traits-method">Method Resolution</a></li>
+                        <li><a href="#traits-examples">Code Examples</a></li>
+                    </ul>
+                </li>
+                <li><a href="#variable-access">Variable Access Methods</a>
+                    <ul class="submenu">
+                        <li><a href="#basic-access">Basic Variable Access</a></li>
+                        <li><a href="#alternative-access">Alternative Access Methods</a></li>
+                        <li><a href="#scalar-variables">Working with Scalar Variables</a></li>
+                    </ul>
+                </li>
+                <li><a href="#method-forwarding">Method Forwarding</a>
+                    <ul class="submenu">
+                        <li><a href="#forward-syntax">Basic Forward Command Syntax</a></li>
+                        <li><a href="#forward-patterns">Usage Patterns</a></li>
+                        <li><a href="#forward-substitutions">Positional Substitutions</a></li>
+                        <li><a href="#forward-dynamic">Dynamic Command Selection</a></li>
+                    </ul>
+                </li>
+                <li><a href="#runtime-assertions">Runtime Assertion Checking (RAC)</a>
+                    <ul class="submenu">
+                        <li><a href="#assertion-types">Assertion Types</a></li>
+                        <li><a href="#assertion-setup">Setting Up Assertions</a></li>
+                        <li><a href="#assertion-activation">Activating/Deactivating Assertions</a></li>
+                        <li><a href="#assertion-inheritance">Inheritance and Assertions</a></li>
+                        <li><a href="#assertion-examples">Usage Examples</a></li>
+                    </ul>
+                </li>
+                <li><a href="#nxsh">The nxsh Shell and Testing</a>
+                    <ul class="submenu">
+                        <li><a href="#nxsh-usage">Command Line Usage</a></li>
+                        <li><a href="#nxsh-test">Test Framework</a></li>
+                        <li><a href="#nxsh-patterns">Common Test Patterns</a></li>
+                    </ul>
+                </li>
+                <li><a href="#submethods">Submethods</a>
+                    <ul class="submenu">
+                        <li><a href="#submethod-syntax">Basic Syntax</a></li>
+                        <li><a href="#submethod-calling">Calling Submethods</a></li>
+                        <li><a href="#submethod-introspection">Introspection</a></li>
+                    </ul>
+                </li>
+                <li><a href="#method-visibility">Method Visibility Control</a>
+                    <ul class="submenu">
+                        <li><a href="#visibility-concepts">Key Concepts</a></li>
+                        <li><a href="#visibility-export">Export Behaviors</a></li>
+                        <li><a href="#visibility-unexport">Unexport Behaviors</a></li>
+                    </ul>
+                </li>
+                <li><a href="#core-architecture">NSF Core Architecture</a>
+                    <ul class="submenu">
+                        <li><a href="#foundation-components">Foundation Components</a></li>
+                        <li><a href="#plain-object">Plain Object Method Package</a></li>
+                        <li><a href="#core-features">Advanced Features</a></li>
+                    </ul>
+                </li>
+                <li><a href="#variable-resolution">Variable Resolution</a>
+                    <ul class="submenu">
+                        <li><a href="#var-types">Variable Types and Notation</a></li>
+                        <li><a href="#method-aliases">Method Aliases for Variable Operations</a></li>
+                        <li><a href="#object-namespaces">Object Namespaces</a></li>
+                    </ul>
+                </li>
+                <li><a href="#object-lifecycle">Object Lifecycle</a>
+                    <ul class="submenu">
+                        <li><a href="#creation">Creation</a></li>
+                        <li><a href="#initialization">Initialization</a></li>
+                        <li><a href="#destruction">Destruction</a></li>
+                        <li><a href="#volatile-objects">Volatile Objects</a></li>
+                    </ul>
+                </li>
+                <li><a href="#method-resolution">Method Resolution</a>
+                    <ul class="submenu">
+                        <li><a href="#resolution-order">Resolution Order</a></li>
+                        <li><a href="#method-lookup">Method Lookup</a></li>
+                        <li><a href="#method-inheritance">Method Inheritance</a></li>
+                    </ul>
+                </li>
+                <li><a href="#internationalization">Internationalization</a>
+                    <ul class="submenu">
+                        <li><a href="#msgcat-integration">Message Catalog Integration</a></li>
+                        <li><a href="#namespace-behavior">Namespace Behavior</a></li>
+                        <li><a href="#message-resolution">Message Resolution</a></li>
+                    </ul>
+                </li>
+                <li><a href="#command-resolution">Command Resolution</a>
+                    <ul class="submenu">
+                        <li><a href="#special-chars">Special Characters</a></li>
+                        <li><a href="#namespace-resolution">Namespace Resolution</a></li>
+                        <li><a href="#interpreter-aliases">Interpreter Aliases</a></li>
+                    </ul>
+                </li>
+                <li><a href="#testing-framework">Testing Framework</a>
+                    <ul class="submenu">
+                        <li><a href="#test-structure">Test Structure</a></li>
+                        <li><a href="#assertions">Assertions</a></li>
+                        <li><a href="#version-testing">Version-Specific Testing</a></li>
+                    </ul>
+                </li>
+                <li><a href="#performance">Performance Optimization</a>
+                    <ul class="submenu">
+                        <li><a href="#method-caching">Method Caching</a></li>
+                        <li><a href="#resource-mgmt">Resource Management</a></li>
+                        <li><a href="#memory-mgmt">Memory Management</a></li>
+                    </ul>
+                </li>
+                <li><a href="#error-handling-advanced">Advanced Error Handling</a>
+                    <ul class="submenu">
+                        <li><a href="#error-prevention">Error Prevention</a></li>
+                        <li><a href="#error-recovery">Error Recovery</a></li>
+                        <li><a href="#error-reporting">Error Reporting</a></li>
+                    </ul>
+                </li>
+                <li><a href="#advanced-patterns">Advanced Programming Patterns</a>
+                    <ul class="submenu">
+                        <li><a href="#aspect-oriented">Aspect-Oriented Programming</a></li>
+                        <li><a href="#dynamic-features">Dynamic Features</a></li>
+                        <li><a href="#introspection">Introspection</a></li>
+                    </ul>
+                </li>
+                <li><a href="#concurrency">Concurrency and Threading</a>
+                    <ul class="submenu">
+                        <li><a href="#thread-manager">Thread Manager</a></li>
+                        <li><a href="#thread-pool">Thread Pool</a></li>
+                    </ul>
+                </li>
+                <li><a href="#security">Security Features</a>
+                    <ul class="submenu">
+                        <li><a href="#access-control">Access Control</a></li>
+                        <li><a href="#encryption">Encryption Support</a></li>
+                    </ul>
+                </li>
+                <li><a href="#logging">Logging and Monitoring</a>
+                    <ul class="submenu">
+                        <li><a href="#logger">Advanced Logger</a></li>
+                        <li><a href="#monitoring">System Monitor</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <h1>NX/NSF: The Definitive Guide</h1>
+
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>NX/NSF (Next Scripting Framework) is a Tcl-based object-oriented programming system that provides advanced capabilities for building complex applications. This guide serves as a comprehensive reference for NX/NSF programming.</p>
+
+            <h3 id="historical-context">Historical Context</h3>
+            <p>While NX has predecessors in the Tcl ecosystem (XOTcl and XOTcl2), it is a distinct and improved language with its own features and design philosophy. Key points about NX's position in the Tcl ecosystem:</p>
+            <ul>
+                <li><strong>Foundation:</strong> Built on Tcl (requires Tcl 8.5 or newer)</li>
+                <li><strong>Framework:</strong> Part of the Next Scripting Framework (NSF)</li>
+                <li><strong>Design Goals:</strong>
+                    <ul>
+                        <li>Easier learning curve for novices</li>
+                        <li>Improved maintainability</li>
+                        <li>Better structured programs</li>
+                        <li>Enhanced support for large projects</li>
+                        <li>Language-oriented programming support</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3 id="key-differentiators">Key Differentiators</h3>
+            <p>NX differs from its predecessors in several important ways:</p>
+            <ul>
+                <li>More mainstream terminology</li>
+                <li>Higher orthogonality of methods</li>
+                <li>Fewer predefined methods</li>
+                <li>Strong focus on maintainability</li>
+                <li>Built-in support for interfaces</li>
+                <li>Language-oriented programming capabilities</li>
+            </ul>
+        </section>
+
+        <section id="core-packages">
+            <h2>Core Packages and Base Classes</h2>
+            <p>The foundation of NX/NSF begins with its core packages:</p>
+            <pre><code>package require nsf     # Next Scripting Framework
+package require nx      # NX object system</code></pre>
+
+            <p>The system is built on two fundamental base classes:</p>
+            <ul>
+                <li><code>nx::Object</code>: The base object class for all objects in the system</li>
+                <li><code>nx::Class</code>: The metaclass for creating classes (which is an instance of itself)</li>
+            </ul>
+
+            <h3 id="tcl-interpreter">Tcl Interpreter Integration</h3>
+            <p>NX/NSF provides robust integration with Tcl's interpreter system, allowing for sophisticated control over command visibility and interpreter management. This section covers the essential aspects of working with Tcl interpreters in NX/NSF applications.</p>
+
+            <h3 id="basic-interpreter">Basic Interpreter Operations</h3>
+            <pre><code># Create a new slave interpreter
+interp create
+
+# Create a new interpreter with NSF loaded
+::nsf::interp create
+
+# Create a new safe interpreter with NSF loaded
+::nsf::interp create -safe
+
+# Evaluate commands in a slave interpreter
+$i eval {cmd}
+
+# Destroy an interpreter
+interp delete $i
+
+# Check if interpreter is safe
+interp issafe $i</code></pre>
+        </section>
+
+        <section id="mixins">
+            <h2>Mixins</h2>
+            <p>Mixins are a powerful feature in NX that allows you to add functionality to classes or objects without using inheritance. A mixin is a class that is mixed into another class or object to provide additional functionality.</p>
+
+            <h3 id="basic-concepts">Basic Concepts</h3>
+            <ul>
+                <li><strong>Mixin:</strong> A class that is mixed into another class or object to provide additional functionality</li>
+                <li><strong>Per-Object Mixin:</strong> A mixin applied to a specific object instance</li>
+                <li><strong>Per-Class Mixin:</strong> A mixin applied to a class, affecting all instances of that class</li>
+            </ul>
+
+            <h3 id="setting-mixins">Setting Mixins</h3>
+            <pre><code># Apply per-object mixin
+nx::Object create obj -object-mixins MixinClass
+
+# Apply per-class mixin
+nx::Class create MyClass -mixin MixinClass
+
+# Set mixin on existing class
+MyClass mixins set MixinClass
+
+# Add guard to mixin
+MyClass mixins guard MixinClass "guardCondition"</code></pre>
+
+            <h3 id="querying-mixins">Querying Mixins</h3>
+            <pre><code># Get mixins for an object
+obj object mixins get        # Returns list of object mixins
+obj info object mixins       # Alternative syntax
+
+# Get mixins for a class
+MyClass mixins get           # Returns list of class mixins
+MyClass info mixins          # Alternative syntax
+MyClass info mixins -guards  # Show mixins with guards</code></pre>
+        </section>
+
+        <section id="methods">
+            <h2>Methods and Properties</h2>
+            <p>The NX/NSF system provides comprehensive support for method definition and property management.</p>
+
+            <h3 id="method-provision">Method Provision and Requirements</h3>
+            <pre><code># Basic method provision
+nsf::method::provide method_name {implementation}
+
+# Alias to a Tcl command
+nsf::method::provide append {::nsf::method::alias append -frame object ::append}
+
+# Create a custom method
+nsf::method::provide foo {::nsf::method::create foo {x y} {return x=$x,y=$y}}</code></pre>
+
+            <h3 id="property-declaration">Property Declaration Syntax</h3>
+            <pre><code># Class Level Properties
+:property {name defaultValue}                    # Basic property
+:property -accessor public|protected|private|none {name defaultValue}  # With accessor
+:property -incremental {name defaultValue}       # For collections
+:property -incremental name:type,multiplicity   # With type and multiplicity
+:property -accessor none -configurable false {name defaultValue}  # Non-configurable
+
+# Object Level Properties
+:object property {name defaultValue}             # Basic object property
+:object property -accessor public|protected|private|none {name defaultValue}  # With accessor
+:object property -incremental {name defaultValue}  # For collections</code></pre>
+
+            <h3 id="accessor-visibility">Accessor Visibility</h3>
+            <p>Properties can have different access levels:</p>
+            <ul>
+                <li><strong>public:</strong> Accessible from anywhere</li>
+                <li><strong>protected:</strong> Accessible only from methods in the class and its subclasses</li>
+                <li><strong>private:</strong> Accessible only from methods within the class</li>
+                <li><strong>none:</strong> No accessor method is created</li>
+            </ul>
+        </section>
+
+        <section id="protection">
+            <h2>Protection Mechanisms</h2>
+            <p>The NX/NSF system provides comprehensive protection mechanisms for methods and properties, allowing fine-grained control over access and visibility.</p>
+
+            <h3 id="access-modifiers">Access Modifiers</h3>
+            <pre><code># Method Declaration with Access Modifiers
+:public method methodName {args} {body}      # Public method (default)
+:protected method methodName {args} {body}   # Protected method
+:private method methodName {args} {body}     # Private method
+
+# Per-object methods
+:public object method methodName {args} {body}
+:protected object method methodName {args} {body}
+:private object method methodName {args} {body}</code></pre>
+
+            <h3 id="method-protection">Method Protection and Visibility</h3>
+            <p>The NX/NSF system provides three levels of method protection to control access and visibility:</p>
+            <pre><code>nx::Class create SecureClass {
+    # Public interface - accessible from anywhere
+    :public method publicMethod {} {
+        return "This is public"
+    }
+    
+    # Protected method - only accessible by class and subclasses
+    :protected method protectedMethod {} {
+        return "This is protected"
+    }
+    
+    # Private method - only accessible within the class
+    :private method privateMethod {} {
+        return "This is private"
+    }
+}</code></pre>
+
+            <h3 id="return-value">Return Value Checking</h3>
+            <p>NX provides a comprehensive system for checking and validating method return values:</p>
+            <pre><code># Enable return value checking globally
+::nsf::configure checkresult true
+
+# Set return type for a method
+::nsf::method::property ClassName methodName returns typeName
+
+# Method with return type
+:method methodName {param1 param2} -returns typeName {
+    # method body
+}</code></pre>
+        </section>
+
+        <section id="object-copying">
+            <h2>Object Copying</h2>
+            <p>The NX/NSF system provides powerful object copying capabilities that allow you to create duplicates of objects with various options.</p>
+
+            <h3 id="copy-features">Copying Features</h3>
+            <pre><code># Create an original object
+nx::Class create Template {
+    :property name
+    :property config
+    
+    :method init {} {
+        :configure -name "Default"
+        :configure -config {color blue size large}
+    }
+}
+
+# Create and copy objects
+set original [Template new]
+set copy [$original copy]
+
+# Copy with new name
+set namedCopy [$original copy "myNewTemplate"]</code></pre>
+
+            <h3 id="copy-patterns">Common Patterns</h3>
+            <pre><code># Template-Based Copying
+nx::Class create DocumentTemplate {
+    :property content
+    :property style
+    
+    :method createFromTemplate {name} {
+        set new [:copy $name]
+        $new configure -content [:get content]
+        return $new
+    }
+}
+
+# Configuration Copying
+nx::Class create ConfigurableObject {
+    :property settings
+    
+    :method copyWithSettings {newName settings} {
+        set new [:copy $newName]
+        $new configure -settings $settings
+        return $new
+    }
+}
+
+# State Preservation
+nx::Class create StatefulObject {
+    :variable state
+    
+    :method copy {?newName?} {
+        set new [next]
+        # Preserve state
+        $new configure -state [:get state]
+        return $new
+    }
+}</code></pre>
+
+            <h3 id="copy-best-practices">Best Practices</h3>
+            <pre><code># Deep Copying
+nx::Class create Container {
+    :property -incremental {items:object,*}
+    
+    :method copy {?newName?} {
+        set new [next]
+        foreach item [:get items] {
+            $new items add [$item copy]
+        }
+        return $new
+    }
+}
+
+# Selective Copying
+nx::Class create Configurable {
+    :property name
+    :property settings
+    :property internal
+    
+    :method copy {?newName?} {
+        set new [next]
+        # Only copy specific properties
+        $new configure -name [:get name]
+        $new configure -settings [:get settings]
+        return $new
+    }
+}</code></pre>
+        </section>
+
+        <section id="serialization">
+            <h2>Serialization</h2>
+            <p>The NX/NSF system provides comprehensive serialization capabilities through the nx::serializer package.</p>
+
+            <h3 id="basic-serialization">Basic Serialization</h3>
+            <pre><code># Serialize an object
+set script [object serialize]
+
+# Eval the script to recreate the object
+eval $script</code></pre>
+
+            <h3 id="target-mapping">Target Mapping</h3>
+            <pre><code># Serialize an object with a target mapping
+set script [object serialize -target NewObjectName]
+
+# The serialized object will be created with the new target name
+eval $script</code></pre>
+
+            <h3 id="deep-serialization">Deep Serialization</h3>
+            <pre><code># Serialize an object and all its children
+set script [::Serializer deepSerialize object]
+
+# Recreate the object hierarchy
+eval $script</code></pre>
+
+            <h3 id="name-mapping">Name Mapping</h3>
+            <pre><code># Remap object names during serialization
+set script [::Serializer deepSerialize -map {::old::name ::new::name} object]
+
+# Example with multiple mappings
+set script [::Serializer deepSerialize -map {::a::b ::x::y ::a ::x} ::a]</code></pre>
+
+            <h3 id="variable-filtering">Variable Filtering</h3>
+            <pre><code># Ignore no variables (serialize all)
+set script [::Serializer deepSerialize -ignoreVarsRE "" object]
+
+# Ignore variables matching a pattern
+set script [::Serializer deepSerialize -ignoreVarsRE "pattern" object]
+
+# Ignore all variables
+set script [::Serializer deepSerialize -ignoreVarsRE "." object]
+
+# Specific variable filtering examples:
+# Ignore variables ending with 'a'
+set script [::Serializer deepSerialize -ignoreVarsRE {::a$} object]
+
+# Exclude specific slot names
+set names {}
+foreach s [Class info slots] {
+  lappend names [$s cget -name]
+}
+set script [::Serializer deepSerialize -ignoreVarsRE [join $names |] object]</code></pre>
+
+            <h3 id="object-exclusion">Object Exclusion</h3>
+            <pre><code># Serialize a parent object but exclude a specific child
+set script [::Serializer deepSerialize -ignore ::parent::child ::parent]</code></pre>
+        </section>
+
+        <section id="advanced-features">
+            <h2>Advanced Features</h2>
+            <p>The NX/NSF system provides several advanced features for meta-programming and event handling.</p>
+
+            <h3 id="meta-programming">Meta-Programming</h3>
+            <pre><code>nx::Class create MetaExample {
+    # Add methods dynamically
+    :public method addMethod {name body} {
+        :public method $name {} $body
+    }
+    
+    # Introspection
+    :public method listMethods {} {
+        return [:info methods]
+    }
+}
+
+# Dynamic Method Creation
+nx::Class create DynamicClass {
+    :public method addMethod {name args body} {
+        :public method $name $args $body
+    }
+    
+    :public method addProperty {name defaultValue} {
+        :property [list $name $defaultValue]
+    }
+}</code></pre>
+
+            <h3 id="event-handling">Event Handling</h3>
+            <pre><code>nx::Class create Observable {
+    :property -incremental {observers:object,*}
+    
+    :method notify {event args} {
+        foreach observer [:get observers] {
+            $observer update $event {*}$args
+        }
+    }
+}
+
+# Method Profiler
+nx::Class create MethodProfiler {
+    :variable timings
+    
+    :public method profileMethod {obj methodName} {
+        set original [::nsf::method::body $obj $methodName]
+        ::nsf::method::create $obj $methodName [subst {
+            set start [clock microseconds]
+            set result [uplevel 1 $original]
+            set end [clock microseconds]
+            set duration [expr {$end - $start}]
+            lappend :timings($methodName) $duration
+            return \$result
+        }]
+    }
+    
+    :public method getStats {methodName} {
+        if {![info exists :timings($methodName)]} {
+            return "No data for $methodName"
+        }
+        set times ${:timings($methodName)}
+        set avg [expr {[tcl::mathop::+ {*}$times] / [llength $times]}]
+        return "Average time: ${avg}μs"
+    }
+}</code></pre>
+
+            <h3 id="design-patterns">Design Patterns</h3>
+            <pre><code># Singleton Pattern
+nx::Class create Singleton {
+    :property instance:object,0..1
+    
+    :public object method getInstance {} {
+        if {![info exists :instance]} {
+            set :instance [:new]
+        }
+        return ${:instance}
+    }
+}
+
+# Factory Pattern
+nx::Class create ShapeFactory {
+    :public object method create {type args} {
+        switch $type {
+            "circle" {
+                return [Circle new {*}$args]
+            }
+            "rectangle" {
+                return [Rectangle new {*}$args]
+            }
+            default {
+                error "Unknown shape type: $type"
+            }
+        }
+    }
+}</code></pre>
+        </section>
+
+        <section id="best-practices">
+            <h2>Best Practices</h2>
+            <p>The NX/NSF system provides powerful features, but following best practices is essential for maintainable and efficient code.</p>
+
+            <h3 id="object-system">Object System Design</h3>
+            <pre><code># Define clear class hierarchies
+nx::Class create Animal {
+    :property name
+    :property age
+}
+
+nx::Class create Mammal -superclass Animal {
+    :property furColor
+}
+
+nx::Class create Dog -superclass Mammal {
+    :property breed
+}</code></pre>
+
+            <h3 id="meta-programming-practices">Meta-Programming</h3>
+            <pre><code># Cache introspection results
+nx::Class create EfficientClass {
+    :variable methodCache
+    
+    :method getMethods {} {
+        if {![info exists :methodCache]} {
+            set :methodCache [:info methods]
+        }
+        return ${:methodCache}
+    }
+}</code></pre>
+
+            <h3 id="error-handling">Error Handling</h3>
+            <pre><code>nx::Class create SafeClass {
+    :method configure {args} {
+        if {[catch {next} result]} {
+            error "Configuration failed: $result"
+        }
+        return $result
+    }
+}</code></pre>
+        </section>
+
+        <section id="traits">
+            <h2>Traits</h2>
+            <p>Traits are a powerful feature in NX that allows you to add functionality to classes or objects without using inheritance. A trait is a class that is mixed into another class or object to provide additional functionality.</p>
+
+            <h3 id="traits-basic">Basic Concepts</h3>
+            <ul>
+                <li><strong>Trait:</strong> A class that is mixed into another class or object to provide additional functionality</li>
+                <li><strong>Per-Object Trait:</strong> A trait applied to a specific object instance</li>
+                <li><strong>Per-Class Trait:</strong> A trait applied to a class, affecting all instances of that class</li>
+            </ul>
+
+            <h3 id="traits-method">Method Resolution</h3>
+            <p>Traits can be used to add methods to a class or object. The NX/NSF system provides a mechanism to resolve method calls between traits and the class or object.</p>
+
+            <h3 id="traits-examples">Code Examples</h3>
+            <pre><code># Apply per-object trait
+nx::Object create obj -object-traits TraitClass
+
+# Apply per-class trait
+nx::Class create MyClass -trait TraitClass
+
+# Set trait on existing class
+MyClass traits set TraitClass
+
+# Add guard to trait
+MyClass traits guard TraitClass "guardCondition"</code></pre>
+        </section>
+
+        <section id="variable-access">
+            <h2>Variable Access Methods</h2>
+            <p>The NX/NSF system provides comprehensive methods for accessing and manipulating variables in objects.</p>
+
+            <h3 id="basic-access">Basic Variable Access</h3>
+            <pre><code># Basic Variable Access Functions
+nsf::var::set object varName ?value?           # Get or set a scalar variable
+nsf::var::set -array object arrayName ?keyValueList?  # Get or set an array variable
+nsf::var::exists object varName                # Check if a scalar variable exists
+nsf::var::exists -array object arrayName       # Check if an array variable exists
+nsf::var::unset object varName                 # Unset a variable
+nsf::var::unset -nocomplain object varName     # Unset without error if not exists
+nsf::var::import object varName                # Import a variable from an object</code></pre>
+
+            <h3 id="alternative-access">Alternative Access Methods</h3>
+            <pre><code># Namespace Ensemble (::nx::var1)
+namespace eval ::nx::var1 {
+    namespace ensemble create -map {
+        exists ::nsf::var::exists 
+        import ::nsf::var::import 
+        set ::nsf::var::set
+    }
+}
+
+# Usage:
+::nx::var1 set object varName ?value?
+::nx::var1 exists object varName
+::nx::var1 import object varName
+
+# NX Object with Aliases (::nx::var2)
+::nx::Object create ::nx::var2 {
+    :object alias exists ::nsf::var::exists 
+    :object alias import ::nsf::var::import
+    :object alias set ::nsf::var::set
+}
+
+# Usage:
+::nx::var2 set object varName ?value?
+::nx::var2 exists object varName</code></pre>
+
+            <h3 id="scalar-variables">Working with Scalar Variables</h3>
+            <pre><code># Set a scalar variable
+nsf::var::set objectName varName value  # Returns the value
+
+# Get a scalar variable value
+nsf::var::set objectName varName        # Returns the current value
+
+# Check if a scalar variable exists
+nsf::var::exists objectName varName     # Returns 1 if exists, 0 if not
+
+# Working with arrays
+nsf::var::set -array objectName arrayName {key1 value1 key2 value2}
+nsf::var::exists -array objectName arrayName
+nsf::var::unset -array objectName arrayName</code></pre>
+        </section>
+
+        <section id="method-forwarding">
+            <h2>Method Forwarding</h2>
+            <p>The NX/NSF system provides powerful method forwarding capabilities that allow methods to be delegated to other objects or commands.</p>
+
+            <h3 id="forward-syntax">Basic Forward Command Syntax</h3>
+            <pre><code>object public [object] forward methodName targetObject|targetCommand [args...]
+
+# Example: Simple Delegation
+nx::Object create dog
+nx::Object create tail {
+    :public object method wag args { return $args }
+}
+dog public object forward wag tail %proc</code></pre>
+
+            <h3 id="forward-patterns">Usage Patterns</h3>
+            <pre><code># Simple Delegation
+nx::Object create dog
+nx::Object create tail {
+    :public object method wag args { return $args }
+}
+dog public object forward wag tail %proc
+
+# Executing Commands
+nx::Object create obj {
+    :public object forward addOne expr 1 +
+}
+# obj addOne 5  -> returns 6
+
+# Special Substitution Variables
+# %self  - Reference to the current object
+# %method - Name of the current method
+# %proc  - Refers to the target procedure
+# %%     - Literal percent sign
+# %1     - First argument or default from list</code></pre>
+
+            <h3 id="forward-substitutions">Positional Substitutions</h3>
+            <pre><code># Add argument at the end
+obj public object forward foo list {%@end value}
+# obj foo 1 2 3  -> returns [1 2 3 value]
+
+# Add argument at specific position
+obj public object forward foo list {%@2 value}
+# obj foo 1 2 3  -> returns [1 value 2 3]
+
+# Add argument at beginning
+obj public object forward foo list {%@1 value}
+# obj foo 1 2 3  -> returns [value 1 2 3]
+
+# Add argument at second-to-last position
+obj public object forward foo list {%@-1 value}
+# obj foo 1 2 3  -> returns [1 2 value 3]</code></pre>
+
+            <h3 id="forward-dynamic">Dynamic Command Selection</h3>
+            <pre><code># Choose from multiple methods based on first argument
+obj public object forward foo %self {%1 {methodA methodB}}
+
+# With default values
+obj public object forward foo %self {%1 {methodA methodB}} {%1 {defaultA defaultB}}
+
+# Argument Count-Based Forwarding
+nx::Object create obj {
+    :public object forward f %self [list %argclindex [list a b c]]
+    :object method a args {...}
+    :object method b args {...}
+    :object method c args {...}
+}
+# obj f       -> calls method a
+# obj f 1     -> calls method b with argument 1
+# obj f 1 2   -> calls method c with arguments 1 2</code></pre>
+        </section>
+
+        <section id="runtime-assertions">
+            <h2>Runtime Assertion Checking (RAC)</h2>
+            <p>Runtime Assertion Checking (RAC) is a powerful feature in NX that allows for runtime validation of correctness conditions, based on the conceptual baseline of the Eiffel specification (ECMA Standard 367, 2nd edition, 2006).</p>
+
+            <h3 id="assertion-types">Assertion Types</h3>
+            <pre><code># Class Invariants
+nx::Class create MyClass -invariant {
+    {# invariant_name: }
+    {${:property1} >= ${:property2}}
+} {
+    # class definition...
+}
+
+# Object Invariants
+MyObject configure -object-invariant {
+    {${:property} > 0}
+}
+
+# Method Preconditions and Postconditions
+MyClass public method myMethod {} {
+    # method body
+} -precondition {
+    {# pre_condition_name: }
+    {${:property} > 0}
+} -postcondition {
+    {# post_condition_name: }
+    {${:property} > ${:anotherProperty}}
+}</code></pre>
+
+            <h3 id="assertion-setup">Setting Up Assertions</h3>
+            <pre><code># Direct interface for class invariants
+::nsf::method::assertion MyClass class-invar $invariantList
+
+# Object interface for class invariants
+MyClass configure -invariant $invariantList
+
+# Direct interface for object invariants
+::nsf::method::assertion myObject object-invar $invariantList
+
+# Object interface for object invariants
+myObject configure -object-invariant $invariantList
+
+# Reading invariants
+MyClass cget -invariant          # Get class invariant
+myObject cget -object-invariant  # Get object invariant</code></pre>
+
+            <h3 id="assertion-activation">Activating/Deactivating Assertions</h3>
+            <pre><code># Activate all assertions for an object
+::nsf::method::assertion myObject check all
+
+# Activate only preconditions
+::nsf::method::assertion myObject check pre
+
+# Activate only postconditions
+::nsf::method::assertion myObject check post
+
+# Activate only class invariants
+::nsf::method::assertion myObject check class-invar
+
+# Deactivate all assertions for an object
+::nsf::method::assertion myObject check {}</code></pre>
+
+            <h3 id="assertion-inheritance">Inheritance and Assertions</h3>
+            <pre><code># Child class with inherited invariants
+nx::Class create SavingsAccount -superclass Account -invariant {
+    {# minimum_deposit: }
+    {${:minimumBalance} > 100}
+}
+
+# Method with inherited assertions
+Account public method deposit {sum:integer} {
+    incr :depositTransactions
+    incr :balance $sum
+} -precondition {
+    {# deposit_positive: }
+    {$sum > 0}
+} -postcondition {
+    {# balance_increased: }
+    {${:balance} > 0}
+}</code></pre>
+
+            <h3 id="assertion-examples">Usage Examples</h3>
+            <pre><code># Basic Class with Invariant
+nx::Class create Account -invariant {
+    {# sufficient_balance: }
+    {${:balance} >= ${:minimumBalance}}
+} {
+    :property -accessor public balance:integer
+    :property -accessor public minimumBalance:integer
+}
+
+# Method with Preconditions and Postconditions
+Account public method deposit {sum:integer} {
+    incr :depositTransactions
+    incr :balance $sum
+} -precondition {
+    {# deposit_positive: }
+    {$sum > 0}
+} -postcondition {
+    {# balance_increased: }
+    {${:balance} > 0}
+}</code></pre>
+        </section>
+
+        <section id="nxsh">
+            <h2>The nxsh Shell and Testing</h2>
+            <p>The nxsh shell is a command-line interface for NX/NSF applications. It provides a convenient way to interact with the system and execute commands.</p>
+
+            <h3 id="nxsh-usage">Command Line Usage</h3>
+            <p>The nxsh shell provides several commands for interacting with the system:</p>
+            <pre><code># Run a command in the shell
+nxsh
+
+# Run a command in a specific interpreter
+nxsh -i interpreter_name
+
+# Run a command in a specific directory
+nxsh -d directory_name</code></pre>
+
+            <h3 id="nxsh-test">Test Framework</h3>
+            <p>The NX/NSF system provides a comprehensive test framework for writing and running tests.</p>
+
+            <h3 id="nxsh-patterns">Common Test Patterns</h3>
+            <p>The NX/NSF system provides several common test patterns:</p>
+            <pre><code># Unit Test Pattern
+nx::Class create TestClass {
+    :method testMethod {} {
+        # Test body
+    }
+}
+
+# Integration Test Pattern
+nx::Class create IntegrationTest {
+    :method testMethod {} {
+        # Test body
+    }
+}
+
+# Acceptance Test Pattern
+nx::Class create AcceptanceTest {
+    :method testMethod {} {
+        # Test body
+    }
+}</code></pre>
+        </section>
+
+        <section id="submethods">
+            <h2>Submethods</h2>
+            <p>Submethods are a powerful feature in NX that allows you to add functionality to methods without using inheritance. A submethod is a method that is mixed into another method to provide additional functionality.</p>
+
+            <h3 id="submethod-syntax">Basic Syntax</h3>
+            <pre><code># Define a submethod
+:submethod submethodName {args} {body}
+
+# Call a submethod
+:method methodName {args} {
+    # Call submethod
+    submethodName {args}
+}</code></pre>
+
+            <h3 id="submethod-calling">Calling Submethods</h3>
+            <p>Submethods can be called from other methods. The NX/NSF system provides a mechanism to call submethods.</p>
+
+            <h3 id="submethod-introspection">Introspection</h3>
+            <p>The NX/NSF system provides methods for introspecting submethods:</p>
+            <pre><code># Get submethods for a method
+:method methodName submethods get
+
+# Get submethods for a method
+:method methodName submethods info</code></pre>
+        </section>
+
+        <section id="method-visibility">
+            <h2>Method Visibility Control</h2>
+            <p>The NX/NSF system provides comprehensive control over method visibility.</p>
+
+            <h3 id="visibility-concepts">Key Concepts</h3>
+            <p>The NX/NSF system provides several key concepts for method visibility:</p>
+            <ul>
+                <li><strong>Public Method:</strong> Accessible from anywhere</li>
+                <li><strong>Protected Method:</strong> Accessible only from methods in the class and its subclasses</li>
+                <li><strong>Private Method:</strong> Accessible only from methods within the class</li>
+            </ul>
+
+            <h3 id="visibility-export">Export Behaviors</h3>
+            <p>The NX/NSF system provides several behaviors for exporting methods:</p>
+            <ul>
+                <li><strong>Public Export:</strong> Method is accessible from anywhere</li>
+                <li><strong>Protected Export:</strong> Method is accessible only from methods in the class and its subclasses</li>
+                <li><strong>Private Export:</strong> Method is accessible only from methods within the class</li>
+            </ul>
+
+            <h3 id="visibility-unexport">Unexport Behaviors</h3>
+            <p>The NX/NSF system provides several behaviors for unexporting methods:</p>
+            <ul>
+                <li><strong>Public Unexport:</strong> Method is not accessible from anywhere</li>
+                <li><strong>Protected Unexport:</strong> Method is not accessible from methods in the class and its subclasses</li>
+                <li><strong>Private Unexport:</strong> Method is not accessible from methods within the class</li>
+            </ul>
+        </section>
+
+        <section id="core-architecture">
+            <h2>NSF Core Architecture</h2>
+            <p>The NSF system is built on three fundamental components that work together to provide a robust object-oriented programming environment.</p>
+
+            <h3 id="foundation-components">Foundation Components</h3>
+            <pre><code># Core Components
+1. NsfObject
+   - Core object representation
+   - Contains command name, namespace, and class references
+   - Manages instance variables and method dispatch
+
+2. NsfClass
+   - Class representation
+   - Manages superclass/subclass relationships
+   - Handles method resolution order
+   - Controls instance creation and initialization
+
+3. NsfObjectSystem
+   - Container for classes and objects
+   - Manages root class and meta-class
+   - Controls object system lifecycle</code></pre>
+
+            <h3 id="plain-object">Plain Object Method Package</h3>
+            <pre><code># Loading and Configuration
+package require nx::plain-object-method
+
+# Configure warnings
+nx::configure plain-object-method-warning on  # Enable warnings
+nx::configure plain-object-method-warning off # Disable warnings
+
+# Object Creation and Methods
+nx::Object create ::o {
+    # Public method
+    :public method foo {} {return foo}
+    
+    # Protected method
+    :protected method pm1 args {return pm1}
+    
+    # Private method
+    :private method priv args {return priv}
+    
+    # Default method (protected)
+    :method pm2 args {return pm2}
+    
+    # Object method
+    :public object method f args {next}
+}
+
+# Method Aliases and Forwarding
+nx::Object create ::o {
+    # Create an alias to another method
+    :public alias a ::o::pm1
+    
+    # Create a forwarding method
+    :public forward fwd %self pm1
+}</code></pre>
+
+            <h3 id="core-features">Advanced Features</h3>
+            <pre><code># Properties and Variables
+nx::Object create ::o {
+    # Property with public accessor
+    :property -accessor public p
+    
+    # Simple variable
+    :variable v1 1
+    
+    # Incremental variable with type constraint
+    :variable -incremental v2:integer 1
+}
+
+# Mixins and Filters
+# Create a mixin class
+nx::Class create M1
+
+# Set a mixin
+o mixins set M1
+
+# Check mixins
+o info mixins
+
+# Clear mixins
+o mixins set ""
+
+# Set a filter
+o filters set f
+
+# Check filters
+o info filters
+
+# Clear filters
+o filters set ""</code></pre>
+        </section>
+
+        <section id="variable-resolution">
+            <h2>Variable Resolution</h2>
+            <p>The NX/NSF system provides sophisticated variable resolution mechanisms that handle different types of variables and their scoping rules.</p>
+
+            <h3 id="var-types">Variable Types and Notation</h3>
+            <p>NX supports several types of variables with distinct notation:</p>
+            <ul>
+                <li><strong>Instance Variables</strong>: Variables belonging to an object
+                    <pre><code>:varname  # Colon prefix for instance variables</code></pre>
+                </li>
+                <li><strong>Global Variables</strong>: Variables in the global namespace
+                    <pre><code>::varname  # Double colon prefix for global variables</code></pre>
+                </li>
+                <li><strong>Namespace Variables</strong>: Variables in object namespaces
+                    <pre><code>[current]::varname  # Fully qualified namespace variable
+[self]::varname     # Alternative for current object's namespace variables</code></pre>
+                </li>
+            </ul>
+
+            <h3 id="method-aliases">Method Aliases for Variable Operations</h3>
+            <pre><code>
+::nsf::method::alias ::nx::Object objeval -frame object ::eval
+::nsf::method::alias ::nx::Object array -frame object ::array
+::nsf::method::alias ::nx::Object lappend -frame object ::lappend
+::nsf::method::alias ::nx::Object incr -frame object ::incr
+::nsf::method::alias ::nx::Object set -frame object ::set
+::nsf::method::alias ::nx::Object unset -frame object ::unset</code></pre>
+
+            <h3 id="object-namespaces">Object Namespaces</h3>
+            <pre><code>nx::Object create o
+o require namespace  # Create a namespace for the object
+
+# Check namespace status
+o info has namespace  # Returns 1 if namespace is required, 0 if namespace exists but wasn't required
+
+# Direct namespace access
+namespace eval ::o {set x 3}
+
+# Object variable access (same variable)
+::o set x</code></pre>
+        </section>
+
+        <section id="object-lifecycle">
+            <h2>Object Lifecycle</h2>
+
+            <h3 id="creation">Creation</h3>
+            <pre><code>$class new ?options? ?args?                # Create new object
+$class create name ?args?                 # Create named object
+::nsf::object::alloc class ?name?       # Allocate object</code></pre>
+
+            <h3 id="initialization">Initialization</h3>
+            <pre><code>:public method init {} {
+    next                                  # Call parent's init
+    # Initialization code
+}</code></pre>
+
+            <h3 id="destruction">Destruction</h3>
+            <pre><code>:public method destroy {} {
+    # Cleanup code
+    next                                  # Call parent's destroy
+}</code></pre>
+
+            <h3 id="volatile-objects">Volatile Objects</h3>
+            <p>Volatile objects are automatically destroyed when they go out of scope.</p>
+            <pre><code># Required Setup
+package require nx::volatile
+::nsf::method::require ::nx::Object volatile
+
+# Create a named volatile object
+Class create obj1 -volatile {
+    :object method destroy {} {
+        puts "[self] destroy"
+        next
+    }
+}</code></pre>
+        </section>
+
+        <section id="method-resolution">
+            <h2>Method Resolution</h2>
+            <p>Method resolution in NX follows a specific order and provides various mechanisms for method lookup and inheritance.</p>
+
+            <h3>Resolution Order</h3>
+            <p>When a method is called, NX follows this resolution order:</p>
+            <ol>
+                <li>Per-object mixins</li>
+                <li>Class of the object</li>
+                <li>Per-class mixins</li>
+                <li>Superclasses (in inheritance order)</li>
+                <li>Base class (nx::Object)</li>
+            </ol>
+
+            <h3>Method Lookup</h3>
+            <pre><code># Get method lookup path
+obj info lookup method methodName
+
+# Get all available methods
+obj info lookup methods
+
+# Check method existence
+obj info method exists methodName</code></pre>
+
+            <h3>Method Inheritance</h3>
+            <pre><code># Call parent method
+next
+
+# Call specific parent method
+next methodName args
+
+# Check if method is inherited
+obj info method inherited methodName</code></pre>
+        </section>
+
+        <section id="variable-resolution">
+            <h2>Variable Resolution</h2>
+            <p>The NX/NSF system provides sophisticated variable resolution mechanisms that handle different types of variables and their scoping rules.</p>
+
+            <h3>Variable Types and Notation</h3>
+            <pre><code># Instance Variables
+:varname  # Colon prefix for instance variables
+
+# Global Variables
+::varname  # Double colon prefix for global variables
+
+# Namespace Variables
+[current]::varname  # Fully qualified namespace variable
+[self]::varname     # Alternative for current object's namespace variables</code></pre>
+
+            <h3>Method Aliases for Variable Operations</h3>
+            <pre><code>::nsf::method::alias ::nx::Object objeval -frame object ::eval
+::nsf::method::alias ::nx::Object array -frame object ::array
+::nsf::method::alias ::nx::Object lappend -frame object ::lappend
+::nsf::method::alias ::nx::Object incr -frame object ::incr
+::nsf::method::alias ::nx::Object set -frame object ::set
+::nsf::method::alias ::nx::Object unset -frame object ::unset</code></pre>
+
+            <h3>Evaluation Contexts</h3>
+            <pre><code># Standard evaluation with instance variable access
+o eval {set :x 1}  # Evaluate in object context
+
+# All variables become instance variables
+o objeval {
+  set aaa 1        # Creates instance variable 'aaa'
+  set :a 1         # Creates instance variable 'a'
+  global g         # Access global variable
+  :require namespace # Can require namespace within objscoped frame
+}
+
+# Only variables with colon prefixes become instance variables
+o softeval {
+  set bbb 1        # Local variable, not an instance variable
+  set :b 1         # Creates instance variable 'b'
+}
+
+# No automatic instance variable creation
+o softeval2 {
+  set zzz 1        # Local variable
+  set :z 1         # Not an instance variable
+}</code></pre>
+
+            <h3>Variable Persistence and Caching</h3>
+            <pre><code># Variable caching between method calls
+nx::Object create o
+o object method foo {x} {set :y 2; return ${:x},${:y}}
+o object method bar {} {return ${:x},${:y}}
+o set x 1
+o foo 1        # "1,2" - creates var y and fetches var x
+o bar          # "1,2" - fetches two instance variables</code></pre>
+
+            <h3>Best Practices</h3>
+            <ol>
+                <li>Use <code>o require namespace</code> when mixing namespace and object interfaces</li>
+                <li>Prefer explicit notation for clarity: <code>:var</code> within methods, <code>o set var</code> externally</li>
+                <li>Be aware of different behavior in objeval, softeval, and plain eval</li>
+                <li>Use <code>::nx::var</code> API for safer external access</li>
+                <li>Be careful with array elements in variable operations</li>
+                <li>Consider cached resolution effects with compiled code</li>
+                <li>Avoid mixing colon-prefixed variable names with <code>variable</code> and <code>upvar</code> commands</li>
+                <li>Test both compiled and interpreted execution paths</li>
+                <li>Be aware of frame context differences when using <code>uplevel</code> and <code>apply</code></li>
+                <li>Avoid namespace variables with same names as instance variables</li>
+            </ol>
+        </section>
+
+        <section id="object-lifecycle">
+            <h2>Object Lifecycle</h2>
+            <p>Understanding the lifecycle of objects in NX is crucial for proper resource management and application design.</p>
+
+            <h3>Creation</h3>
+            <pre><code>$class new ?options? ?args?                # Create new object
+$class create name ?args?                 # Create named object
+::nsf::object::alloc class ?name?       # Allocate object</code></pre>
+
+            <h3>Initialization</h3>
+            <pre><code>:public method init {} {
+    next                                  # Call parent's init
+    # Initialization code
+}</code></pre>
+
+            <h3>Destruction</h3>
+            <pre><code>:public method destroy {} {
+    # Cleanup code
+    next                                  # Call parent's destroy
+}</code></pre>
+
+            <h3>Common Pitfalls</h3>
+            <ul>
+                <li>Not calling <code>next</code> in initialization or destruction methods</li>
+                <li>Not properly cleaning up resources in destroy methods</li>
+                <li>Creating circular references that prevent proper garbage collection</li>
+                <li>Not handling exceptions during initialization or destruction</li>
+            </ul>
+        </section>
+    </main>
+
+    <script>
+        function toggleNav() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+
+        // Highlight current section in navigation
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 60) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').slice(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

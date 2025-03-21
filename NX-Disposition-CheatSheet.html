@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NX-Disposition-CheatSheet</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="temp_style.css" />
+</head>
+<body>
+<h1 id="nx-parameter-disposition-cheatsheet">Nx Parameter Disposition
+Cheatsheet</h1>
+<h2 id="parameter-dispositions">Parameter Dispositions</h2>
+<p>Parameter dispositions provide ways to invoke methods when object
+parameters are configured. The test file focuses on two main disposition
+types: <code>alias</code> and <code>forward</code>.</p>
+<h2 id="basic-syntax">Basic Syntax</h2>
+<h3 id="alias-disposition">Alias Disposition</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>parameterName:alias<span class="kw">[</span>,options<span class="kw">]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>-parameterName:alias<span class="kw">[</span>,options<span class="kw">]</span></span></code></pre></div>
+<h3 id="forward-disposition">Forward Disposition</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>parameterName:forward,method=SPEC<span class="kw">[</span>,options<span class="kw">]</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>-parameterName:forward,method=SPEC<span class="kw">[</span>,options<span class="kw">]</span></span></code></pre></div>
+<p>Where <code>SPEC</code> can contain these placeholders: -
+<code>%self</code>: Reference to the current object -
+<code>%method</code>: Method name</p>
+<h2 id="key-characteristics">Key Characteristics</h2>
+<ol type="1">
+<li>Dispositions are restricted to object parameters only</li>
+<li>Aliases and forwarders do not set instance variables</li>
+<li>Parameters are limited to a single value, unless using special
+techniques</li>
+<li>Both <code>alias</code> and <code>forward</code> work with public
+and protected target methods</li>
+</ol>
+<h2 id="common-options">Common Options</h2>
+<h3 id="noarg-option-for-alias-only"><code>noarg</code> Option (for
+alias only)</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>-bar:alias,noarg  # Calls method &#39;bar&#39; without arguments</span></code></pre></div>
+<h3 id="method-option"><code>method</code> Option</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>-foo:alias,method=bar  # Aliasing to a specific method</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>-foo:forward,method=%self bar  # Forwarding to a specific method</span></code></pre></div>
+<h3 id="type-constraints">Type Constraints</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>-foo:alias,boolean</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>-foo:forward,method=%self %method,integer</span></code></pre></div>
+<h3 id="multiplicity">Multiplicity</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>-foo:alias,<span class="dv">1</span>..*,boolean  # List of boolean <span class="ot">values</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>-foo:alias,<span class="dv">0</span>..*,false    # Optional <span class="kw">list</span> of false <span class="ot">values</span></span></code></pre></div>
+<h2 id="common-patterns">Common Patterns</h2>
+<h3 id="positional-vs.-non-positional">Positional
+vs. Non-positional</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>foo:alias         # Positional parameter</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>-foo:alias        # Non-positional parameter</span></code></pre></div>
+<h3 id="handling-multiple-arguments">Handling Multiple Arguments</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Passing multiple arguments as a list</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>-multi-escape:alias</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span>C new<span class="ot"> -multi</span>-escape <span class="kw">[list</span> X Y<span class="kw">]]</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Using eval in a forward</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>-multi<span class="dv">-2</span>:forward,method=<span class="kw">eval</span> %self %method</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span>C new<span class="ot"> -multi</span><span class="dv">-2</span> <span class="kw">{</span>X Y<span class="kw">}]</span></span></code></pre></div>
+<h3 id="residual-args-handling">Residual Args Handling</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ot">args</span>:alias,method=Residualargs,<span class="ot">args</span></span></code></pre></div>
+<h2 id="object-targets-for-dispositions">Object Targets for
+Dispositions</h2>
+<p>Dispositions can target not only methods but also objects:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aliasing to an object</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>T setObjectParams <span class="ot">x</span>:alias,method=::obj</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Using the defaultmethod of an object</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>T setObjectParams <span class="kw">[list</span> <span class="kw">[list</span> z:alias,noarg <span class="st">&quot;&quot;</span><span class="kw">]]</span></span></code></pre></div>
+<p>When working with object targets: - Using <code>noarg</code> with an
+object target calls the object’s defaultmethod - Chained dispatches work
+by forwarding messages: <code>tt-&gt;z(::obj)-&gt;YYY()</code> - Method
+handles can be used as targets: <code>x:alias,method=$methods(z)</code>
+- Tcl procedures can be aliased: <code>x:alias,method=::baz</code></p>
+<h2 id="xotcl-compatibility">XOTcl Compatibility</h2>
+<h3 id="xotcl-parameter-handling">XOTcl Parameter Handling</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># XOTcl class with parameters</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>::xotcl::Class <span class="ot">create</span> XC<span class="ot"> -parameter</span> <span class="kw">{</span>a b c<span class="kw">}</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Residual args handling for init</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>::XD instproc init <span class="ot">args</span> <span class="kw">{</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">set</span> :<span class="ot">args</span> <span class="dt">$args</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard XOTcl parameter structure</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;-instfilter:filterreg,alias,0..n -superclass:alias,0..n -instmixin:mixinreg,alias,0..n \</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="st"> {-__default_metaclass ::xotcl::Class} {-__default_superclass ::xotcl::Object} \</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="st"> -mixin:mixinreg,alias,0..n -filter:filterreg,alias,0..n -class:class,alias args:alias,method=residualargs,args&quot;</span></span></code></pre></div>
+<h3 id="xotcl-uplevelupvar-resolution">XOTcl Uplevel/Upvar
+Resolution</h3>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># XOTcl uplevel/upvar with callstack resolution</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>xotcl::Class C<span class="ot"> -instproc</span> call <span class="kw">{</span><span class="ot">x</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  :<span class="kw">uplevel</span> <span class="kw">[list</span> <span class="kw">set</span> ix <span class="dt">$x</span><span class="kw">]</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  :<span class="kw">upvar</span> <span class="dt">$x</span> _</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">incr</span> _</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="return-value-interactions">Return Value Interactions</h2>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Return value checking with alias disposition</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>-foo:alias,true</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">set</span> methods(foo) <span class="kw">[</span>R public method foo <span class="kw">{</span><span class="ot">x</span>:true<span class="kw">}</span><span class="ot"> -returns</span> false <span class="kw">{</span>...<span class="kw">}]</span></span></code></pre></div>
+<h2 id="callstack-considerations">Callstack Considerations</h2>
+<p>When using uplevel/upvar with alias and forward dispositions: - Level
+-1 → C-level frame - Level -2 → Actual caller frame - Target methods of
+alias parameters don’t have full callstack transparency</p>
+<p>Use these for proper callstack handling:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>:<span class="kw">uplevel</span> <span class="kw">[list</span> <span class="kw">set</span> ix <span class="dt">$x</span><span class="kw">]</span>  # NSF/Nx <span class="kw">uplevel</span> method</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>:<span class="kw">upvar</span> <span class="dt">$x</span> _               # NSF/Nx <span class="kw">upvar</span> method</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">uplevel</span> <span class="kw">[</span><span class="ot">current</span> callinglevel<span class="kw">]</span> <span class="kw">[list</span> <span class="kw">set</span> ix <span class="dt">$x</span><span class="kw">]</span>  # Using callinglevel</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">uplevel</span> <span class="kw">[</span><span class="ot">current</span> activelevel<span class="kw">]</span> <span class="kw">[list</span> <span class="kw">set</span> ix <span class="dt">$x</span><span class="kw">]</span>   # Using activelevel</span></code></pre></div>
+<h2 id="init-and-configuration">Init and Configuration</h2>
+<h3 id="init-method"><code>init</code> Method</h3>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calling init via alias disposition</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{</span>-a init:alias,noarg<span class="ot"> -b</span>:integer<span class="kw">}</span></span></code></pre></div>
+<p>The init method is called only once during object creation, even when
+configured via alias.</p>
+<h3 id="default-superclass-handling">Default Superclass Handling</h3>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default superclass behavior</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>nx::Class <span class="ot">create</span> P</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># P inherits from ::nx::Object by default</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Explicit superclass</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>nx::Class <span class="ot">create</span> Q<span class="ot"> -superclass</span> P</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># configure does not reset superclass to default</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>Q <span class="ot">configure</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Q still inherits from P, not ::nx::Object</span></span></code></pre></div>
+<h3 id="initcmd-interactions">initcmd Interactions</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># initcmd with default</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{{</span>__init:cmd :foo<span class="kw">}}</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># optional initcmd</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{</span>initcmd:cmd,optional<span class="kw">}</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># initcmd with default value</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{{</span>initcmd:cmd <span class="st">&quot;&quot;</span><span class="kw">}}</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co"># initcmd cannot use noarg</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{</span>initcmd:cmd,noarg<span class="kw">}</span>  # ERROR: noarg only <span class="kw">for</span> alias</span></code></pre></div>
+<h2 id="common-error-messages">Common Error Messages</h2>
+<ul>
+<li>“parameter option ‘alias’ not allowed”</li>
+<li>“parameter option ‘noarg’ only allowed for parameter type
+‘alias’”</li>
+<li>“parameter option ‘method=’ only allowed for parameter types
+‘alias’, ‘forward’ and ‘slotset’”</li>
+<li>“parameter invocation types cannot be used with option
+‘switch’”</li>
+<li>“multiplicity settings for variable argument parameter ‘args’ not
+allowed”</li>
+<li>“parameter option ‘args’ invalid for parameter ‘a’; only allowed for
+last parameter”</li>
+<li>“refuse to redefine parameter type of ‘args’ from type ‘integer’ to
+type ‘args’”</li>
+</ul>
+<h2 id="examples">Examples</h2>
+<h3 id="basic-alias">Basic Alias</h3>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{</span>-foo:alias<span class="kw">}</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>C <span class="ot">create</span> c1<span class="ot"> -foo</span> value</span></code></pre></div>
+<h3 id="basic-forward">Basic Forward</h3>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{{{</span>-foo:forward,method=%self %method<span class="kw">}}}</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>C <span class="ot">create</span> c1<span class="ot"> -foo</span> value</span></code></pre></div>
+<h3 id="alias-with-default-value">Alias with Default Value</h3>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{{</span>-foo:alias <span class="st">&quot;defaultValue&quot;</span><span class="kw">}}</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>C <span class="ot">create</span> c1</span></code></pre></div>
+<h3 id="alias-with-no-arguments">Alias with No Arguments</h3>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{</span>-foo:alias,noarg<span class="kw">}</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>C <span class="ot">create</span> c1<span class="ot"> -foo</span>  # Calls method &#39;foo&#39; with no arguments</span></code></pre></div>
+<h3 id="forward-with-complex-logic">Forward with Complex Logic</h3>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>C method multi-mix <span class="kw">{</span>-<span class="ot">x</span> <span class="ot">y</span> <span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">set</span> :<span class="kw">[</span><span class="ot">current</span> method<span class="kw">]</span> --<span class="ot">x</span>-<span class="dt">$x</span>--<span class="ot">y</span>-<span class="dt">$y</span>--<span class="ot">args</span>-<span class="dt">$args</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{{{</span>-multi-mix:forward,method=<span class="kw">eval</span> %self %method<span class="kw">}}}</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="kw">[</span>C new<span class="ot"> -multi</span>-mix <span class="kw">[list</span><span class="ot"> -x</span> X Y Z <span class="dv">1</span> <span class="dv">2</span><span class="kw">]]</span></span></code></pre></div>
+<h3 id="custom-user-defined-type">Custom User-defined Type</h3>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>::nx::methodParameterSlot object method <span class="ot">type</span>=mytype <span class="kw">{</span><span class="ot">name</span> value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">if</span> <span class="kw">{</span><span class="dt">$value</span> &lt; <span class="dv">1</span> || <span class="dt">$value</span> &gt; <span class="dv">3</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">error</span> <span class="st">&quot;Value &#39;</span><span class="dt">$</span><span class="st">value&#39; of parameter </span><span class="dt">$</span><span class="st">name is not between 1 and 3&quot;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">}</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">[list</span> <span class="kw">[list</span><span class="ot"> -baz</span>:alias,mytype<span class="kw">]]</span></span></code></pre></div>
+<h2 id="integration-with-other-features">Integration with Other
+Features</h2>
+<h3 id="with-submethods">With Submethods</h3>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>C public method <span class="st">&quot;FOO foo&quot;</span> <span class="kw">{}</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">[list</span> FOO:alias<span class="kw">]</span></span></code></pre></div>
+<h3 id="with-mixins">With Mixins</h3>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>C mixins <span class="kw">set</span> M</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">[list</span> FOO:alias<span class="kw">]</span></span></code></pre></div>
+<h3 id="with-filters">With Filters</h3>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>C public method intercept <span class="ot">args</span> <span class="kw">{</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  next</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>C filters <span class="kw">set</span> intercept</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">[list</span> FOO:alias<span class="kw">]</span></span></code></pre></div>
+<h3 id="with-residual-args-xotcl-compatibility">With Residual Args
+(XOTcl compatibility)</h3>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>C setObjectParams <span class="kw">{</span><span class="ot">args</span>:alias,method=Residualargs,<span class="ot">args</span><span class="kw">}</span></span></code></pre></div>
+<h2 id="implementation-notes">Implementation Notes</h2>
+<ul>
+<li>The <code>method</code> parameter name is used consistently, though
+it may seem more fitting for alias than forward</li>
+<li>Return value checkers can’t use disposition types</li>
+<li>Callstack position must be considered when using uplevel/upvar</li>
+<li>Ensemble callstack structures differ between ordinary dispatch and
+parameter dispatch</li>
+<li>In parameter (alias) dispatch, configure() introduces additional
+frames in the callstack</li>
+</ul>
+</body>
+</html>

@@ -291,7 +291,7 @@ nx::Class create Singleton {
     
     :public object method getInstance {} {
         if {![info exists :instance]} {
-            set :instance [my new]
+            set :instance [:new]
         }
         return ${:instance}
     }

@@ -400,7 +400,7 @@ if {[obj info lookup methods pattern] ne ""} {
 :method "foo" args {
   # Dynamically determine and call a submethod
   set submethod [lindex $args 0]
-  return [my foo $submethod {*}[lrange $args 1 end]]
+  return [:foo $submethod {*}[lrange $args 1 end]]
 }
 ```
 

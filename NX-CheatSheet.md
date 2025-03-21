@@ -386,7 +386,7 @@ $class create name ?args?                 # Create named object
 ```tcl
 next                                      # Call next method in chain
 self                                     # Reference to current object
-my                                      # Call method on self
+:                                      # Call method on self
 ```
 
 ### Method Precedence
@@ -652,10 +652,10 @@ rename $obj newname                      # Renames object command
 
 :method destroy {} {
     # Cleanup resources
-    my cleanup_resources
+    :cleanup_resources
     
     # Notify observers
-    my notify_destruction
+    :notify_destruction
     
     # Final cleanup
     next
@@ -886,8 +886,8 @@ nx::dispatch obj protectedMethod args  # Call protected method
 ```tcl
 # Internal method calls (allowed)
 :public method caller {} {
-    my protectedMethod              # Access protected method
-    my privateMethod                # Access private method
+    :protectedMethod              # Access protected method
+    :privateMethod                # Access private method
 }
 
 # Cross-instance calls
@@ -921,7 +921,7 @@ Class create obj {
 }
 
 :public method interface {} {
-    my internal                     # Use internal method
+    :internal                     # Use internal method
 }
 
 # Protected factory pattern
@@ -930,7 +930,7 @@ Class create obj {
 }
 
 :public method create {type} {
-    my create_impl $type           # Use protected factory
+    :create_impl $type           # Use protected factory
 }
 
 # Visibility inheritance
@@ -1006,7 +1006,7 @@ obj propName value                    # Set value (if public)
 
 # Protected access
 :public method wrapper {} {
-    my protectedProp                  # Access protected property
+    :protectedProp                  # Access protected property
 }
 ```
 
@@ -1049,7 +1049,7 @@ nsf::method::property Class prop call-protected  # Check protection
     :public method set {value} {
         set old ${:observed}
         set :observed $value
-        my notify $old $value
+        :notify $old $value
     }
 }
 ```
@@ -1330,22 +1330,22 @@ if {[obj info lookup method name] ne ""} {
 
 # Method documentation
 :public method documented {} {
-    set def [my info method definition [current method]]
+    set def [:info method definition [current method]]
     return $def
 }
 
 # Method analysis
 :public method analyze {methodName} {
-    set args [my info method args $methodName]
-    set body [my info method body $methodName]
-    set prot [my info method protection $methodName]
+    set args [:info method args $methodName]
+    set body [:info method body $methodName]
+    set prot [:info method protection $methodName]
     # Analysis code
 }
 
 # Dynamic method handling
 :public method handle {name args} {
-    if {[my info methods $name] ne ""} {
-        my $name {*}$args
+    if {[:info methods $name] ne ""} {
+        :$name {*}$args
     } else {
         error "Unknown method: $name"
     }

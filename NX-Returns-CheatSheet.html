@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NX-Returns-CheatSheet</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="temp_style.css" />
+</head>
+<body>
+<h1 id="nx-method-return-values-cheatsheet">NX Method Return Values
+Cheatsheet</h1>
+<h2 id="overview">Overview</h2>
+<p>This cheatsheet documents the return value checking and typing system
+in the NX Tcl extension, as evidenced in the <code>returns.test</code>
+test suite. The system allows for type checking and conversion of method
+return values.</p>
+<h2 id="basic-configuration">Basic Configuration</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable return value checking globally</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">configure</span> checkresult true</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Disable return value checking globally</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">configure</span> checkresults false</span></code></pre></div>
+<h2 id="setting-return-types">Setting Return Types</h2>
+<h3 id="for-existing-methods">For Existing Methods</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set return type for a method</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>::nsf::method::property ClassName methodName returns typeName</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Set return type with additional arguments</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>::nsf::method::property ClassName methodName returns typeName,arg=value</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable value conversion for return values</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>::nsf::method::property ClassName methodName returns typeName,convert</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove return type checking</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>::nsf::method::property ClassName methodName returns <span class="st">&quot;&quot;</span></span></code></pre></div>
+<h3 id="during-method-declaration">During Method Declaration</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method with return type</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>:method methodName <span class="kw">{</span>param1 param2<span class="kw">}</span><span class="ot"> -returns</span> typeName <span class="kw">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># method body</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Alias with return type</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>:alias aliasName<span class="ot"> -returns</span> typeName<span class="ot"> -frame</span> object ::someCommand</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Forward with return type</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>:forward forwardName<span class="ot"> -returns</span> typeName ::someCommand</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Object method with complex return type (object with cardinality)</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>:public object method methodName <span class="kw">{}</span><span class="ot"> -returns</span> object,<span class="dv">1</span>..n <span class="kw">{</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># method body</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="querying-return-types">Querying Return Types</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the return type of a method</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>::nsf::method::property ClassName methodName returns</span></code></pre></div>
+<h2 id="built-in-return-types">Built-in Return Types</h2>
+<ul>
+<li><code>integer</code>: Checks if return value is an integer</li>
+<li><code>object</code>: Checks if return value is a valid object</li>
+<li><code>object,1..n</code>: Checks if return value is one or more
+valid objects</li>
+</ul>
+<h2 id="custom-return-types">Custom Return Types</h2>
+<h3 id="creating-a-custom-return-type">Creating a Custom Return
+Type</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>::nx::methodParameterSlot object method <span class="ot">type</span>=typeName <span class="kw">{</span><span class="ot">name</span> value <span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Validation logic</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="kw">{</span>!valid<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">error</span> <span class="st">&quot;Error message&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">$value</span>  # Return original or modified value</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="example-range-type">Example: Range Type</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>::nx::methodParameterSlot object method <span class="ot">type</span>=<span class="ot">range</span> <span class="kw">{</span><span class="ot">name</span> value arg<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">lassign</span> <span class="kw">[split</span> <span class="dt">$arg</span> -<span class="kw">]</span> min max</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="kw">{</span><span class="dt">$value</span> &lt; <span class="dt">$min</span> || <span class="dt">$value</span> &gt; <span class="dt">$max</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">error</span> <span class="st">&quot;Value &#39;</span><span class="dt">$</span><span class="st">value&#39; of parameter </span><span class="dt">$</span><span class="st">name not between </span><span class="dt">$</span><span class="st">min and </span><span class="dt">$</span><span class="st">max&quot;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">$value</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage:</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>::nsf::method::property ClassName methodName returns <span class="ot">range</span>,arg=<span class="dv">1-30</span></span></code></pre></div>
+<h3 id="example-value-conversion-type">Example: Value Conversion
+Type</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>::nx::methodParameterSlot object method <span class="ot">type</span>=sex <span class="kw">{</span><span class="ot">name</span> value <span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">switch</span><span class="ot"> -glob</span> <span class="dt">$value</span> <span class="kw">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        m* <span class="kw">{return</span> m<span class="kw">}</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        f* <span class="kw">{return</span> f<span class="kw">}</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="ot">default</span> <span class="kw">{error</span> <span class="st">&quot;expected sex but got </span><span class="dt">$</span><span class="st">value&quot;</span><span class="kw">}</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage with conversion:</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>::nsf::method::property ClassName methodName returns sex,convert</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Now &quot;male&quot; returns as &quot;m&quot;, &quot;female&quot; as &quot;f&quot;</span></span></code></pre></div>
+<h2 id="behavior-with-check-results-enableddisabled">Behavior with Check
+Results Enabled/Disabled</h2>
+<h3 id="with-checkresult-true">With <code>checkresult true</code>:</h3>
+<ul>
+<li>Methods with return type constraints will validate return
+values</li>
+<li>Return value errors are raised when constraints aren’t met</li>
+<li>Converters with <code>convert</code> flag still function</li>
+</ul>
+<h3 id="with-checkresult-false">With
+<code>checkresult false</code>:</h3>
+<ul>
+<li>Type checking is disabled (no errors for invalid return values)</li>
+<li>Converters with <code>convert</code> flag still function (conversion
+still happens)</li>
+</ul>
+<h2 id="method-types-supporting-return-values">Method Types Supporting
+Return Values</h2>
+<ul>
+<li>Regular methods (<code>:method</code>)</li>
+<li>Object methods (<code>:object method</code>)</li>
+<li>Aliases (<code>:alias</code>)</li>
+<li>Forwards (<code>:forward</code>)</li>
+</ul>
+<h2 id="common-error-messages">Common Error Messages</h2>
+<ul>
+<li><code>expected integer but got "x" as return value</code></li>
+<li><code>Value 'x' of parameter return-value not between min and max</code></li>
+<li><code>expected sex but got x</code></li>
+</ul>
+<h2 id="testing-return-values">Testing Return Values</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In NX test cases:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>? <span class="kw">{</span>objectName methodName <span class="ot">args</span><span class="kw">}</span> expectedResult</span></code></pre></div>
+<h2 id="notes-on-empty-parameter-definitions">Notes on Empty Parameter
+Definitions</h2>
+<ul>
+<li>Return value specifications work even with methods that have no
+parameters</li>
+<li>Setting a return type does not affect the parameter definitions</li>
+</ul>
+<h2 id="examples">Examples</h2>
+<h3 id="basic-integer-return-checking">Basic Integer Return
+Checking</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::property C method1 returns integer</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>C method1  # Will <span class="kw">error</span> <span class="kw">if</span> <span class="kw">return</span> value <span class="ot">is</span> not an integer</span></code></pre></div>
+<h3 id="custom-range-return-checking">Custom Range Return Checking</h3>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::property C method1 returns <span class="ot">range</span>,arg=<span class="dv">1-100</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>C method1  # Will <span class="kw">error</span> <span class="kw">if</span> <span class="kw">return</span> value <span class="ot">is</span> not between <span class="dv">1</span> and <span class="dv">100</span></span></code></pre></div>
+<h3 id="return-value-conversion">Return Value Conversion</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::property C method1 returns sex,convert</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>C method1  # Will convert <span class="st">&quot;male&quot;</span> to <span class="st">&quot;m&quot;</span>, <span class="st">&quot;female&quot;</span> to <span class="st">&quot;f&quot;</span></span></code></pre></div>
+</body>
+</html>

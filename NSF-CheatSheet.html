@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NSF-CheatSheet</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="temp_style.css" />
+</head>
+<body>
+<h1 id="nsf-cheat-sheet">NSF Cheat Sheet</h1>
+<h2 id="slot-definition">Slot Definition</h2>
+<h3 id="slot-types">Slot Types</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>::nx::Slot                    # Base slot <span class="ot">type</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>::nx::ObjectParameterSlot     # Object parameter slot</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>::nx::MethodParameterSlot     # Method parameter slot</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>::nx::VariableSlot           # Variable slot</span></code></pre></div>
+<h3 id="slot-properties">Slot Properties</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>-<span class="ot">type</span> <span class="ot">type</span>                   # Slot <span class="ot">type</span> (built-in or <span class="ot">class</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>-arg argument               # Argument specification</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>-multiplicity <span class="ot">range</span>         # Multiplicity constraint (e.g. <span class="st">&quot;0..1&quot;</span>, <span class="st">&quot;1..n&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>-required boolean          # Whether value <span class="ot">is</span> required</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>-convert boolean          # Enable value conversion</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>-noarg boolean           # No argument flag</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>-nodashalnum boolean    # No dash-alphanumeric flag</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>-configurable boolean   # Configurable flag</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>-incremental boolean   # Incremental flag</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>-substdefault pattern  # Subst <span class="ot">default</span> pattern (<span class="dv">0</span>b111 <span class="kw">for</span> all)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>-methodname <span class="ot">name</span>      # Associated method <span class="ot">name</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>-disposition <span class="ot">type</span>    # Slot disposition (alias|forward|cmd|initcmd)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>-per-object boolean # Per-object flag</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>-private boolean   # Private slot flag</span></code></pre></div>
+<h3 id="parameter-specification-format">Parameter Specification
+Format</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>                        # Simple parameter</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:required              # Required parameter</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="ot">type</span>=<span class="ot">type</span>            # Parameter with <span class="ot">type</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:arg=arg             # Parameter with argument spec</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="dv">0</span>..<span class="dv">1</span>                # Optional parameter (<span class="dv">0</span> or <span class="dv">1</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="dv">1</span>..n               # Multiple required <span class="ot">values</span> (<span class="dv">1</span> or more)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="dv">0</span>..n              # Multiple optional <span class="ot">values</span> (<span class="dv">0</span> or more)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:convert          # Enable value conversion</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:noarg           # No argument parameter</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:nodashalnum    # No dash-alphanumeric parameter</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:method=method  # Parameter with associated method</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:substdefault  # Enable <span class="kw">subst</span> on <span class="ot">default</span> value</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:alias        # Alias parameter</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:forward     # Forward parameter</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:cmd        # Command parameter</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:initcmd   # Init <span class="ot">command</span> parameter</span></code></pre></div>
+<h3 id="slot-operations">Slot Operations</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>::nx::slotObj<span class="ot"> -container</span> <span class="ot">type</span> object <span class="ot">name</span>    # Create slot object</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">set</span> slot property value         # Set slot property</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>::nsf::method::setter <span class="ot">class</span> slotName       # Register standard setter</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>::nsf::method::property <span class="ot">class</span> slot property value  # Set slot method property</span></code></pre></div>
+<h2 id="nsf-system-commands">NSF System Commands</h2>
+<h3 id="procedure-definition">Procedure Definition</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="kw">proc</span> ?-ad? ?-checkalways? ?-<span class="ot">debug</span>? ?-deprecated? procName arguments <span class="ot">body</span></span></code></pre></div>
+<p>Options: - <code>-ad</code>: Enable argument dispatch -
+<code>-checkalways</code>: Always check arguments - <code>-debug</code>:
+Enable debug mode for the proc - <code>-deprecated</code>: Mark proc as
+deprecated</p>
+<h3 id="method-definition-commands">Method Definition Commands</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">create</span> object methodName arguments <span class="ot">body</span>  # Create method</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">delete</span> object methodName                # Delete method</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">copy</span> srcObj srcMethod destObj destMethod  # Copy method</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">move</span> srcObj srcMethod destObj destMethod  # Move method</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object methodName property value # Set method property</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">require</span> object methodName isPerObject    # Require method</span></code></pre></div>
+<h3 id="method-properties">Method Properties</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method call-protected boolean  # Protection <span class="ot">level</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method call-private boolean   # Private access</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method <span class="ot">debug</span> boolean         # Debug mode</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method deprecated <span class="kw">message</span>    # Deprecation</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method returns <span class="ot">type</span>         # Return <span class="ot">type</span></span></code></pre></div>
+<h3 id="object-system-commands">Object System Commands</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>::nsf::objectsystem::<span class="ot">create</span> <span class="ot">name</span> classCmd <span class="kw">{</span>options<span class="kw">}</span>    # Create object <span class="ot">system</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>::nsf::object::<span class="ot">exists</span> object                          # Check existence</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>::nsf::object::property object property value         # Set object property</span></code></pre></div>
+<h3 id="configuration-and-debug">Configuration and Debug</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">configure</span> <span class="kw">option</span> value                         # Configure NSF</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">debug</span> <span class="ot">level</span>                                    # Set <span class="ot">debug</span> <span class="ot">level</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>::nsf::log <span class="ot">level</span> <span class="kw">message</span>                             # Log <span class="kw">message</span></span></code></pre></div>
+<h3 id="namespace-management">Namespace Management</h3>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>::nsf::directdispatch object cmd <span class="ot">args</span>                # Direct method dispatch</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>::nsf::dispatch object method <span class="ot">args</span>                   # Method dispatch</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">current</span> ?<span class="kw">option</span>?                             # Get <span class="ot">current</span> context <span class="kw">info</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>::nsf::next ?<span class="ot">args</span>?                                  # Call next method</span></code></pre></div>
+<h2 id="extended-type-system">Extended Type System</h2>
+<h3 id="custom-type-definition">Custom Type Definition</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">type</span>::<span class="ot">create</span> typename <span class="kw">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Basic validation</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">validate</span> <span class="kw">{</span>value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Return validated value or throw error</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Argument validation for parameterized types</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    -validatearg <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Validate type parameters</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Value conversion</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    -convert <span class="kw">{</span>value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Convert value to canonical form</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Custom error formatting</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    -errormsg <span class="kw">{</span>value <span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Return formatted error message</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="type-composition">Type Composition</h3>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Union type</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>type1|type2</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Intersection type</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>type1&amp;type2</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameterized type</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ot">type</span>,param1,param2</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Constrained type</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="ot">type</span>,constraint</span></code></pre></div>
+<h3 id="built-in-constraints">Built-in Constraints</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Value constraints</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>nonNegative                            # Value &gt;= <span class="dv">0</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>positive                               # Value &gt; <span class="dv">0</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>negative                               # Value &lt; <span class="dv">0</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>between,min,max                        # min &lt;= value &lt;= max</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># String constraints</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>nonempty                              # Non-empty <span class="kw">string</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>alnum                                 # Alphanumeric</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>alpha                                 # Alphabetic</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>ascii                                 # ASCII characters</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>control                               # Control characters</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>digit                                 # Digits</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>graph                                 # Graphical chars</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="kw">lower</span>                                 # Lowercase</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>print                                 # Printable chars</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>punct                                 # Punctuation</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>space                                 # Whitespace</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>upper                                 # Uppercase</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>xdigit                               # Hex digits</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Collection constraints</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>unique                               # Unique elements</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>sorted                               # Sorted elements</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>nonempty                            # Non-empty collection</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="ot">size</span>,n                              # Exact <span class="ot">size</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="ot">minsize</span>,n                           # Minimum <span class="ot">size</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="ot">maxsize</span>,n                           # Maximum <span class="ot">size</span></span></code></pre></div>
+<h2 id="method-manipulation">Method Manipulation</h2>
+<h3 id="method-creation">Method Creation</h3>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">create</span> object methodName arguments <span class="ot">body</span>  # Create method</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">delete</span> object methodName                # Delete method</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">copy</span> srcObj srcMethod destObj destMethod  # Copy method</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">move</span> srcObj srcMethod destObj destMethod  # Move method</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object methodName property value # Set method property</span></code></pre></div>
+<h3 id="method-properties-1">Method Properties</h3>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method call-protected boolean  # Protection <span class="ot">level</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method call-private boolean   # Private access</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method <span class="ot">debug</span> boolean         # Debug mode</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method deprecated <span class="kw">message</span>    # Deprecation</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>::nsf::method::property object method returns <span class="ot">type</span>         # Return <span class="ot">type</span></span></code></pre></div>
+<h2 id="variable-and-slot-management">Variable and Slot Management</h2>
+<h3 id="variable-operations">Variable Operations</h3>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">exists</span> obj var               # Check <span class="kw">if</span> <span class="kw">variable</span> <span class="ot">exists</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">set</span> obj var value           # Set <span class="kw">variable</span> value</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">get</span> obj var                # Get <span class="kw">variable</span> value</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">unset</span> ?-nocomplain? obj var  # Unset <span class="kw">variable</span></span></code></pre></div>
+<h3 id="slot-operations-1">Slot Operations</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>::nsf::slot::<span class="ot">create</span> object slotName      # Create slot</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>::nsf::slot::<span class="ot">delete</span> object slotName     # Delete slot</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>::nsf::slot::property object slot prop  # Set slot property</span></code></pre></div>
+<h2 id="debugging-and-development">Debugging and Development</h2>
+<h3 id="debug-commands">Debug Commands</h3>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">debug</span>::call <span class="ot">level</span> objectInfo methodInfo arglist  # Report method/<span class="kw">proc</span> call</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">debug</span>::<span class="kw">exit</span> <span class="ot">level</span> objectInfo methodInfo result usec  # Report method/<span class="kw">proc</span> <span class="kw">exit</span></span></code></pre></div>
+<h3 id="profiling">Profiling</h3>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>::nsf::__profile_clear                    # Clear profiling data</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>::nsf::__profile_get                      # Get profiling data</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>::nsf::__profile_trace<span class="ot"> -enable</span> <span class="dv">1</span>|<span class="dv">0</span> <span class="ch">\ </span>     # Enable/disable tracing</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    ?-verbose <span class="dv">1</span>|<span class="dv">0</span>? <span class="ch">\ </span>                     # Enable verbose output</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    ?-dontsave <span class="dv">1</span>|<span class="dv">0</span>? <span class="ch">\ </span>                    # Don&#39;t save <span class="kw">trace</span> data</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    ?-builtins cmdList?                   # Built-in <span class="ot">commands</span> to <span class="kw">trace</span></span></code></pre></div>
+<h3 id="development-tools">Development Tools</h3>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>::nsf::cmd::<span class="kw">info</span>                    # Command information</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>::nsf::cmd::usage                   # Usage information</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>::nsf::cmd::<span class="ot">complete</span>               # Command completion</span></code></pre></div>
+<h2 id="parameter-slots">Parameter Slots</h2>
+<h3 id="object-parameter-slot-properties">Object Parameter Slot
+Properties</h3>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>                        # Slot <span class="ot">name</span> (defaults to <span class="kw">namespace</span> <span class="ot">tail</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>domain                     # Domain object/<span class="ot">class</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="ot">manager</span>                   # Manager object</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>per-object               # Per-object flag</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>methodname              # Method <span class="ot">name</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>forwardername          # Forwarder method <span class="ot">name</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>defaultmethods        # Default methods</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>accessor             # Access <span class="ot">level</span> (public|protected|private)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>incremental         # Incremental flag</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>configurable       # Configurable flag</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>noarg             # No argument flag</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>nodashalnum      # No dash-alphanumeric flag</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>disposition      # Disposition (alias|forward|cmd|initcmd|slotset)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>required        # Required flag</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="ot">default</span>        # Default value</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>initblock     # Initialization block</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>substdefault # Subst <span class="ot">default</span> pattern</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>position    # Position (<span class="dv">0</span>-based)</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>positional # Positional flag</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>elementtype # Element <span class="ot">type</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>multiplicity # Multiplicity constraint</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="kw">trace</span>      # Trace settings</span></code></pre></div>
+<h3 id="object-parameter-slot-methods">Object Parameter Slot
+Methods</h3>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> init <span class="ot">args</span>                           # Initialize slot</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> <span class="kw">destroy</span>                            # Destroy slot</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> createForwarder <span class="ot">name</span> domain       # Create forwarder method</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> onError cmd msg                  # Handle <span class="kw">error</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> makeForwarder                   # Build forwarder from domain</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> getParameterOptions ?options?  # Get parameter options</span></code></pre></div>
+<h3 id="method-parameter-slot-operations">Method Parameter Slot
+Operations</h3>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::classinvalidate <span class="ot">class</span>    # Invalidate <span class="ot">class</span> parameter cache</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::objectinvalidate obj    # Invalidate object parameter cache</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>::nsf::method::forward domain ?options? target ?<span class="ot">args</span>?  # Create method forwarder</span></code></pre></div>
+<h3 id="parameter-cache-operations">Parameter Cache Operations</h3>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::classinvalidate <span class="ot">class</span>   # Invalidate <span class="ot">class</span> cache</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::objectinvalidate obj   # Invalidate object cache</span></code></pre></div>
+<h2 id="relation-slots">Relation Slots</h2>
+<h3 id="relation-slot-properties">Relation Slot Properties</h3>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>accessor                    # Access <span class="ot">level</span> (public|protected|private)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>multiplicity              # Multiplicity constraint (<span class="ot">default</span>: <span class="dv">0</span>..n)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>settername              # Setter method <span class="ot">name</span></span></code></pre></div>
+<h3 id="relation-slot-methods">Relation Slot Methods</h3>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> init                                # Initialize slot</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> value=<span class="kw">set</span> obj prop value           # Set relation value</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> value=<span class="ot">get</span> obj prop                # Get relation value</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> value=<span class="ot">clear</span> obj prop             # Clear relation value</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> value=<span class="ot">add</span> obj prop value ?pos?  # Add value to relation</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> value=<span class="ot">delete</span> ?-nocomplain? obj prop value  # Delete value from relation</span></code></pre></div>
+<h3 id="relation-operations">Relation Operations</h3>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>::nsf::relation::<span class="kw">set</span> obj prop value    # Set relation</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>::nsf::relation::<span class="ot">get</span> obj prop         # Get relation</span></code></pre></div>
+<h3 id="relation-value-handling">Relation Value Handling</h3>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Value Types</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>simple_value              # Single value</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>list_value               # List of <span class="ot">values</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>qualified_value         # Fully qualified value (::<span class="kw">namespace</span>::value)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>glob_pattern           # Pattern with * or <span class="kw">[</span> <span class="kw">for</span> matching</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Value Operations</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="kw">lsearch</span><span class="ot"> -exact</span>        # Exact value matching</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="kw">lsearch</span><span class="ot"> -glob</span>       # Pattern matching with * and <span class="kw">[]</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="kw">linsert</span> pos value  # Insert at position</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="kw">lreplace</span> pos pos  # Remove at position</span></code></pre></div>
+<h2 id="variable-slots">Variable Slots</h2>
+<h3 id="variable-slot-properties">Variable Slot Properties</h3>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>arg                         # Argument specification</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>convert                    # Enable value conversion</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>incremental              # Incremental flag</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>multiplicity            # Multiplicity constraint (<span class="ot">default</span>: <span class="dv">1</span>..<span class="dv">1</span>)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>accessor               # Access <span class="ot">level</span> (public|protected|private)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="ot">type</span>                 # Value <span class="ot">type</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>settername          # Setter method <span class="ot">name</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="kw">trace</span>              # Trace settings (none|<span class="kw">set</span>)</span></code></pre></div>
+<h3 id="variable-slot-methods">Variable Slot Methods</h3>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> setCheckedInstVar ?-nocomplain? ?-allowpreset? obj value  # Set checked instance <span class="kw">variable</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> value=<span class="kw">set</span> obj value                                      # Set value</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> value=<span class="ot">get</span> obj                                          # Get value</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> initialize obj                                        # Initialize slot</span></code></pre></div>
+<h3 id="built-in-value-types">Built-in Value Types</h3>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic Types</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>boolean          # Boolean value</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>integer         # Integer value</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>double         # Double value</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="kw">string</span>        # String value</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Object Types</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>object        # Any object</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="ot">class</span>        # Class object</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>metaclass   # Metaclass object</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>baseclass  # Base <span class="ot">class</span> object</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>parameter # Parameter object</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="co"># String Types</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>alnum      # Alphanumeric</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>alpha     # Alphabetic</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>ascii    # ASCII</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>control # Control characters</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>digit   # Digits</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>graph  # Graphical characters</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a><span class="kw">lower</span> # Lowercase letters</span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>print # Printable characters</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>punct # Punctuation</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>space # Whitespace</span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>upper # Uppercase letters</span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>wordchar # Word characters</span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>xdigit   # Hexadecimal digits</span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Special Types</span></span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a><span class="kw">switch</span>   # Switch/boolean parameter</span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>cmd     # Command parameter</span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>initcmd # Initialization <span class="ot">command</span></span></code></pre></div>
+<h3 id="value-checking">Value Checking</h3>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -configure -complain -name</span> <span class="ot">name</span>: <span class="ot">type</span> value  # Check value against <span class="ot">type</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">exists</span> obj var                           # Check <span class="kw">if</span> <span class="kw">variable</span> <span class="ot">exists</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">set</span> obj var value                      # Set <span class="kw">variable</span> value</span></code></pre></div>
+<h2 id="variable-traces">Variable Traces</h2>
+<h3 id="trace-types">Trace Types</h3>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ot">default</span>          # Default value <span class="kw">trace</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="ot">get</span>             # Get value <span class="kw">trace</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="kw">set</span>            # Set value <span class="kw">trace</span></span></code></pre></div>
+<h3 id="trace-operations">Trace Operations</h3>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="kw">info</span> <span class="kw">variable</span> var                    # Get <span class="kw">variable</span> traces</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="ot">add</span> <span class="kw">variable</span> var ops cmdPrefix      # Add <span class="kw">variable</span> <span class="kw">trace</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="ot">remove</span> <span class="kw">variable</span> var ops cmdPrefix  # Remove <span class="kw">variable</span> <span class="kw">trace</span></span></code></pre></div>
+<h3 id="trace-commands">Trace Commands</h3>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> removeTraces obj matchOps                  # Remove matching traces</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> handleTraces                              # Set up traces</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> __default_from_cmd obj cmd var sub op    # Default value handler</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> __trace_default obj                     # Default <span class="kw">trace</span> handler</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> __trace_get obj                       # Get <span class="kw">trace</span> handler</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="dt">$slot</span> __trace_set obj                      # Set <span class="kw">trace</span> handler</span></code></pre></div>
+<h3 id="trace-options">Trace Options</h3>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Operation Types</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="kw">read</span>            # Read operation</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>write          # Write operation</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="kw">unset</span>         # Unset operation</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace Combinations</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="kw">read</span> write    # Read and write operations</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="kw">read</span> <span class="kw">unset</span>   # Read and <span class="kw">unset</span> operations</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>write <span class="kw">unset</span> # Write and <span class="kw">unset</span> operations</span></code></pre></div>
+<h3 id="trace-restrictions">Trace Restrictions</h3>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Invalid Combinations</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>-<span class="kw">trace</span> <span class="ot">default</span> +<span class="ot"> -trace</span> <span class="ot">get</span>     # Can&#39;t use together</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>-<span class="kw">trace</span> <span class="ot">default</span> + <span class="ot">default</span> value # Can&#39;t use together</span></code></pre></div>
+<h2 id="package-management">Package Management</h2>
+<h3 id="package-commands">Package Commands</h3>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">package</span> <span class="ot">require</span> nx                  # Load NX</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="kw">package</span> <span class="ot">require</span> nx::test           # Load test framework</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="kw">package</span> <span class="ot">require</span> nsf                # Load NSF core</span></code></pre></div>
+<h3 id="version-information">Version Information</h3>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>::nsf::version                     # Get NSF version</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>::nx::version                      # Get NX version</span></code></pre></div>
+<h2 id="parameter-patterns-and-type-checking">Parameter Patterns and
+Type Checking</h2>
+<h3 id="basic-type-checking">Basic Type Checking</h3>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Built-in type checks</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> integer <span class="dv">1</span>                   # Check <span class="kw">for</span> integer</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> boolean on                  # Check <span class="kw">for</span> boolean (on/off/<span class="dv">1</span>/<span class="dv">0</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> object obj                  # Check <span class="kw">if</span> object <span class="ot">exists</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> <span class="ot">class</span> Class                 # Check <span class="kw">if</span> <span class="ot">class</span> <span class="ot">exists</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Type checking with constraints</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> object,<span class="ot">type</span>=::C obj        # Check object <span class="ot">type</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -complain</span> object obj       # Check with <span class="kw">error</span> <span class="kw">message</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -name</span> <span class="ot">name</span>: <span class="ot">type</span> value     # Named <span class="ot">type</span> check</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Property type constraints</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span><span class="ot">name</span>:<span class="kw">string}</span>               # String property</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>flag:boolean<span class="kw">}</span>              # Boolean property</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>count:integer<span class="kw">}</span>             # Integer property</span></code></pre></div>
+<h3 id="parameter-validation">Parameter Validation</h3>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Method parameter validation</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>:public method <span class="ot">validate</span> <span class="kw">{</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    -object obj                       # Must be valid object</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">class</span> cls                        # Must be valid <span class="ot">class</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    -boolean flag                     # Must be boolean</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    <span class="ot">args</span>                             # Additional <span class="ot">args</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Method body</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Complex parameter patterns</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>:public method complex <span class="kw">{</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    -object,<span class="ot">type</span>=::MyClass obj       # Object of specific <span class="ot">type</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">class</span>,<span class="ot">type</span>=::BaseClass cls      # Class of specific <span class="ot">type</span></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>    -integer,min=<span class="dv">0</span>,max=<span class="dv">100</span> num       # Integer with <span class="ot">range</span></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom type validation</span></span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>::nx::methodParameterSlot object method <span class="ot">type</span>=mytype <span class="kw">{</span><span class="ot">name</span> value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="kw">{</span><span class="dt">$value</span> &lt; <span class="dv">1</span> || <span class="dt">$value</span> &gt; <span class="dv">3</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>        <span class="kw">error</span> <span class="st">&quot;value &#39;</span><span class="dt">$</span><span class="st">value&#39; of parameter </span><span class="dt">$</span><span class="st">name is not between 1 and 3&quot;</span></span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom type with arguments</span></span>
+<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>::nx::methodParameterSlot object method <span class="ot">type</span>=in <span class="kw">{</span><span class="ot">name</span> value arg<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="kw">{</span><span class="dt">$value</span> ni <span class="kw">[split</span> <span class="dt">$arg</span> |<span class="kw">]}</span> <span class="kw">{</span></span>
+<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>        <span class="kw">error</span> <span class="st">&quot;value &#39;</span><span class="dt">$</span><span class="st">value&#39; of parameter </span><span class="dt">$</span><span class="st">name not in permissible values </span><span class="dt">$</span><span class="st">arg&quot;</span></span>
+<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">return</span> <span class="dt">$value</span></span>
+<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="object-and-class-checks">Object and Class Checks</h3>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Object existence</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>::nsf::object::<span class="ot">exists</span> <span class="dt">$obj</span>           # Check <span class="kw">if</span> object <span class="ot">exists</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Class type checks</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> baseclass ::nx::Object     # Check <span class="kw">if</span> baseclass</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> <span class="ot">class</span> ::nx::Object         # Check <span class="kw">if</span> <span class="ot">class</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Mixin checks</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>obj <span class="kw">info</span> has mixin ::Mixin           # Check mixin</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>obj <span class="kw">info</span> has <span class="ot">type</span> Class              # Check <span class="ot">type</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Object type validation</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> object,<span class="ot">type</span>=::C obj        # Check object <span class="ot">type</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -complain</span> object,<span class="ot">type</span>=::C obj # Check with <span class="kw">error</span> <span class="kw">message</span></span></code></pre></div>
+<h3 id="property-type-definitions">Property Type Definitions</h3>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple property types</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span><span class="ot">name</span>:<span class="kw">string}</span>               # String property</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>age:integer<span class="kw">}</span>              # Integer property</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>active:boolean<span class="kw">}</span>           # Boolean property</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Property with constraints</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>count:integer,min=<span class="dv">0</span><span class="kw">}</span>      # Non-negative integer</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span><span class="ot">level</span>:integer,<span class="dv">0</span>..<span class="dv">10</span><span class="kw">}</span>      # Integer <span class="ot">range</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span><span class="ot">type</span>:enum=red,green,blue<span class="kw">}</span> # Enumeration</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Property with default</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>timeout:integer <span class="dv">30</span><span class="kw">}</span>       # Default value</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>prefix:<span class="kw">string</span> <span class="st">&quot;&quot;</span><span class="kw">}</span>         # Empty <span class="kw">string</span> <span class="ot">default</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Property with type checking</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>obj:object,<span class="ot">type</span>=::C<span class="kw">}</span>      # Object of specific <span class="ot">type</span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>:property <span class="kw">{</span>cls:<span class="ot">class</span>,<span class="ot">type</span>=::MC<span class="kw">}</span>      # Class of specific <span class="ot">type</span></span></code></pre></div>
+<h3 id="parameter-cache-operations-1">Parameter Cache Operations</h3>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cache invalidation</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::classinvalidate <span class="ot">class</span>    # Class cache</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::objectinvalidate obj     # Object cache</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter handling</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::<span class="ot">get</span> obj                 # Get cache</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::<span class="kw">set</span> obj value          # Set cache</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::<span class="ot">clear</span> obj             # Clear cache</span></code></pre></div>
+<h3 id="low-level-parameter-commands">Low-level Parameter Commands</h3>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter creation</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="ot">create</span> <span class="ot">name</span> spec            # Create parameter</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::property param prop value   # Set property</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter validation</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="ot">validate</span> param value       # Validate value</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::convert param value        # Convert value</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter introspection</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="kw">info</span> param property        # Get property</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="ot">exists</span> param               # Check existence</span></code></pre></div>
+<h3 id="parameter-manager-system">Parameter Manager System</h3>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom type manager</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>::paramManager <span class="kw">{</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    :object method <span class="ot">type</span>=customtype <span class="kw">{</span><span class="ot">name</span> value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Validation logic</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="dt">$result</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter registration</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::register <span class="ot">type</span> <span class="ot">manager</span>     # Register <span class="ot">type</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::unregister <span class="ot">type</span>          # Unregister <span class="ot">type</span></span></code></pre></div>
+<h3 id="parameter-value-handling">Parameter Value Handling</h3>
+<div class="sourceCode" id="cb47"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Value operations</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">set</span> slot property value        # Set value</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">get</span> slot property              # Get value</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">exists</span> slot property           # Check existence</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">unset</span> slot property            # Unset value</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Value checking</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -configure -complain -name</span> <span class="ot">name</span>: <span class="ot">type</span> value  # Full check</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">exists</span> obj var                           # Check existence</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">set</span> obj var value                       # Set with check</span></code></pre></div>
+<h3 id="parameter-trace-system">Parameter Trace System</h3>
+<div class="sourceCode" id="cb48"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace types</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="ot">default</span>                                    # Default value <span class="kw">trace</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="ot">get</span>                                       # Get value <span class="kw">trace</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="kw">set</span>                                      # Set value <span class="kw">trace</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace operations</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="ot">add</span> <span class="kw">variable</span> var ops cmdPrefix    # Add <span class="kw">trace</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="ot">remove</span> <span class="kw">variable</span> var ops cmdPrefix # Remove <span class="kw">trace</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="kw">info</span> <span class="kw">variable</span> var                # Get traces</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace handlers</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>__trace_default obj                      # Default handler</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>__trace_get obj                         # Get handler</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>__trace_set obj                        # Set handler</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Value changed handler</span></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>:public object method value=<span class="kw">set</span> <span class="kw">{</span>obj var value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle value change</span></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>    ::nsf::var::<span class="kw">set</span><span class="ot"> -notrace</span> <span class="dt">$obj</span> <span class="dt">$var</span> <span class="kw">[expr</span> <span class="kw">{</span><span class="dt">$value</span> + <span class="dv">1</span><span class="kw">}]</span></span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="parameter-specification-format-1">Parameter Specification
+Format</h3>
+<div class="sourceCode" id="cb49"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic format</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>                                       # Simple parameter</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:required                              # Required parameter</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="ot">type</span>=<span class="ot">type</span>                            # Typed parameter</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:arg=arg                              # Argument spec</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiplicity format</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="dv">0</span>..<span class="dv">1</span>                                 # Optional parameter</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="dv">1</span>..n                                 # Multiple required</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="dv">0</span>..n                                 # Multiple optional</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:convert                              # Enable conversion</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Special formats</span></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:noarg                                # No argument</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:nodashalnum                          # No dash-alphanumeric</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:method=method                        # Associated method</span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:substdefault                         # Enable <span class="kw">subst</span> <span class="ot">default</span></span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:alias                                # Alias parameter</span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:forward                              # Forward parameter</span></code></pre></div>
+<h2 id="parameter-handling-and-type-system">Parameter Handling and Type
+System</h2>
+<h3 id="parameter-type-checking">Parameter Type Checking</h3>
+<div class="sourceCode" id="cb50"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic type checking</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> integer value                    # Check integer <span class="ot">type</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> boolean value                    # Check boolean <span class="ot">type</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> object value                     # Check object existence</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> <span class="ot">class</span> value                      # Check <span class="ot">class</span> existence</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Type checking with options</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -configure</span> <span class="ot">type</span> value            # Configure <span class="ot">type</span> check</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -complain</span> <span class="ot">type</span> value             # Check with <span class="kw">error</span> <span class="kw">message</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -name</span> <span class="ot">name</span>: <span class="ot">type</span> value           # Named <span class="ot">type</span> check</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Object type checking</span></span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> object,<span class="ot">type</span>=::C obj              # Check object <span class="ot">type</span></span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> <span class="ot">class</span>,<span class="ot">type</span>=::C cls               # Check <span class="ot">class</span> <span class="ot">type</span></span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is</span> metaclass,<span class="ot">type</span>=::C mcls          # Check metaclass <span class="ot">type</span></span></code></pre></div>
+<h3 id="parameter-validation-system">Parameter Validation System</h3>
+<div class="sourceCode" id="cb51"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom type validation</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">type</span>::<span class="ot">create</span> typename <span class="kw">{</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">validate</span> <span class="kw">{</span>value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Validation logic</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="dt">$value</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>    -validatearg <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Argument validation</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>    -convert <span class="kw">{</span>value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Value conversion</span></span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>    -errormsg <span class="kw">{</span>value <span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Error message formatting</span></span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-18"><a href="#cb51-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter validation</span></span>
+<span id="cb51-19"><a href="#cb51-19" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="ot">validate</span> param value     # Validate parameter</span>
+<span id="cb51-20"><a href="#cb51-20" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::convert param value      # Convert parameter value</span>
+<span id="cb51-21"><a href="#cb51-21" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="ot">exists</span> param             # Check parameter existence</span></code></pre></div>
+<h3 id="parameter-cache-operations-2">Parameter Cache Operations</h3>
+<div class="sourceCode" id="cb52"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cache management</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::classinvalidate <span class="ot">class</span>    # Invalidate <span class="ot">class</span> cache</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::objectinvalidate obj     # Invalidate object cache</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::<span class="ot">get</span> obj                  # Get cache</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::<span class="kw">set</span> obj value           # Set cache</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::<span class="ot">clear</span> obj               # Clear cache</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Parameter handling</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="ot">create</span> <span class="ot">name</span> spec               # Create parameter</span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::property param prop value      # Set property</span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="kw">info</span> param property            # Get property</span></code></pre></div>
+<h3 id="parameter-value-handling-1">Parameter Value Handling</h3>
+<div class="sourceCode" id="cb53"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Value operations</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">set</span> obj var value                   # Set value</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">get</span> obj var                         # Get value</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">exists</span> obj var                      # Check existence</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">unset</span><span class="ot"> -nocomplain</span> obj var          # Unset value</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Value checking</span></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -configure -complain -name</span> <span class="ot">name</span>: <span class="ot">type</span> value  # Full check</span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="ot">exists</span> obj var                            # Check existence</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">set</span> obj var value                        # Set with check</span></code></pre></div>
+<h3 id="parameter-trace-system-1">Parameter Trace System</h3>
+<div class="sourceCode" id="cb54"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace types</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="ot">add</span> <span class="kw">variable</span> var ops cmdPrefix            # Add <span class="kw">trace</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="ot">remove</span> <span class="kw">variable</span> var ops cmdPrefix         # Remove <span class="kw">trace</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>::<span class="kw">trace</span> <span class="kw">info</span> <span class="kw">variable</span> var                         # Get traces</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace operations</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a><span class="kw">read</span>                                             # Read operation</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>write                                            # Write operation</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a><span class="kw">unset</span>                                            # Unset operation</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="ot">default</span>                                          # Default value <span class="kw">trace</span></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Value changed handler</span></span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>:public object method value=<span class="kw">set</span> <span class="kw">{</span>obj var value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle value change</span></span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>    ::nsf::var::<span class="kw">set</span><span class="ot"> -notrace</span> <span class="dt">$obj</span> <span class="dt">$var</span> <span class="dt">$value</span></span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb54-17"><a href="#cb54-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-18"><a href="#cb54-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace restrictions</span></span>
+<span id="cb54-19"><a href="#cb54-19" aria-hidden="true" tabindex="-1"></a>-<span class="kw">trace</span> <span class="ot">default</span> +<span class="ot"> -trace</span> <span class="ot">get</span>                      # Invalid combination</span>
+<span id="cb54-20"><a href="#cb54-20" aria-hidden="true" tabindex="-1"></a>-<span class="kw">trace</span> <span class="ot">default</span> + <span class="ot">default</span> value                   # Invalid combination</span></code></pre></div>
+<h3 id="parameter-namespace-binding">Parameter Namespace Binding</h3>
+<div class="sourceCode" id="cb55"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Namespace qualification</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::qualify <span class="ot">name</span>                   # Qualify parameter <span class="ot">name</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::unqualify <span class="ot">name</span>                 # Unqualify parameter <span class="ot">name</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Type binding</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="ot">type</span>=<span class="kw">[namespace</span> <span class="ot">current</span><span class="kw">]</span>::<span class="ot">type</span>                   # Current <span class="kw">namespace</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="ot">type</span>=<span class="kw">[namespace</span> qualifiers <span class="kw">[</span>self<span class="kw">]]</span>::<span class="ot">type</span>         # Object <span class="kw">namespace</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a><span class="ot">type</span>=::fully::qualified::<span class="ot">type</span>                    # Absolute <span class="kw">namespace</span></span></code></pre></div>
+<h3 id="parameter-error-handling">Parameter Error Handling</h3>
+<div class="sourceCode" id="cb56"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Error generation</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::<span class="kw">error</span> param msg                # Raise parameter <span class="kw">error</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::warning param msg              # Issue warning</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Error checking</span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a><span class="kw">catch</span> <span class="kw">{</span>::nsf::<span class="ot">is</span> <span class="ot">type</span> value<span class="kw">}</span> err                # Catch <span class="ot">type</span> <span class="kw">error</span></span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a><span class="kw">catch</span> <span class="kw">{</span>::nsf::parameter::<span class="ot">validate</span> param value<span class="kw">}</span> err  # Catch validation <span class="kw">error</span></span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Error messages</span></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;expected type but got value&quot;</span>                    # Type mismatch</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;invalid value constraints&quot;</span>                      # Invalid constraints</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;required parameter not given&quot;</span>                   # Missing required</span></code></pre></div>
+<h3 id="parameter-parsing">Parameter Parsing</h3>
+<div class="sourceCode" id="cb57"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse arguments</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>::nsf::parseargs spec <span class="ot">args</span>                       # Parse arguments</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>::nsf::parseargs<span class="ot"> -asdict</span> spec <span class="ot">args</span>              # Parse as dictionary</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Argument specifications</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="ot">type</span>                                        # Type specification</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="kw">{</span>-<span class="ot">name</span>:<span class="ot">type</span> <span class="ot">default</span><span class="kw">}</span>                             # Default value</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="ot">name</span>:<span class="ot">type</span>,constraint                             # With constraint</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a><span class="ot">args</span>:<span class="ot">type</span>,<span class="dv">0</span>..n                                   # Variable arguments</span></code></pre></div>
+<h3 id="parameter-manager-system-1">Parameter Manager System</h3>
+<div class="sourceCode" id="cb58"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type manager</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>::paramManager <span class="kw">{</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    :object method <span class="ot">type</span>=customtype <span class="kw">{</span><span class="ot">name</span> value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Validation logic</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="dt">$result</span></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Registration</span></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::register <span class="ot">type</span> <span class="ot">manager</span>          # Register <span class="ot">type</span></span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::unregister <span class="ot">type</span>               # Unregister <span class="ot">type</span></span></code></pre></div>
+<h3 id="parameter-slot-system">Parameter Slot System</h3>
+<div class="sourceCode" id="cb59"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Slot creation</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>::nx::slotObj<span class="ot"> -container</span> <span class="ot">type</span> object <span class="ot">name</span>        # Create slot</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>::nsf::var::<span class="kw">set</span> slot property value             # Set slot property</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Slot operations</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>::nsf::method::setter <span class="ot">class</span> slotName            # Register setter</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>::nsf::method::property <span class="ot">class</span> slot property value  # Set property</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Slot validation</span></span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>::nsf::slot::<span class="ot">validate</span> slot value                # Validate slot</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>::nsf::slot::convert slot value                 # Convert value</span></code></pre></div>
+<h3 id="best-practices">Best Practices</h3>
+<div class="sourceCode" id="cb60"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Type checking</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -complain</span> <span class="ot">type</span> value                  # Always use<span class="ot"> -complain</span></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -name</span> param: <span class="ot">type</span> value               # Name parameters</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">is -configure</span> <span class="ot">type</span> value                 # Configure checks</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Error handling</span></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a><span class="kw">catch</span> <span class="kw">{</span>::nsf::parameter::<span class="ot">validate</span> param value<span class="kw">}</span> err  # Always <span class="kw">catch</span></span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="kw">if</span> <span class="kw">{</span>!<span class="kw">[</span>::nsf::parameter::<span class="ot">exists</span> param<span class="kw">]}</span> <span class="kw">{</span> <span class="kw">error</span> <span class="kw">}</span>   # Check existence</span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Cache management</span></span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::<span class="ot">clear</span> obj              # Clear <span class="kw">after</span> changes</span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>::nsf::parameter::cache::invalidate obj         # Invalidate modified</span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Trace usage</span></span>
+<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>-<span class="kw">trace</span> <span class="kw">set</span>                                      # Use <span class="kw">for</span> changes</span>
+<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a>-<span class="kw">trace</span> <span class="ot">get</span>                                      # Use <span class="kw">for</span> access</span>
+<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a>-<span class="kw">trace</span> <span class="kw">{</span><span class="ot">get</span> <span class="kw">set}</span>                                # Use <span class="kw">for</span> both</span></code></pre></div>
+</body>
+</html>

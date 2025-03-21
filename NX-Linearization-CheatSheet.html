@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NX-Linearization-CheatSheet</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="temp_style.css" />
+</head>
+<body>
+<h1 id="nx-method-resolution-and-class-linearization-cheatsheet">NX
+Method Resolution and Class Linearization Cheatsheet</h1>
+<h2 id="overview">Overview</h2>
+<p>This cheatsheet explains class linearization in Next Scripting
+Framework (NX), which determines method resolution order (MRO) for
+multiple inheritance hierarchies.</p>
+<h2 id="key-concepts">Key Concepts</h2>
+<h3 id="linearization">Linearization</h3>
+<p>Linearization transforms a class inheritance graph into a linear
+sequence used for method resolution. This is crucial for multiple
+inheritance to determine which superclass method to invoke.</p>
+<h3 id="constraints-types">Constraints Types</h3>
+<ol type="1">
+<li><strong>Direct Constraints</strong>
+<ul>
+<li>Ensures subclass is before superclass in linearization</li>
+<li>Maintains order from superclass list declarations</li>
+</ul></li>
+<li><strong>Monotonicity Constraints</strong>
+<ul>
+<li>Makes linearization monotonic (heritage-consistent)</li>
+<li>Ensures each class’s heritage ordering is preserved in
+linearization</li>
+</ul></li>
+<li><strong>Local-Order Constraints</strong>
+<ul>
+<li>Ensures subclasses appear before their parent classes</li>
+<li>Prevents method resolution from violating inheritance
+relationships</li>
+</ul></li>
+</ol>
+<h2 id="important-nx-commands">Important NX Commands</h2>
+<ul>
+<li><code>info precedence</code> - Returns linearized class order</li>
+<li><code>info superclasses</code> - Returns immediate superclasses</li>
+<li><code>info heritage</code> - Returns linearized inheritance
+chain</li>
+<li><code>info subclasses -closure</code> - Returns all subclasses
+(direct and indirect)</li>
+</ul>
+<h2 id="test-cases">Test Cases</h2>
+<h3 id="boat-example-dhhm-94">Boat Example (DHHM 94)</h3>
+<p>Based on the paper by R. Ducournau, M. Habib, M. Huchard, and M.L.
+Mugnier.</p>
+<pre><code>Class hierarchy:
+                 boat
+                /    \
+           dayboat   wheelboat
+          /      \      /
+  engineless  smallmultihull
+        \        /
+   pedalwheelboat  smallcatamaran
+             \    /
+             pedalo</code></pre>
+<ul>
+<li><code>dayboat</code> defines <code>max-distance</code> returning
+“5m”</li>
+<li><code>wheelboat</code> defines <code>max-distance</code> returning
+“100m”</li>
+<li>For <code>pedalo</code> instances, <code>dayboat</code>’s method is
+called (returns “5m”)</li>
+</ul>
+<h3 id="linearization-test">Linearization Test</h3>
+<p>Verifies NX’s linearization algorithm maintains: - Direct constraints
+- Monotonicity - Local ordering</p>
+<h3 id="boat-crash-test">Boat-Crash Test</h3>
+<p>Tests proper behavior during object destruction with complex
+inheritance.</p>
+<h2 id="reference">Reference</h2>
+<ul>
+<li>Original paper: “Proposal for a Monotonic Multiple Inheritance
+Linearization” (DHHM 94)</li>
+<li>URL: https://www2.lirmm.fr/~ducour/Publis/DHHM-oopsla94.pdf</li>
+</ul>
+</body>
+</html>

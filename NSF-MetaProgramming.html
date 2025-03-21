@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NSF-MetaProgramming</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="temp_style.css" />
+</head>
+<body>
+<h1 id="next-scripting-framework-nsf-meta-programming-guide">Next
+Scripting Framework (NSF) Meta-Programming Guide</h1>
+<h2 id="introduction">Introduction</h2>
+<p>The Next Scripting Framework (NSF) is a powerful meta-system that
+allows you to create custom object-oriented programming languages and
+systems. This guide focuses on the meta-programming capabilities of NSF,
+providing detailed explanations, API coverage, and practical
+examples.</p>
+<h2 id="core-concepts">Core Concepts</h2>
+<h3 id="object-system-architecture">Object System Architecture</h3>
+<p>NSF provides a foundation for creating custom object systems with
+these key components:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> <span class="kw">eval</span> ::myobjsys <span class="kw">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">namespace</span> <span class="kw">eval</span> ::nsf <span class="kw">{}</span>            # NSF integration</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">namespace</span> <span class="kw">eval</span> ::nsf::object <span class="kw">{}</span>    # Object management</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">namespace</span> <span class="kw">eval</span> ::nsf::parameter <span class="kw">{}</span> # Parameter handling</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="basic-object-system-creation">Basic Object System Creation</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>::nsf::objectsystem::<span class="ot">create</span> ::myobjsys::Object ::myobjsys::Class <span class="kw">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">class</span>.alloc <span class="kw">{</span>__alloc ::nsf::methods::<span class="ot">class</span>::alloc <span class="dv">1</span><span class="kw">}</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">class</span>.<span class="ot">create</span> <span class="ot">create</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">class</span>.dealloc <span class="kw">{</span>__dealloc ::nsf::methods::<span class="ot">class</span>::dealloc <span class="dv">1</span><span class="kw">}</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    -object.<span class="ot">configure</span> __configure</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    -object.<span class="kw">destroy</span> <span class="kw">destroy</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="method-management-system">Method Management System</h2>
+<h3 id="method-registration-and-creation">Method Registration and
+Creation</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic method creation</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">create</span> ::myobjsys::Class registerMethod <span class="kw">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="ot">name</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span>protection public<span class="kw">}</span> </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span><span class="ot">type</span> scripted<span class="kw">}</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="ot">body</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Validate method name</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">if</span> <span class="kw">{</span>!<span class="kw">[regexp</span> <span class="kw">{</span>^<span class="kw">[</span>a-zA-Z_<span class="kw">][</span>a-zA-Z0<span class="dv">-9</span>_<span class="kw">]</span>*$<span class="kw">}</span> <span class="dt">$name</span><span class="kw">]}</span> <span class="kw">{</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">error</span> <span class="st">&quot;Invalid method name: </span><span class="dt">$</span><span class="st">name&quot;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Register method implementation</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    ::nsf::method::<span class="ot">create</span> <span class="kw">[</span>self<span class="kw">]</span> <span class="dt">$name</span> <span class="dt">$body</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Set method properties</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    ::nsf::method::property <span class="kw">[</span>self<span class="kw">]</span> <span class="dt">$name</span> protection <span class="dt">$protection</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    ::nsf::method::property <span class="kw">[</span>self<span class="kw">]</span> <span class="dt">$name</span> <span class="ot">type</span> <span class="dt">$type</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="method-properties-and-attributes">Method Properties and
+Attributes</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting method properties</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>::nsf::method::property <span class="dt">$class</span> <span class="dt">$method</span> protection public</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>::nsf::method::property <span class="dt">$class</span> <span class="dt">$method</span> <span class="ot">type</span> scripted</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>::nsf::method::property <span class="dt">$class</span> <span class="dt">$method</span> deprecated <span class="dv">1</span></span></code></pre></div>
+<h3 id="method-inheritance-system">Method Inheritance System</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">create</span> ::myobjsys::Class inheritMethods <span class="kw">{</span>superclass<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get all methods from superclass</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">set</span> methods <span class="kw">[</span><span class="dt">$superclass</span> <span class="kw">info</span> methods<span class="kw">]</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">foreach</span> method <span class="dt">$methods</span> <span class="kw">{</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Skip if method already exists</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="kw">{[</span>:<span class="kw">info</span> methods<span class="ot"> -exact</span> <span class="dt">$method</span><span class="kw">]</span> ne <span class="st">&quot;&quot;</span><span class="kw">}</span> <span class="kw">continue</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Get method implementation and properties</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">set</span> impl <span class="kw">[</span><span class="dt">$superclass</span> <span class="kw">info</span> method definition <span class="dt">$method</span><span class="kw">]</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">set</span> props <span class="kw">[</span><span class="dt">$superclass</span> <span class="kw">info</span> method properties <span class="dt">$method</span><span class="kw">]</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Create inherited method</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        ::nsf::method::<span class="ot">create</span> <span class="kw">[</span>self<span class="kw">]</span> <span class="dt">$method</span> <span class="dt">$impl</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Copy method properties</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">foreach</span> <span class="kw">{</span>prop value<span class="kw">}</span> <span class="dt">$props</span> <span class="kw">{</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>            ::nsf::method::property <span class="kw">[</span>self<span class="kw">]</span> <span class="dt">$method</span> <span class="dt">$prop</span> <span class="dt">$value</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="custom-method-types">Custom Method Types</h2>
+<h3 id="creating-new-method-types">Creating New Method Types</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>::nsf::methodtype::<span class="ot">create</span> async <span class="kw">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    -createCmd <span class="kw">{</span><span class="ot">name</span> argList <span class="ot">body</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">set</span> wrapper <span class="kw">[string</span> <span class="ot">map</span> <span class="kw">[list</span> %<span class="ot">body</span>% <span class="dt">$body</span> %<span class="ot">name</span>% <span class="dt">$name</span><span class="kw">]</span> <span class="kw">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>            coroutine %<span class="ot">name</span>%_cor apply <span class="kw">{{</span><span class="ot">name</span> <span class="ot">body</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                yield</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                <span class="kw">uplevel</span> <span class="dv">1</span> <span class="dt">$body</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            <span class="kw">}}</span> %<span class="ot">name</span>% %<span class="ot">body</span>%</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}]</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="dt">$wrapper</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage example</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>::myobjsys::Class <span class="ot">create</span> AsyncExample <span class="kw">{</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    :method<span class="ot"> -type</span> async longOperation <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        <span class="kw">after</span> <span class="dv">1000</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="st">&quot;Operation complete&quot;</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="custom-property-types">Custom Property Types</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">type</span>::<span class="ot">create</span> email <span class="kw">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">validate</span> <span class="kw">{</span>value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">if</span> <span class="kw">{</span>!<span class="kw">[regexp</span> <span class="kw">{</span>^<span class="kw">[</span>^@<span class="kw">]</span>+@<span class="kw">[</span>^@<span class="kw">]</span>+<span class="ch">\.</span><span class="kw">[</span>^@<span class="kw">]</span>+$<span class="kw">}</span> <span class="dt">$value</span><span class="kw">]}</span> <span class="kw">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>            <span class="kw">error</span> <span class="st">&quot;Invalid email format: </span><span class="dt">$</span><span class="st">value&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="dt">$value</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>::myobjsys::Class <span class="ot">create</span> Person <span class="kw">{</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    :property<span class="ot"> -type</span> email userEmail</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="meta-class-system">Meta-Class System</h2>
+<h3 id="creating-meta-classes">Creating Meta-Classes</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>::myobjsys::Class <span class="ot">create</span> MetaClass <span class="kw">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    :property <span class="kw">{</span>instances <span class="kw">{}}</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    :public method new <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">set</span> instance <span class="kw">[</span>next <span class="kw">{</span>*<span class="kw">}</span><span class="dt">$args</span><span class="kw">]</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">lappend</span> :instances <span class="dt">$instance</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="dt">$instance</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    :public method allInstances <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="dt">${:instances}</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>::myobjsys::Class <span class="ot">create</span> CustomClass<span class="ot"> -metaclass</span> MetaClass <span class="kw">{</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Class definition</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="aspect-oriented-programming">Aspect-Oriented Programming</h2>
+<h3 id="method-advice-system">Method Advice System</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>::myobjsys::Class <span class="ot">create</span> Aspect <span class="kw">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    :public method beforeAdvice <span class="kw">{</span><span class="ot">class</span> method <span class="ot">body</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="kw">set</span> original <span class="kw">[</span><span class="dt">$class</span> <span class="kw">info</span> method definition <span class="dt">$method</span><span class="kw">]</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">$class</span> <span class="kw">eval</span> <span class="kw">{</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            :public method <span class="dt">$method</span> <span class="ot">args</span> <span class="kw">{</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                <span class="kw">uplevel</span> <span class="dv">1</span> <span class="dt">$body</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                <span class="kw">uplevel</span> <span class="dv">1</span> <span class="dt">$original</span> <span class="kw">{</span>*<span class="kw">}</span><span class="dt">$args</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            <span class="kw">}</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    :public method afterAdvice <span class="kw">{</span><span class="ot">class</span> method <span class="ot">body</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        <span class="kw">set</span> original <span class="kw">[</span><span class="dt">$class</span> <span class="kw">info</span> method definition <span class="dt">$method</span><span class="kw">]</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">$class</span> <span class="kw">eval</span> <span class="kw">{</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>            :public method <span class="dt">$method</span> <span class="ot">args</span> <span class="kw">{</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                <span class="kw">set</span> result <span class="kw">[uplevel</span> <span class="dv">1</span> <span class="dt">$original</span> <span class="kw">{</span>*<span class="kw">}</span><span class="dt">$args</span><span class="kw">]</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                <span class="kw">uplevel</span> <span class="dv">1</span> <span class="dt">$body</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                <span class="kw">return</span> <span class="dt">$result</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>            <span class="kw">}</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h2 id="nsf-api-reference">NSF API Reference</h2>
+<h3 id="object-system-creation">Object System Creation</h3>
+<ol type="1">
+<li><code>::nsf::objectsystem::create</code>
+<ul>
+<li><p>Creates a new object system</p></li>
+<li><p>Parameters:</p>
+<ul>
+<li>Object class name</li>
+<li>Class class name</li>
+<li>Configuration options</li>
+</ul></li>
+<li><p>Example:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>::nsf::objectsystem::<span class="ot">create</span> ::myapp::Object ::myapp::Class <span class="kw">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">class</span>.alloc <span class="kw">{</span>__alloc ::nsf::methods::<span class="ot">class</span>::alloc <span class="dv">1</span><span class="kw">}</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    -<span class="ot">class</span>.<span class="ot">create</span> <span class="ot">create</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    -object.<span class="kw">destroy</span> <span class="kw">destroy</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div></li>
+</ul></li>
+</ol>
+<h3 id="method-management">Method Management</h3>
+<ol type="1">
+<li><code>::nsf::method::create</code>
+<ul>
+<li>Creates a new method</li>
+<li>Parameters:
+<ul>
+<li>Target (class or object)</li>
+<li>Method name</li>
+<li>Arguments</li>
+<li>Body</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">create</span> <span class="dt">$class</span> <span class="dt">$name</span> <span class="dt">$arglist</span> <span class="dt">$body</span></span></code></pre></div></li>
+</ul></li>
+<li><code>::nsf::method::property</code>
+<ul>
+<li>Sets/gets method properties</li>
+<li>Parameters:
+<ul>
+<li>Target</li>
+<li>Method name</li>
+<li>Property name</li>
+<li>Value (optional)</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::property <span class="dt">$class</span> <span class="dt">$method</span> protection public</span></code></pre></div></li>
+</ul></li>
+<li><code>::nsf::method::delete</code>
+<ul>
+<li>Deletes a method</li>
+<li>Parameters:
+<ul>
+<li>Target</li>
+<li>Method name</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>::nsf::method::<span class="ot">delete</span> <span class="dt">$class</span> <span class="dt">$method</span></span></code></pre></div></li>
+</ul></li>
+</ol>
+<h3 id="type-system">Type System</h3>
+<ol type="1">
+<li><code>::nsf::type::create</code>
+<ul>
+<li>Creates a new type</li>
+<li>Parameters:
+<ul>
+<li>Type name</li>
+<li>Options and handlers</li>
+</ul>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">type</span>::<span class="ot">create</span> typename <span class="kw">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  -<span class="ot">validate</span> <span class="kw">{</span>value<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Validation logic</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">}</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div></li>
+</ul></li>
+<li><code>::nsf::type::delete</code>
+<ul>
+<li>Deletes a type</li>
+<li>Parameters:
+<ul>
+<li>Type name</li>
+</ul>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>::nsf::<span class="ot">type</span>::<span class="ot">delete</span> typename</span></code></pre></div></li>
+</ul></li>
+</ol>
+<h3 id="method-types">Method Types</h3>
+<ol type="1">
+<li><code>::nsf::methodtype::create</code>
+<ul>
+<li>Creates a new method type</li>
+<li>Parameters:
+<ul>
+<li>Type name</li>
+<li>Creation handler</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>::nsf::methodtype::<span class="ot">create</span> typename <span class="kw">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  -createCmd <span class="kw">{</span><span class="ot">name</span> argList <span class="ot">body</span><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Method creation logic</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">}</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div></li>
+</ul></li>
+</ol>
+<h2 id="advanced-examples">Advanced Examples</h2>
+<h3 id="dynamic-class-generation">Dynamic Class Generation</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>::myobjsys::Class <span class="ot">create</span> ClassGenerator <span class="kw">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    :public method generateClass <span class="kw">{</span><span class="ot">name</span> properties methods<span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Create the class</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        ::myobjsys::Class <span class="ot">create</span> <span class="dt">$name</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Add properties</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="kw">foreach</span> prop <span class="dt">$properties</span> <span class="kw">{</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lassign</span> <span class="dt">$prop</span> <span class="ot">name</span> <span class="ot">type</span> <span class="ot">default</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>            <span class="dt">$name</span> <span class="kw">eval</span> <span class="kw">[list</span> :property <span class="st">&quot;</span><span class="ch">\{</span><span class="dt">$</span><span class="st">name:</span><span class="dt">$</span><span class="st">type </span><span class="dt">$</span><span class="st">default</span><span class="ch">\}</span><span class="st">&quot;</span><span class="kw">]</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Add methods</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>        <span class="kw">foreach</span> method <span class="dt">$methods</span> <span class="kw">{</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lassign</span> <span class="dt">$method</span> <span class="ot">name</span> <span class="ot">args</span> <span class="ot">body</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>            <span class="dt">$name</span> <span class="kw">eval</span> <span class="kw">[list</span> :public method <span class="dt">$name</span> <span class="dt">$args</span> <span class="dt">$body</span><span class="kw">]</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>ClassGenerator <span class="ot">create</span> generator</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>generator generateClass Person <span class="kw">{</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span><span class="ot">name</span> <span class="kw">string</span> <span class="st">&quot;&quot;</span><span class="kw">}</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span>age integer <span class="dv">0</span><span class="kw">}</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span> <span class="kw">{</span></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span>greet <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>        <span class="kw">return</span> <span class="st">&quot;Hello, I&#39;m [:get name]&quot;</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}}</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span>birthday <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>        <span class="kw">incr</span> :age</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}}</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="custom-object-system-example">Custom Object System Example</h3>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a persistent object system</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> <span class="kw">eval</span> ::persys <span class="kw">{</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    ::nsf::objectsystem::<span class="ot">create</span> ::persys::Object ::persys::Class <span class="kw">{</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        -<span class="ot">class</span>.<span class="ot">create</span> <span class="ot">create</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        -object.<span class="ot">configure</span> <span class="ot">configure</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        -object.<span class="kw">destroy</span> <span class="kw">destroy</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    ::persys::Class <span class="ot">create</span> PersistentObject <span class="kw">{</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>        :property filename</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        :public method save <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>            <span class="kw">set</span> data <span class="kw">[list]</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>            <span class="kw">foreach</span> var <span class="kw">[</span>:<span class="kw">info</span> <span class="ot">vars</span><span class="kw">]</span> <span class="kw">{</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                <span class="kw">if</span> <span class="kw">{[string</span> <span class="ot">match</span> :* <span class="dt">$var</span><span class="kw">]}</span> <span class="kw">{</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>                    <span class="kw">lappend</span> data <span class="dt">$var</span> <span class="kw">[set</span> <span class="dt">$var</span><span class="kw">]</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>                <span class="kw">}</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>            <span class="kw">}</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>            <span class="kw">set</span> f <span class="kw">[open</span> <span class="dt">${:filename}</span> w<span class="kw">]</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>            <span class="kw">puts</span> <span class="dt">$f</span> <span class="dt">$data</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            <span class="kw">close</span> <span class="dt">$f</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>        :public method <span class="kw">load</span> <span class="kw">{}</span> <span class="kw">{</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>            <span class="kw">if</span> <span class="kw">{[file</span> <span class="ot">exists</span> <span class="dt">${:filename}</span><span class="kw">]}</span> <span class="kw">{</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>                <span class="kw">set</span> f <span class="kw">[open</span> <span class="dt">${:filename}</span> r<span class="kw">]</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>                <span class="kw">array</span> <span class="kw">set</span> <span class="ot">vars</span> <span class="kw">[read</span> <span class="dt">$f</span><span class="kw">]</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>                <span class="kw">close</span> <span class="dt">$f</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>                <span class="kw">foreach</span> <span class="kw">{</span><span class="ot">name</span> value<span class="kw">}</span> <span class="kw">[array</span> <span class="ot">get</span> <span class="ot">vars</span><span class="kw">]</span> <span class="kw">{</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>                    <span class="kw">set</span> <span class="dt">$name</span> <span class="dt">$value</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>                <span class="kw">}</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>            <span class="kw">}</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>        <span class="kw">}</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+</body>
+</html>

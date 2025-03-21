@@ -119,8 +119,8 @@ When working with object targets:
 ```tcl
 # XOTcl uplevel/upvar with callstack resolution
 xotcl::Class C -instproc call {x} {
-  my uplevel [list set ix $x]
-  my upvar $x _
+  :uplevel [list set ix $x]
+  :upvar $x _
   incr _
 }
 ```

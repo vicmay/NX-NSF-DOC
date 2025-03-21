@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NSF-Commands-CheatSheet</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="temp_style.css" />
+</head>
+<body>
+<h1 id="nsf-next-scripting-framework-commands-cheatsheet">NSF (Next
+Scripting Framework) Commands Cheatsheet</h1>
+<p>This cheatsheet is derived from the <code>nsf-cmd.test</code> file,
+which contains 792 lines of test cases illustrating the usage and
+behavior of NSF commands in Tcl.</p>
+<h2 id="core-nsf-command-information-functions">Core NSF Command
+Information Functions</h2>
+<h3 id="nsfcmdinfo">nsf::cmd::info</h3>
+<p>This is a core command that provides information about methods,
+procs, and commands:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>nsf::cmd::<span class="kw">info</span> <span class="kw">[</span>subcommand<span class="kw">]</span> <span class="kw">[</span>-context object<span class="kw">]</span> methodName <span class="kw">[</span>pattern<span class="kw">]</span></span></code></pre></div>
+<p>Available subcommands:</p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 38%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Subcommand</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>args</code></td>
+<td>Returns argument names</td>
+<td><code>nsf::cmd::info args $handle</code></td>
+</tr>
+<tr class="even">
+<td><code>body</code></td>
+<td>Returns method body</td>
+<td><code>nsf::cmd::info body $handle</code></td>
+</tr>
+<tr class="odd">
+<td><code>definition</code></td>
+<td>Returns method definition</td>
+<td><code>nsf::cmd::info definition $handle</code></td>
+</tr>
+<tr class="even">
+<td><code>exists</code></td>
+<td>Checks if method exists</td>
+<td><code>nsf::cmd::info exists $handle</code></td>
+</tr>
+<tr class="odd">
+<td><code>registrationhandle</code></td>
+<td>Returns registration handle</td>
+<td><code>nsf::cmd::info registrationhandle $handle</code></td>
+</tr>
+<tr class="even">
+<td><code>definitionhandle</code></td>
+<td>Returns definition handle</td>
+<td><code>nsf::cmd::info definitionhandle $handle</code></td>
+</tr>
+<tr class="odd">
+<td><code>origin</code></td>
+<td>Returns origin (for aliases)</td>
+<td><code>nsf::cmd::info origin $handle</code></td>
+</tr>
+<tr class="even">
+<td><code>parameter</code></td>
+<td>Returns parameter definitions</td>
+<td><code>nsf::cmd::info parameter $handle</code></td>
+</tr>
+<tr class="odd">
+<td><code>syntax</code></td>
+<td>Returns syntax definitions</td>
+<td><code>nsf::cmd::info syntax $handle</code></td>
+</tr>
+<tr class="even">
+<td><code>type</code></td>
+<td>Returns type (scripted, cmd, alias, nsfproc)</td>
+<td><code>nsf::cmd::info type $handle</code></td>
+</tr>
+<tr class="odd">
+<td><code>precondition</code></td>
+<td>Returns preconditions</td>
+<td><code>nsf::cmd::info precondition $handle</code></td>
+</tr>
+<tr class="even">
+<td><code>postcondition</code></td>
+<td>Returns postconditions</td>
+<td><code>nsf::cmd::info postcondition $handle</code></td>
+</tr>
+<tr class="odd">
+<td><code>submethods</code></td>
+<td>Returns submethods</td>
+<td><code>nsf::cmd::info submethods $handle</code></td>
+</tr>
+<tr class="even">
+<td><code>returns</code></td>
+<td>Returns return type information</td>
+<td><code>nsf::cmd::info returns $handle</code></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>-context</code> flag provides object context for retrieving
+virtual arguments.</p>
+<h2 id="method-properties">Method Properties</h2>
+<h3 id="nsfmethodproperty">nsf::method::property</h3>
+<p>Manipulates method properties:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>nsf::method::property object <span class="kw">[</span>-per-object<span class="kw">]</span> method property value</span></code></pre></div>
+<p>Properties include: - <code>call-protected</code> - Control access
+protection - <code>debug</code> - Enable debug flag</p>
+<h3 id="nsfmethodforwardproperty">nsf::method::forward::property</h3>
+<p>Manipulates forwarded method properties:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>nsf::method::forward::property object <span class="kw">[</span>-per-object<span class="kw">]</span> method property value</span></code></pre></div>
+<p>Properties include: - <code>verbose</code> - Control verbosity</p>
+<h2 id="process-handling">Process Handling</h2>
+<h3 id="nsfproc">nsf::proc</h3>
+<p>Creates and configures Tcl procedures with NSF features:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>nsf::<span class="kw">proc</span> <span class="kw">[</span>options<span class="kw">]</span> <span class="ot">name</span> arglist <span class="ot">body</span></span></code></pre></div>
+<p>Options: - <code>-debug</code> - Enable debug tracing -
+<code>-deprecated</code> - Mark as deprecated</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>nsf::<span class="kw">proc</span> ::foo <span class="kw">{{</span>-<span class="ot">x</span> <span class="dv">1</span><span class="kw">}</span> <span class="ot">y</span>:optional<span class="kw">}</span> <span class="kw">{return</span> <span class="dt">$x</span>-<span class="dt">$y</span><span class="kw">}</span></span></code></pre></div>
+<h2 id="class-and-object-management">Class and Object Management</h2>
+<h3 id="nxclass-methods">nx::Class Methods</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>nx::Class <span class="ot">create</span> ClassName <span class="kw">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  :property <span class="ot">name</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  :public method methodName <span class="kw">{</span><span class="ot">args</span><span class="kw">}</span> <span class="kw">{</span><span class="ot">body</span><span class="kw">}</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  :<span class="ot">create</span> instanceName</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span></code></pre></div>
+<h3 id="nxobject-methods">nx::Object Methods</h3>
+<p>Methods for object manipulation that appear in tests: -
+<code>configure</code> - Configure object properties - <code>new</code>
+- Create a new object instance - <code>create</code> - Create a named
+object instance</p>
+<h2 id="parameter-types-and-annotations">Parameter Types and
+Annotations</h2>
+<p>NSF supports various parameter types and annotations:</p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 38%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Annotation</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>:integer</code></td>
+<td>Integer type constraint</td>
+<td><code>x:integer</code></td>
+</tr>
+<tr class="even">
+<td><code>:required</code></td>
+<td>Required parameter</td>
+<td><code>{-x:required}</code></td>
+</tr>
+<tr class="odd">
+<td><code>:optional</code></td>
+<td>Optional parameter</td>
+<td><code>y:optional</code></td>
+</tr>
+<tr class="even">
+<td><code>:virtualobjectargs</code></td>
+<td>Virtual object arguments</td>
+<td><code>args:virtualobjectargs</code></td>
+</tr>
+<tr class="odd">
+<td><code>:virtualclassargs</code></td>
+<td>Virtual class arguments</td>
+<td><code>args:virtualclassargs</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="namespace-management">Namespace Management</h2>
+<p>NSF interacts with Tcl namespaces:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> <span class="kw">eval</span> ::<span class="ot">name</span> <span class="kw">{}</span>     # Create <span class="kw">namespace</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">namespace</span> <span class="ot">delete</span> ::<span class="ot">name</span>      # Delete <span class="kw">namespace</span></span></code></pre></div>
+<h2 id="common-command-types">Common Command Types</h2>
+<p>The tests demonstrate various command types:</p>
+<ol type="1">
+<li><strong>Scripted methods</strong>: User-defined NX methods</li>
+<li><strong>nsfproc commands</strong>: NSF-enhanced procedures</li>
+<li><strong>alias commands</strong>: Methods that delegate to other
+commands</li>
+<li><strong>cmd commands</strong>: Native C-implemented commands</li>
+</ol>
+<h2 id="debugging-and-error-handling">Debugging and Error Handling</h2>
+<p>NSF provides debugging and error handling:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>nsf::<span class="kw">proc</span><span class="ot"> -debug</span> proc_name <span class="ot">args</span> <span class="ot">body</span>   # Enable debugging</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>nsf::log notice <span class="kw">message</span>                # Log messages</span></code></pre></div>
+<p>The <code>nsf::config</code> array contains configuration settings
+related to debugging: - <code>::nsf::config(development)</code> -
+<code>::nsf::config(memcount)</code> -
+<code>::nsf::config(memtrace)</code> -
+<code>::nsf::config(profile)</code> - <code>::nsf::config(dtrace)</code>
+- <code>::nsf::config(assertions)</code></p>
+<h2 id="command-lookup-and-method-handling">Command Lookup and Method
+Handling</h2>
+<p>To get a method handle for inspection:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">set</span> <span class="ot">handle</span> <span class="kw">[</span>object <span class="kw">info</span> lookup method methodName<span class="kw">]</span></span></code></pre></div>
+<p>Various inquiries can be performed on handles:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>nsf::cmd::<span class="kw">info</span> <span class="ot">args</span> <span class="dt">$handle</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>nsf::cmd::<span class="kw">info</span> <span class="ot">body</span> <span class="dt">$handle</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># etc.</span></span></code></pre></div>
+<h2 id="ensemble-commands">Ensemble Commands</h2>
+<p>NSF supports ensemble commands (multi-part commands):</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>:public method <span class="st">&quot;string match&quot;</span> <span class="kw">{</span>pattern <span class="kw">string}</span> <span class="kw">{</span><span class="ot">body</span><span class="kw">}</span></span></code></pre></div>
+<p>These can be accessed and inspected using appropriate quoting:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode tcl"><code class="sourceCode tcl"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">set</span> <span class="ot">handle</span> <span class="kw">[</span>object <span class="kw">info</span> lookup method <span class="st">&quot;string match&quot;</span><span class="kw">]</span></span></code></pre></div>
+</body>
+</html>

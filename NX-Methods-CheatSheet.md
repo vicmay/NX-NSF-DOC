@@ -406,13 +406,13 @@ C instproc instanceMethod {args} {
 
 # XOTcl unknown handler
 C proc unknown args {
-    my incr [self proc]
+    :incr [self proc]
     next
 }
 
 # XOTcl assertion
 Edge instproc bar {} {
-    my set xxx
+    :set xxx
 } {} {{1 == 0}}                             # Post-condition
 nsf::method::assertion obj check all        # Enable assertion checking
 ```
